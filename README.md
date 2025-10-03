@@ -4,12 +4,12 @@
 [![codecov](https://codecov.io/gh/ShahdLala66/WA_Kitty_Card/branch/main/graph/badge.svg?token=0EYG0FGD7H)](https://codecov.io/gh/ShahdLala66/WA_Kitty_Card)
 ![Custom badge](https://img.shields.io/badge/With_Zayne-420-purple)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/8067b3954490468f9db6ae49c9254232)](https://app.codacy.com/gh/ShahdLala66/SE_Kitty_Card/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![Build Status](https://app.travis-ci.com/ShahdLala66/SE_Kitty_Card.svg?token=HH1pij9kc7Ve4oqguSMe&branch=developer)](https://app.travis-ci.com/ShahdLala66/SE_Kitty_Card)
+[![Build Status](https://app.travis-ci.com/ShahdLala66/WA_Kitty_Card.svg?token=HH1pij9kc7Ve4oqguSMe&branch=main)](https://app.travis-ci.com/ShahdLala66/WA_Kitty_Card)
 ![Love](https://img.shields.io/badge/Made%20with-%E2%9D%A4-red)
 ### *ZAYNE*  
 
 
-# KITTYi CARDSSSS
+# KITTY CARDSSSS
 
 - ![0121](https://github.com/user-attachments/assets/5f9f56ff-1db6-4243-bf02-c1d24b07b3e9)
 
