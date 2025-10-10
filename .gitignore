@@ -1,2 +1,8 @@
-/.metals
-/.vscode
+.vscode/
+.metals/
+logs/
+target/
+.bsp/
+.idea/
+.project/
+.g8/
