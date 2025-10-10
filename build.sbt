@@ -2,6 +2,8 @@ import sbt.*
 import Keys.*
 import play.sbt.PlayImport.*
 
+lazy val se = ProjectRef(file("../SE_Kitty_Card"), "root")
+
 lazy val root = (project in file("."))
     .enablePlugins(PlayScala)
     .dependsOn(se)
@@ -19,5 +21,3 @@ lazy val root = (project in file("."))
             "javax.inject" % "javax.inject" % "1"
         )
     )
-
-lazy val se = ProjectRef(file("../SE_Kitty_Card"), "root")
