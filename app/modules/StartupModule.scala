@@ -25,9 +25,9 @@ class GameInitializer @Inject()(
   GameLauncher.controller.add(gameStateObserver)
   
   println("GameStateObserver registered with GameController")
+  println("Game controller ready - waiting for API calls to start game")
   
-  // Start the game
-  GameLauncher.startGame()
+ 
   
   lifecycle.addStopHook { () =>
     Future.successful(())

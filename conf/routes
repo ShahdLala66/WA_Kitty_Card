@@ -1,5 +1,10 @@
-GET   /updates      controllers.GameApiController.getUpdates
-POST  /clear        controllers.GameApiController.clearUpdates
+# Home page
+GET   /                     controllers.GameWebController.index()
+
+# API endpoints for getting/receiving updates
+GET   /updates              controllers.GameApiController.getUpdates
+POST  /clear                controllers.GameApiController.clearUpdates
+POST  /api/update           controllers.GameApiController.receiveUpdate()
 
 # Map static resources from the /public folder to the /assets URL path
-GET   /assets/*file controllers.Assets.versioned(path="/public", file: Asset)
+GET   /assets/*file         controllers.Assets.versioned(path="/public", file: Asset)

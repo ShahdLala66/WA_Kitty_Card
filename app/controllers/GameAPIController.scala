@@ -7,13 +7,24 @@ import services.GameStateService
 @Singleton
 class GameApiController @Inject()(cc: ControllerComponents, gameService: GameStateService) extends AbstractController(cc) {
 
-  def getUpdates = Action {
+  def getUpdates: Action[AnyContent] = Action {
     val updates = gameService.getAllUpdates
     Ok(updates.mkString("\n"))
   }
 
-  def clearUpdates = Action {
+  def clearUpdates: Action[AnyContent] = Action {
     gameService.clear()
     Ok("Cleared")
+  }
+  
+  // Receive updates from SE project via HTTP
+  def receiveUpdate(): Action[AnyContent] = Action { request =>
+    request.body.asText match {
+      case Some(update) =>
+        gameService.addUpdate(update)
+        Ok("Update received")
+      case None =>
+        BadRequest("No update provided")
+    }
   }
 }
