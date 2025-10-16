@@ -9,4 +9,11 @@ class UiController @Inject()(cc: ControllerComponents) extends AbstractControlle
     def index: Action[AnyContent] = Action {
         Ok(views.html.index(Main.controller.peekBufferedEvents().toString()))
     }
+
+    def playersState: Action[AnyContent] = Action {
+        Ok(views.html.playersState(Main.controller.getState))
+    }
+    def HelloKitty: Action[AnyContent] = Action {
+        Ok(views.html.HelloKitty("Hello, Kitty Card Game!"))
+    }
 }
