@@ -7,6 +7,6 @@ import main_.Main
 @Singleton
 class UiController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
     def index: Action[AnyContent] = Action {
-        Ok(views.html.index(Main.controller.getState))
+        Ok(views.html.index(Main.controller.peekBufferedEvents().toString()))
     }
 }
