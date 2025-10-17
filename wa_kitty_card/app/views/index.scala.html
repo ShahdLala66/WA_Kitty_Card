@@ -1,5 +1,11 @@
-@(title: String)
+@(bufferedEvents: String)
 
-@main(title) {
-    <h1>@title</h1>
+@main("Kitty Card Game") {
+    <h1>Buffered Events</h1>
+    <pre>@bufferedEvents</pre>
+
+    <a href="@routes.UiController.playersState()">Players State</a>
+    <a href="@routes.UiController.HelloKitty()">Hello Kitty</a>
 }
+
+
