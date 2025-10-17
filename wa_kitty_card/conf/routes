@@ -10,6 +10,8 @@ GET     /listEvents                           controllers.UiController.index()
 
 GET    /playersState                          controllers.UiController.playersState()
 
+GET    /gridColors                            controllers.UiController.gridColors()
+
 GET    /                                      controllers.UiController.HelloKitty()
 
 # Map static resources from the /public folder to the /assets URL path
