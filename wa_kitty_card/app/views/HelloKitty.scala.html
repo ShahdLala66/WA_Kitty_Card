@@ -1,11 +1,159 @@
-@(message: String)
+@(message: String) @main("Hello Kitty - Kitty Card") {
+<div style="text-align: center; max-width: 900px; margin: 0 auto;">
+  <h1>@message</h1>
 
-@main("Hello Kitty - Kitty Card") {
-    <h1>@message</h1>
+  <div>
+    <button>
+      <a href="@routes.UiController.index()">
+        <img
+          width="150"
+          src='@routes.Assets.versioned("images/zayne-icon.png")'
+          alt="Kitty"
+        />
+      </a>
+    </button>
+  </div>
 
-    <hr>
+  <hr />
+
+  <div>
+    <h2>General Stuff:</h2>
+    <p>When you start the game, you will be asked to choose a mode:</p>
+    <ul style="display: inline-block; text-align: left;">
+      <li>Single</li>
+      <li>Multiplayer</li>
+    </ul>
+    <p>
+      Single player mode has a special feature but the game can NOT be played as
+      single player, as it needs two people. Then you will be asked to load or save
+      a game. If its youre first time Playing it, obvious you need to start a new
+      game. now for the
+    </p>
+  </div>
+
+  <div>
+    <h2><em>Rules</em> ────୨ৎ────────୨ৎ────────୨ৎ────────୨ৎ────────୨ৎ───</h2>
+    <h3><em>Normal Mode:</em> ≽^•˕•^≼</h3>
+    
+    <div>
+      <h4><em>About Rounds:</em></h4>
+      <p>At the start of each game, both players decide the order to play.</p>
+      <ul style="display: inline-block; text-align: left;">
+        <li>
+          <span style="color: #9370db"> The player going first </span>
+          receives 3 cards.
+        </li>
+        <li>
+          <span style="color: #9370db">The player going second</span> receives also 3
+          cards.
+        </li>
+      </ul>
+      <p>
+        Players alternate turns, and each round, they can choose to either
+        <span style="color: #9370db">[Play]</span> a card or
+        <span style="color: #9370db">[Draw]</span> a card. When all 9 cups are filled
+        with kitties, the player with
+        <span style="color: #9370db">more points wins the game</span>.
+      </p>
+    </div>
 
     <div>
-        <a href="@routes.UiController.index()">Back to Index</a>
+      <h4><em>About Cards:</em></h4>
+      <p>
+        There are <span style="color: #9370db">4 colors of cards</span> and
+        <span style="color: #9370db">5 colors of cups</span>, including the
+        <span style="color: #9370db">white cup</span>.
+      </p>
+      <ul style="display: inline-block; text-align: left;">
+        <li>There are the ACE and Bomb cards.</li>
+        <li>The ace card freezes the enemy! More rounds for you!</li>
+        <li>
+          If you get the bomb card, consider yourself lucky since it's the best! Most
+          points and it destroys the enemy's card AND lets you play again. If you
+          don't win that round it's on you.
+        </li>
+      </ul>
     </div>
+
+    <div>
+      <h4><em>About Points:</em></h4>
+      <ul style="display: inline-block; text-align: left;">
+        <li>You can put your cards in any unoccupied cups.</li>
+        <li>Place kitties in the cups and score points based on the cup color.</li>
+        <li>
+          <strong>Matched Cup</strong> (kitty color matches cup color) gives
+          <span style="color: #9370db">double points</span>.
+        </li>
+        <li>
+          <strong>White Cup</strong> gives
+          <span style="color: #9370db">standard points</span>.
+        </li>
+        <li>
+          <strong>Unmatched Cup</strong> (kitty color doesn't match the cup color)
+          gives <span style="color: #9370db">no points</span>.
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <h4><em>About the card placement:</em></h4>
+      <ul style="display: inline-block; text-align: left;">
+        <li>
+          Careful where you place your card! If you place it in the wrong cell the cat
+          will destroy it! Your turn will be canceled.
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <h4><em>About the winner:</em></h4>
+      <ul style="display: inline-block; text-align: left;">
+        <li>The one with most Points will win.</li>
+        <li>
+          If you get the <span style="color: #9370db">ACE</span>, you are lucky! You
+          will be able to freeze your enemy! Although it might only give you one
+          point, but a win is a win!
+        </li>
+        <li>Other modes to be added in the future (ahem Semester 5)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div>
+    <h2>GAME!!!!! LOOK!!!</h2>
+    <p>After being asked what mode you wanna play, you get this:</p>
+    <img
+      width="300px"
+      src="https://github.com/user-attachments/assets/d9a47570-83dd-42af-a7e9-470f9e398ab5"
+    />
+    <p>Now for the Game itself!</p>
+    <img
+      width="300px"
+      src="https://github.com/user-attachments/assets/9f592665-8085-4664-b3d9-3281d1907bdd"
+    />
+    <p>Arent the little kitties cute???? Btw THEYRE ALL MOVING!</p>
+    <img
+      width="300px"
+      src="https://github.com/user-attachments/assets/4789d1dd-f420-4a28-9237-1f270d346c70"
+    />
+    <img
+      width="300px"
+      src="https://github.com/user-attachments/assets/f4761088-5c92-4b2a-ad1b-d7495532a261"
+    />
+    <p>And Game Over:</p>
+    <img
+      width="300px"
+      src="https://github.com/user-attachments/assets/90c78aaa-d0af-455b-a8ae-c2bf2257085d"
+    />
+    <img
+      width="300px"
+      src="https://github.com/user-attachments/assets/0dabce1d-05ac-43b2-9b42-0b0db84bbe00"
+    />
+    <img
+      width="300px"
+      src="https://github.com/user-attachments/assets/efecb4e8-2e53-4586-8bd7-b79ecacc3ab6"
+    />
+  </div>
+</div>
+
 }
