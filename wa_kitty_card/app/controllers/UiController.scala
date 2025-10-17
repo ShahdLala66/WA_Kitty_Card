@@ -48,8 +48,15 @@ def index: Action[AnyContent] = Action {
   def combinedView: Action[AnyContent] = Action {
     val state = Main.controller.getState
     val gridData = getGridWithHtmlColors
-    Ok(views.html.combinedView(state, gridData))
+    val currentPlayer = Main.controller.getCurrentplayer
+    val currentPlayerHand = currentPlayer.getHand.map(_.toString).mkString(", ")
+    Ok(views.html.combinedView(state, gridData, currentPlayerHand))
   }
+
+  def getCurrentplayerHand : Action[AnyContent] = Action {
+    val currentPlayer = Main.controller.getCurrentplayer
+    val handCards = currentPlayer.getHand.map(_.toString).mkString(", ")
+    Ok(s"Hand: [$handCards]")
+  }
+
 }
-  
-    

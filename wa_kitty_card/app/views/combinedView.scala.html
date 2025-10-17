@@ -1,4 +1,4 @@
-@(state: String, gridData: Seq[(Int, Int, String, String, String)])
+@(state: String, gridData: Seq[(Int, Int, String, String, String)], currentPlayerHand: String)
 
 @main("Combined View - Kitty Card") {
     <h1>Kitty Card Game - Complete View</h1>
@@ -16,8 +16,21 @@
     </div>
     
     <hr />
-    
+
+        <h2>Current Player Hand</h2>
+        <table border="1.69" width="169px" height="269px">
+            <tr width="169px" height="269px"> @girl ich rafs nicht wie die table funktioniert XD
+                @for(card <- currentPlayerHand.split(", ")) {
+                    <td>
+                        @card
+                    </td>
+                }
+            </tr>
+        </table>
+
     <div style="text-align: center; margin-top: 20px;">
         <a href="@routes.UiController.index()">Back to Home page</a>
     </div>
+
+
 }
