@@ -1,0 +1,35 @@
+@(gridData: Seq[(Int, Int, String, String, String)])
+
+<div class="grid-colors-section">
+    <h2>Kitty Card Grid ≽^•⩊•^≼</h2>
+    
+    <table class="grid-table" border="6.69px" width="369" height="369">
+        <tbody>
+            @for(row <- 0 to 2) {
+                <tr>
+                    @for(col <- 0 to 2) {
+                        @defining(gridData.find(t => t._1 == col && t._2 == row)) { cellData =>
+                            @cellData match {
+                                case Some((x, y, cardInfo, htmlColor, suitName)) => {
+                                    <td>
+                                         <font color="@htmlColor"> 
+                                        <div style="font-weight: bold;">(@x, @y)</div>
+                                        <div style="margin: 5px 0;">@cardInfo</div>
+                                        <div style="font-style: italic;">@suitName</div>
+                                        </font> 
+                                    </td>
+                                }
+                                case None => {
+                                    <td >
+                                        <div>(@col, @row)</div>
+                                        <div>Empty</div>
+                                    </td>
+                                }
+                            }
+                        }
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,23 @@
+@(state: String, gridData: Seq[(Int, Int, String, String, String)])
+
+@main("Combined View - Kitty Card") {
+    <h1>Kitty Card Game - Complete View</h1>
+    
+    <div class="combined-container" style="display: flex; flex-direction: column; gap: 30px; padding: 20px;">
+        
+        @* Include the player state section *@
+        @partials.playerStateSection(state)
+        
+        <hr style="border: 2px solid #ccc; width: 100%;">
+        
+        @* Include the grid colors section *@
+        @partials.gridColorsSection(gridData)
+        
+    </div>
+    
+    <hr />
+    
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="@routes.UiController.index()">Back to Home page</a>
+    </div>
+}

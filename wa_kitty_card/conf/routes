@@ -1,14 +1,11 @@
-GET     /listEvents                     controllers.UiController.index()
 
-GET     /playersState                   controllers.UiController.playersState()
-
-
-# An example controller showing a sample home page
 GET     /listEvents                           controllers.UiController.index()
 
 GET    /playersState                          controllers.UiController.playersState()
 
 GET    /gridColors                            controllers.UiController.gridColors()
+
+GET    /combinedView                          controllers.UiController.combinedView()
 
 GET    /                                      controllers.UiController.HelloKitty()
 
