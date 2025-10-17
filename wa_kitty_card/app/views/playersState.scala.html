@@ -1,15 +1,13 @@
-@(state: String)
+@(state: String) @main("Players State - Kitty Card") {
+<h1>Players State</h1>
 
-@main("Players State - Kitty Card") {
-    <h1>Players State</h1>
-    
-    <div>
-        <pre>@state</pre>
-    </div>
+<div>
+  <pre>@state</pre>
+</div>
 
-    <hr>
+<hr />
 
-    <div>
-        <a href="@routes.UiController.index()">Back to Index</a>
-    </div>
+<div>
+  <a href="@routes.UiController.index()">Back to Index</a>
+</div>
 }
