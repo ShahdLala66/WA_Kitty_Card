@@ -17,18 +17,19 @@
     
     <hr />
 
-        <h2>Current Player Hand</h2>
-        <table border="1.69" width="169px" height="269px">
-            <tr width="169px" height="269px"> @girl ich rafs nicht wie die table funktioniert XD
+    <div>
+        <table border="1.69" width="169" height="269" >
+            <tr width="150" height="200">
                 @for(card <- currentPlayerHand.split(", ")) {
-                    <td>
+                    <td width="150" height="200">
                         @card
                     </td>
                 }
             </tr>
         </table>
+    </div>
 
-    <div style="text-align: center; margin-top: 20px;">
+    <div>
         <a href="@routes.UiController.index()">Back to Home page</a>
     </div>
 
