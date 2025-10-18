@@ -44,12 +44,19 @@ def listEvents: Action[AnyContent] = Action {
     Ok(views.html.playersState(Main.controller.getStateElements))
   }
 
+  private def parseHand(handStr: String): Seq[String] = {
+    val hand = Option(handStr).getOrElse("")
+    if (hand.trim.isEmpty) Seq.empty[String]
+    else hand.split(",").map(_.trim).filter(_.nonEmpty).toSeq
+  }
+
   def combinedView: Action[AnyContent] = Action {
     val state = Main.controller.getStateElements
     val gridData = getGridWithHtmlColors
     val currentPlayer = Main.controller.getCurrentplayer
     val currentPlayerHand = currentPlayer.getHand.map(_.toString).mkString(", ")
-    Ok(views.html.combinedView(state, gridData, currentPlayerHand))
+    val currentPlayerHandSeq = parseHand(currentPlayerHand)
+    Ok(views.html.combinedView(state, gridData, currentPlayerHandSeq))
   }
 
   def getCurrentplayerHand : Action[AnyContent] = Action {
@@ -58,4 +65,7 @@ def listEvents: Action[AnyContent] = Action {
     Ok(s"Hand: [$handCards]")
   }
 
+  def enterNames: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.enterNames())
+  }
 }
