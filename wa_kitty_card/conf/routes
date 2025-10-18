@@ -1,13 +1,10 @@
+# user mode
+GET     /                               controllers.UiController.helloKitty()
+GET     /combinedView                   controllers.UiController.combinedView()
+GET     /enterNames                     controllers.UiController.enterNames()
 
-GET     /listEvents                           controllers.UiController.index()
-
-GET    /playersState                          controllers.UiController.playersState()
-
-GET    /gridColors                            controllers.UiController.gridColors()
-
-GET    /combinedView                          controllers.UiController.combinedView()
-
-GET    /                                      controllers.UiController.HelloKitty()
-
-# Map static resources from the /public folder to the /assets URL path
+# kernel mode
 GET     /assets/*file                   controllers.Assets.versioned(path="/public", file: Asset)
+GET     /listEvents                     controllers.UiController.listEvents()
+GET     /playersState                   controllers.UiController.playersState()
+GET     /gridColors                     controllers.UiController.gridColors()

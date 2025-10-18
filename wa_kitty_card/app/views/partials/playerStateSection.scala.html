@@ -1,8 +1,16 @@
-@(state: String)
+@(state: Seq[String])
 
 <div class="player-state-section">
-    <h2>Players State</h2>
+  <div>
     <div>
-        <pre>@state</pre>
+      <pre>
+        <font size="4"><b>Player 1: @state(1)         Player 2: @state(2)</b></font> 
+      </pre>
     </div>
+    <div>
+      <p>
+        <font size="5" color="purple"><b>Current player:</b> @state(0)</font>
+      </p>
+    </div>
+  </div>
 </div>

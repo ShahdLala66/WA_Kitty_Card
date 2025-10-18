@@ -1,37 +1,14 @@
-@(state: String, gridData: Seq[(Int, Int, String, String, String)], currentPlayerHand: String)
+@(state: Seq[String], gridData: Seq[(Int, Int, String, String, String)],
+currentPlayerHand: Seq[String]) @main("Combined View") {
 
-@main("Combined View - Kitty Card") {
-    <h1>Kitty Card Game - Complete View</h1>
-    
-    <div class="combined-container" style="display: flex; flex-direction: column; gap: 30px; padding: 20px;">
-        
-        @* Include the player state section *@
-        @partials.playerStateSection(state)
-        
-        <hr style="border: 2px solid #ccc; width: 100%;">
-        
-        @* Include the grid colors section *@
-        @partials.gridColorsSection(gridData)
-        
-    </div>
-    
-    <hr />
-
-    <div>
-        <table border="1.69" width="169" height="269" >
-            <tr width="150" height="200">
-                @for(card <- currentPlayerHand.split(", ")) {
-                    <td width="150" height="200">
-                        @card
-                    </td>
-                }
-            </tr>
-        </table>
-    </div>
-
-    <div>
-        <a href="@routes.UiController.index()">Back to Home page</a>
-    </div>
-
+<div class="combined-container" align="center">
+  @partials.playerStateSection(state)
+  <hr />
+  @partials.gridColorsSection(gridData)
+  <br>
+  @partials.playerHandSection(currentPlayerHand)
+  <br>
+  <a href="@routes.UiController.helloKitty()">Back to Home page</a>
+</div>
 
 }

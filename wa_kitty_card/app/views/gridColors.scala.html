@@ -1,9 +1,12 @@
-@(gridData: Seq[(Int, Int, String, String, String)])
+@(gridData: Seq[(Int, Int, String, String, String)]) @main("Grid Colors") {
 
-@main("Grid Colors") {
-    <h1>Kitty Card Grid ≽^•⩊•^≼</h1>
-    
-    @partials.gridColorsSection(gridData)
-    
-    
+<div align="center">
+  <h1>Kitty Card Grid ≽^•⩊•^≼</h1>
+
+  @partials.gridColorsSection(gridData)
+  <br />
+  <a href="@routes.UiController.playersState()">Players State</a>
+  <a href="@routes.UiController.listEvents()">List Events</a>
+  <a href="@routes.UiController.helloKitty()">Hello Kitty</a>
+</div>
 }
