@@ -1,5 +1,5 @@
 @(state: Seq[String], gridData: Seq[(Int, Int, String, String, String)],
-currentPlayerHand: String) @main("Combined View - Kitty Card") {
+currentPlayerHand: Seq[String]) @main("Combined View") {
 
 <div class="combined-container" align="center">
   @partials.playerStateSection(state)
