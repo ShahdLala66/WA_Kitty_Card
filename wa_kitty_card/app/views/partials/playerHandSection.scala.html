@@ -1,0 +1,20 @@
+@(currentPlayerHand: String)
+
+@defining({
+  val hand = Option(currentPlayerHand).getOrElse("")
+  if (hand.trim.isEmpty) Seq.empty[String] else hand.split(",").map(_.trim).filter(_.nonEmpty).toSeq
+}) { cards =>
+
+  <div class="player-hand-section">
+    <table border="1.69" bgcolor="#FFFFFF">
+      <tr>
+        @for(card <- cards) {
+        <td width="85" height="119" align="center">
+            @card
+        </td>
+        }
+      </tr>
+    </table>
+  </div>
+
+}
