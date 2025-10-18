@@ -1,23 +1,22 @@
-@()(implicit request: play.api.mvc.RequestHeader)
+
+@()
 
 @main("Enter names") {
-	<div class="enter-names" style="margin:2rem;">
-		<h1>Spieler eintragen</h1>
-		@helper.form(action = routes.UiController.submitNames()) {
-			@helper.CSRF.formField
+	<div class="enter-names" align="center">
+		<h1>Enter Player Names</h1>
+		<form method="get">
 			<div>
-				<label for="name1">Name Spieler 1</label><br />
-				<input type="text" id="name1" name="name1" placeholder="z.B. Anna" required />
+				<label for="name1">Name Player 1</label><br />
+				<input type="text" id="name1" required />
 			</div>
-			<div style="margin-top:1rem;">
-				<label for="name2">Name Spieler 2</label><br />
-				<input type="text" id="name2" name="name2" placeholder="z.B. Ben" required />
+			<div">
+				<label for="name2">Name Player 2</label><br />
+				<input type="text" id="name2" required />
 			</div>
-			<div style="margin-top:1rem;">
-				<button type="submit">Weiter</button>
+            <br>
+			<div align ="center">
+				<button type="submit">Continue</button>
 			</div>
-		}
-	</div>
-}
+		</form>
 	</div>
 }
