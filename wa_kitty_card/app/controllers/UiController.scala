@@ -7,19 +7,14 @@ import main_.Main
 @Singleton
 class UiController @Inject() (cc: ControllerComponents) extends AbstractController(cc) {
 
-def index: Action[AnyContent] = Action {
-    Ok(views.html.index(Main.controller.peekBufferedEvents().toString()))
-  }
-
-  def playersState: Action[AnyContent] = Action {
-    Ok(views.html.playersState(Main.controller.getState))
+def listEvents: Action[AnyContent] = Action {
+    Ok(views.html.listEvents(Main.controller.peekBufferedEvents().toString()))
   }
   
-  def HelloKitty: Action[AnyContent] = Action {
-    Ok(views.html.HelloKitty("Hello, Kitty Card Game!"))
+  def helloKitty: Action[AnyContent] = Action {
+    Ok(views.html.helloKitty("Welcome to the Kitty Card Game! :3"))
   }
 
-  // Helper method 
   private def getGridWithHtmlColors: Seq[(Int, Int, String, String, String)] = {
     val gridData = Main.controller.getGridColors
     
@@ -45,8 +40,12 @@ def index: Action[AnyContent] = Action {
     Ok(views.html.gridColors(getGridWithHtmlColors))
   }
 
+  def playersState: Action[AnyContent] = Action {
+    Ok(views.html.playersState(Main.controller.getStateElements))
+  }
+
   def combinedView: Action[AnyContent] = Action {
-    val state = Main.controller.getState
+    val state = Main.controller.getStateElements
     val gridData = getGridWithHtmlColors
     val currentPlayer = Main.controller.getCurrentplayer
     val currentPlayerHand = currentPlayer.getHand.map(_.toString).mkString(", ")
