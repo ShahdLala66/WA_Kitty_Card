@@ -12,11 +12,11 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
 
   def listEvents: Action[AnyContent] = Action {
     val events = Main.controller.peekBufferedEvents().toString()
-    Ok(views.html.listEvents(events))
+    Ok(views.html.debug.listEvents(events))
   }
 
   def helloKitty: Action[AnyContent] = Action {
-    Ok(views.html.helloKitty("Welcome to the Kitty Card Game! :3"))
+    Ok(views.html.ui.helloKitty("Welcome to the Kitty Card Game! :3"))
   }
 
   def combinedView: Action[AnyContent] = Action {
@@ -25,7 +25,7 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
     val playerOpt = safe(Main.controller.getCurrentplayer)
 
     if (stateOpt.isEmpty || gridData.isEmpty || playerOpt.isEmpty) {
-      Ok(views.html.loadingScreen("I feel like im supposed to be loading something. . ."))
+      Ok(views.html.debug.loadingScreen("I feel like im supposed to be loading something. . ."))
     } else {
       val state         = stateOpt.get
       val currentPlayer = playerOpt.get
@@ -35,16 +35,16 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
         .getOrElse("")
       val handSeq = parseHand(hand)
 
-      Ok(views.html.combinedView(state, gridData, handSeq))
+      Ok(views.html.ui.combinedView(state, gridData, handSeq))
     }
   }
 
   def enterNames: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.enterNames())
+    Ok(views.html.ui.enterNames())
   }
 
   def loadingScreen: Action[AnyContent] = Action {
-    Ok(views.html.loadingScreen("Loading… or maybe just debugging the loading."))
+    Ok(views.html.debug.loadingScreen("Loading… or maybe just debugging the loading."))
   }
 
   // GRID
@@ -77,9 +77,9 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
   def gridColors: Action[AnyContent] = Action {
     val grid = getGridState
     if (grid.isEmpty)
-      Ok(views.html.loadingScreen("I swear it's almost done."))
+      Ok(views.html.debug.loadingScreen("I swear it's almost done."))
     else
-      Ok(views.html.gridColors(grid))
+      Ok(views.html.debug.gridColors(grid))
   }
 
   // PLAYER
@@ -87,8 +87,8 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
   def playersState: Action[AnyContent] = Action {
     safe(Main.controller.getStateElements)
       .filter(_.size >= 2)
-      .map(state => Ok(views.html.playersState(state)))
-      .getOrElse(Ok(views.html.loadingScreen("Computing the secret to life, the universe, and everything.")))
+      .map(state => Ok(views.html.debug.playersState(state)))
+      .getOrElse(Ok(views.html.debug.loadingScreen("Computing the secret to life, the universe, and everything.")))
   }
 
   private def parseHand(handStr: String): Seq[String] = {
@@ -108,7 +108,7 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
       case Some(hand) if hand.nonEmpty =>
         Ok(s"Hand: [${hand.map(_.toString).mkString(", ")}]")
       case _ =>
-        Ok(views.html.loadingScreen("I think I am, therefore, I am. I think."))
+        Ok(views.html.debug.loadingScreen("I think I am, therefore, I am. I think."))
     }
   }
 

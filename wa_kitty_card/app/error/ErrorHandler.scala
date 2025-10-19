@@ -2,15 +2,19 @@ package error
 
 import scala.concurrent._
 import play.api.http.HttpErrorHandler
+import play.api.http.DefaultHttpErrorHandler
 import play.api.mvc._
 import play.api.mvc.Results._
 import play.api.routing.Router
 import javax.inject._
 
 @Singleton
-class ErrorHandler @Inject() (router: Provider[Router]) extends HttpErrorHandler {
+class ErrorHandler @Inject() (
+    router: Provider[Router],
+    defaultHandler: DefaultHttpErrorHandler
+) extends HttpErrorHandler {
 
-  def onClientError(
+  override def onClientError(
       request: RequestHeader,
       statusCode: Int,
       message: String
@@ -18,21 +22,18 @@ class ErrorHandler @Inject() (router: Provider[Router]) extends HttpErrorHandler
     statusCode match {
       case 404 =>
         val docs = router.get.documentation
-        val html = views.html.error404("Page Not Found", docs)(request)
+        val html = views.html.errors.error404("Page Not Found", docs)(request)
         Future.successful(NotFound(html))
       case _ =>
-        Future.successful(
-          Status(statusCode)(
-            s"A client error occurred ($statusCode) on ${request.uri}"
-          )
-        )
+        // delegate other client errors to Play's default handler
+        defaultHandler.onClientError(request, statusCode, message)
     }
   }
 
-  def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
-    Future.successful(
-      InternalServerError("A server error occurred: " + exception.getMessage)
-    )
+  override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
+    // delegate server errors to Play's default handler
+    defaultHandler.onServerError(request, exception)
   }
 
 }
+
