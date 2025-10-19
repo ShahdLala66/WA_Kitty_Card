@@ -1,0 +1,248 @@
+@()
+
+@main("Kitty Card Game - Terminal") {
+    <style>
+        body {
+            background-color: #4d4d4d;
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .terminal-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .terminal-header {
+            color: #ce9178;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-bottom: 2px solid #ce9178;
+        }
+        
+        .terminal-output {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #252526;
+            padding: 15px;
+            border: 1px solid #3e3e42;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .terminal-output::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .terminal-output::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        
+        .terminal-output::-webkit-scrollbar-thumb {
+            background: #424242;
+            border-radius: 4px;
+        }
+        
+        .terminal-output::-webkit-scrollbar-thumb:hover {
+            background: #4e4e4e;
+        }
+        
+        .terminal-input-container {
+            display: flex;
+            align-items: center;
+            background-color: #252526;
+            padding: 10px;
+            border: 1px solid #3e3e42;
+            border-radius: 4px;
+        }
+        
+        .terminal-prompt {
+            color: #4ec9b0;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+        
+        .terminal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .terminal-input::placeholder {
+            color: #6a6a6a;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .status-connected {
+            background-color: #4ec9b0;
+            box-shadow: 0 0 8px #4ec9b0;
+        }
+        
+        .status-disconnected {
+            background-color: #f48771;
+            box-shadow: 0 0 8px #f48771;
+        }
+        
+        .status-connecting {
+            background-color: #dcdcaa;
+            box-shadow: 0 0 8px #dcdcaa;
+        }
+        
+        .success { color: #4ec9b0; }
+        .error { color: #f48771; }
+        .warning { color: #dcdcaa; }
+        .info { color: #569cd6; }
+    </style>
+    
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <span class="status-indicator" id="status-indicator"></span>
+            <span id="status-text">🐱 Kitty Card Game - TUI Mode</span>
+        </div>
+        
+        <div class="terminal-output" id="output"></div>
+        
+        <div class="terminal-input-container">
+            <span class="terminal-prompt">></span>
+            <input 
+                type="text" 
+                class="terminal-input" 
+                id="input" 
+                placeholder="Type your command here..."
+                autocomplete="off"
+                autofocus
+            />
+        </div>
+    </div>
+    
+    <script>
+        const output = document.getElementById('output');
+        const input = document.getElementById('input');
+        const statusIndicator = document.getElementById('status-indicator');
+        const statusText = document.getElementById('status-text');
+        
+        let ws;
+        let commandHistory = [];
+        let historyIndex = -1;
+        
+        function connect() {
+            // Update status to connecting
+            statusIndicator.className = 'status-indicator status-connecting';
+            statusText.textContent = '🐱 Kitty Card Game - Connecting...';
+            
+            // Create WebSocket connection
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = function() {
+                statusIndicator.className = 'status-indicator status-connected';
+                statusText.textContent = '🐱 Kitty Card Game - Connected';
+                appendOutput('Connected to game server\n', 'success');
+            };
+            
+            ws.onmessage = function(event) {
+                appendOutput(event.data);
+                scrollToBottom();
+            };
+            
+            ws.onerror = function(error) {
+                statusIndicator.className = 'status-indicator status-disconnected';
+                statusText.textContent = '🐱 Kitty Card Game - Error';
+                appendOutput('WebSocket error occurred\n', 'error');
+            };
+            
+            ws.onclose = function() {
+                statusIndicator.className = 'status-indicator status-disconnected';
+                statusText.textContent = '🐱 Kitty Card Game - Disconnected';
+                appendOutput('Disconnected from server. Reconnecting in 3 seconds...\n', 'warning');
+                setTimeout(connect, 3000);
+            };
+        }
+        
+        function appendOutput(text, className = '') {
+            const span = document.createElement('span');
+            if (className) {
+                span.className = className;
+            }
+            span.textContent = text;
+            output.appendChild(span);
+        }
+        
+        function scrollToBottom() {
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function sendCommand(cmd) {
+            if (ws && ws.readyState === WebSocket.OPEN && cmd.trim()) {
+                // Show user input in output
+                appendOutput(`> ${cmd}\n`, 'info');
+                
+                // Send to server
+                ws.send(cmd);
+                
+                // Add to history
+                commandHistory.push(cmd);
+                historyIndex = commandHistory.length;
+                
+                // Clear input
+                input.value = '';
+                
+                scrollToBottom();
+            }
+        }
+        
+        // Handle Enter key
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                sendCommand(input.value);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    input.value = commandHistory[historyIndex];
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    input.value = commandHistory[historyIndex];
+                } else {
+                    historyIndex = commandHistory.length;
+                    input.value = '';
+                }
+            }
+        });
+        
+        // Prevent losing focus
+        document.addEventListener('click', function() {
+            input.focus();
+        });
+        
+        // Initial connection
+        connect();
+    </script>
+}

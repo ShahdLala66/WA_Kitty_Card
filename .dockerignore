@@ -1,0 +1,37 @@
+# SBT
+target/
+project/target/
+project/project/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+
+# Git
+.git/
+.gitignore
+
+# Documentation (optional - comment out if you want to include)
+*.md
+!README.md
+
+# Test files (optional)
+**/test/
+
+# Node modules (if any)
+node_modules/

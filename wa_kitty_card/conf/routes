@@ -1,7 +1,12 @@
 # user mode
-GET     /                               controllers.UiController.helloKitty()
+GET     /                               controllers.UiController.terminal()
+GET     /terminal                       controllers.UiController.terminal()
 GET     /combinedView                   controllers.UiController.combinedView()
 GET     /enterNames                     controllers.UiController.enterNames()
+GET     /helloKitty                     controllers.UiController.helloKitty()
+
+# WebSocket
+GET     /ws                             controllers.WebSocketController.socket
 
 # kernel mode
 GET     /assets/*file                   controllers.Assets.versioned(path="/public", file: Asset)

@@ -11,6 +11,10 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
 
   // VIEWS
 
+  def terminal: Action[AnyContent] = Action {
+    Ok(views.html.terminal())
+  }
+
   def listEvents: Action[AnyContent] = Action {
     val events = Main.controller.peekBufferedEvents().toString()
     Ok(views.html.debug.listEvents(events))
