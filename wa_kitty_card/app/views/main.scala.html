@@ -1,6 +1,6 @@
 @(title: String)(content: Html)
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <title>@title</title>
@@ -16,7 +16,40 @@
     />
   </head>
   <body bgcolor="FFE8F0">
-    @content
+    <table width="100%" border="1">
+      <tr>
+        <td width="200" valign="top">
+          <details open>
+            <summary><font size="4"><b>Player</b></font></summary>
+            &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.helloKitty()"
+              ><font size="4" color="black">Information</font></a
+            ><br />
+            &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.combinedView()"
+              ><font size="4" color="black">Game View</font></a
+            ><br />
+            &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.enterNames()"
+              ><font size="4" color="black">Enter Names</font></a
+            ><br><br>
+          </details>
+
+          <details open>
+            <summary><font size="4"><b>Debug</b></font></summary>
+            &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.playersState()"
+              ><font size="4" color="black">Players State</font></a
+            ><br />
+            &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.gridColors()"
+              ><font size="4" color="black">Grid Colors</font></a
+            ><br />
+            &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.listEvents()"
+              ><font size="4" color="black">List Events</font></a
+            ><br />
+          </details>
+        </td>
+
+        <td valign="top">@content</td>
+      </tr>
+    </table>
+
     <script
       src='@routes.Assets.versioned("javascripts/main.js")'
       type="text/javascript"
