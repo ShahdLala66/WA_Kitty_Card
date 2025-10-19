@@ -3,6 +3,7 @@ package controllers
 import javax.inject._
 import play.api.mvc._
 import main_.Main
+import model.gameModelComp.PlayerInterface
 import scala.util.Try
 
 @Singleton
@@ -29,11 +30,7 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
     } else {
       val state         = stateOpt.get
       val currentPlayer = playerOpt.get
-
-      val hand = safe(currentPlayer.getHand)
-        .map(_.map(_.toString).mkString(", "))
-        .getOrElse("")
-      val handSeq = parseHand(hand)
+      val handSeq = getPlayerHand(currentPlayer)
 
       Ok(views.html.ui.combinedView(state, gridData, handSeq))
     }
@@ -100,6 +97,13 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
       .toSeq
   }
 
+  private def getPlayerHand(player: PlayerInterface): Seq[String] = {
+    safe(player.getHand)
+      .map(_.map(_.toString).mkString(", "))
+      .map(parseHand)
+      .getOrElse(Seq.empty)
+  }
+
   def getCurrentplayerHand: Action[AnyContent] = Action {
     val playerOpt = safe(Main.controller.getCurrentplayer)
     val handOpt   = playerOpt.flatMap(p => safe(p.getHand))
@@ -109,6 +113,17 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
         Ok(s"Hand: [${hand.map(_.toString).mkString(", ")}]")
       case _ =>
         Ok(views.html.debug.loadingScreen("I think I am, therefore, I am. I think."))
+    }
+  }
+
+  def playerHandView: Action[AnyContent] = Action {
+    val playerOpt = safe(Main.controller.getCurrentplayer)
+    playerOpt match {
+      case Some(p: PlayerInterface) =>
+        val handSeq = getPlayerHand(p)
+        Ok(views.html.debug.playerHand(handSeq))
+      case _ =>
+        Ok(views.html.debug.loadingScreen("Couldn't load current player's hand."))
     }
   }
 
