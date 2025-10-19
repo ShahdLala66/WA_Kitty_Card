@@ -8,3 +8,4 @@ GET     /assets/*file                   controllers.Assets.versioned(path="/publ
 GET     /listEvents                     controllers.UiController.listEvents()
 GET     /playersState                   controllers.UiController.playersState()
 GET     /gridColors                     controllers.UiController.gridColors()
+GET     /loadingScreen                  controllers.UiController.loadingScreen()

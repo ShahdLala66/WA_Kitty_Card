@@ -1,6 +1,6 @@
 @(title: String)(content: Html)
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <title>@title</title>
@@ -20,7 +20,9 @@
       <tr>
         <td width="200" valign="top">
           <details open>
-            <summary><font size="4"><b>Player</b></font></summary>
+            <summary>
+              <font size="4"><b>Player</b></font>
+            </summary>
             &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.helloKitty()"
               ><font size="4" color="black">Information</font></a
             ><br />
@@ -29,11 +31,13 @@
             ><br />
             &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.enterNames()"
               ><font size="4" color="black">Enter Names</font></a
-            ><br><br>
+            ><br /><br />
           </details>
 
           <details open>
-            <summary><font size="4"><b>Debug</b></font></summary>
+            <summary>
+              <font size="4"><b>Debug</b></font>
+            </summary>
             &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.playersState()"
               ><font size="4" color="black">Players State</font></a
             ><br />
@@ -42,6 +46,9 @@
             ><br />
             &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.listEvents()"
               ><font size="4" color="black">List Events</font></a
+            ><br />
+            &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.loadingScreen()"
+              ><font size="4" color="black">Loading Screen</font></a
             ><br />
           </details>
         </td>

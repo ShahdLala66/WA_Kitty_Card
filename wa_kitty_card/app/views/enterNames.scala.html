@@ -1,23 +1,20 @@
-
-@()
-
-@main("Enter names") {
-	<div class="enter-names" align="center">
-		<h1>Enter Player Names</h1>
-		<form method="get">
-			<div>
-				<label for="name1">Name Player 1</label><br />
-				<input type="text" id="name1" required />
-			</div>
-			<br>
-			<div>
-				<label for="name2">Name Player 2</label><br />
-				<input type="text" id="name2" required />
-			</div>
-            <br>
-			<div align ="center">
-				<button type="submit">Continue</button>
-			</div>
-		</form>
-	</div>
+@() @main("Enter names") {
+<div class="enter-names" align="center">
+  <h1>Enter Player Names</h1>
+  <form method="get">
+    <div>
+      <label for="name1">Name Player 1</label><br />
+      <input type="text" id="name1" required />
+    </div>
+    <br />
+    <div>
+      <label for="name2">Name Player 2</label><br />
+      <input type="text" id="name2" required />
+    </div>
+    <br />
+    <div align="center">
+      <button type="submit">Continue</button>
+    </div>
+  </form>
+</div>
 }
