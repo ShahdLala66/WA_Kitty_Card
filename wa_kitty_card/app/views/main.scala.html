@@ -1,6 +1,6 @@
 @(title: String)(content: Html)
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <title>@title</title>
@@ -23,13 +23,13 @@
             <summary>
               <font size="4"><b>Player</b></font>
             </summary>
-            &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.helloKitty()"
+            &nbsp;<a href="@routes.UiController.helloKitty()"
               ><font size="4" color="black">Information</font></a
             ><br />
-            &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.combinedView()"
+            &nbsp;<a href="@routes.UiController.combinedView()"
               ><font size="4" color="black">Game View</font></a
             ><br />
-            &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.enterNames()"
+            &nbsp;<a href="@routes.UiController.enterNames()"
               ><font size="4" color="black">Enter Names</font></a
             ><br /><br />
           </details>
@@ -38,17 +38,34 @@
             <summary>
               <font size="4"><b>Debug</b></font>
             </summary>
-            &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.playersState()"
-              ><font size="4" color="black">Players State</font></a
+
+            <table>
+              <tr>
+                <td width="20"></td>
+                <td>
+                  <details open>
+                    <summary>
+                      <font size="4"><b>Game View</b></font>
+                    </summary>
+                    &nbsp;<a href="@routes.UiController.playersState()">
+                      <font size="4" color="black">Players State</font> </a
+                    ><br />
+                    &nbsp;<a href="@routes.UiController.gridColors()">
+                      <font size="4" color="black">Grid</font> </a
+                    ><br />
+                    &nbsp;<a href="@routes.UiController.playerHandView()">
+                      <font size="4" color="black">Players Hand</font> </a
+                    ><br />
+                  </details>
+                </td>
+              </tr>
+            </table>
+
+            &nbsp;<a href="@routes.UiController.listEvents()">
+              <font size="4" color="black">List Events</font> </a
             ><br />
-            &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.gridColors()"
-              ><font size="4" color="black">Grid Colors</font></a
-            ><br />
-            &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.listEvents()"
-              ><font size="4" color="black">List Events</font></a
-            ><br />
-            &nbsp;&nbsp;&nbsp;<a href="@routes.UiController.loadingScreen()"
-              ><font size="4" color="black">Loading Screen</font></a
+            &nbsp;<a href="@routes.UiController.loadingScreen()">
+              <font size="4" color="black">Loading Screen</font> </a
             ><br />
           </details>
         </td>
