@@ -1,0 +1,13 @@
+@(state: Seq[String], gridData: Seq[(Int, Int, String, String, String)],
+currentPlayerHand: Seq[String]) @main("Combined View") {
+
+<div class="combined-container" align="center">
+  @partials.playerStateSection(state)
+  <hr />
+  @partials.gridColorsSection(gridData)
+  <br />
+  @partials.playerHandSection(currentPlayerHand)
+  <br />
+</div>
+
+}
