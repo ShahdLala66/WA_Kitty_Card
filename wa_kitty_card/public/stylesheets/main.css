@@ -1,7 +1,6 @@
 body {
     font-family: 'comic sans ms', sans-serif;
     background-color: #FFE8F0;
-    border: 10px solid #ffbadd;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -9,13 +8,22 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 div { 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
     text-align: center;
     border : 2px solid #ffbadd;
+    margin: 0 auto;
+
+
 }
 
 p{
     text-align: center;
 }
+
+.helloKitty  {
+    max-width: 500px;
+    margin: 0 auto;
+    align-content: center;  
+
+}
+

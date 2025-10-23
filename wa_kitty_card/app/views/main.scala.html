@@ -17,37 +17,36 @@
   </head>
 
   <body>
-          <div>
-        <details open>
-          <summary>
-            <b>Player</b>
-          </summary>
-          <a href="@routes.UiController.helloKitty()">Information</a><br />
-          <a href="@routes.UiController.combinedView()">Game View</a><br />
-          <a href="@routes.UiController.enterNames()">Enter Names</a><br /><br />
-        </details>
+    <div>
+      <details open>
+        <summary>
+          <b>Player</b>
+        </summary>
+        <a href="@routes.UiController.helloKitty()">Information</a><br />
+        <a href="@routes.UiController.combinedView()">Game View</a><br />
+        <a href="@routes.UiController.enterNames()">Enter Names</a><br /><br />
+      </details>
+
+      <details open>
+        <summary>
+          <b>Debug</b>
+        </summary>
 
         <details open>
           <summary>
-            <b>Debug</b>
+            <b>Game View</b>
           </summary>
-
-            <details open>
-              <summary>
-                <b>Game View</b>
-              </summary>
-              <a href="@routes.UiController.playersState()">Players State</a><br />
-              <a href="@routes.UiController.gridColors()">Grid</a><br />
-              <a href="@routes.UiController.playerHandView()">Players Hand</a><br />
-            </details>
-
-          <a href="@routes.UiController.listEvents()">List Events</a><br />
-          <a href="@routes.UiController.loadingScreen()">Loading Screen</a><br />
+          <a href="@routes.UiController.playersState()">Players State</a><br />
+          <a href="@routes.UiController.gridColors()">Grid</a><br />
+          <a href="@routes.UiController.playerHandView()">Players Hand</a><br />
         </details>
-       </div>
 
+        <a href="@routes.UiController.listEvents()">List Events</a><br />
+        <a href="@routes.UiController.loadingScreen()">Loading Screen</a><br />
+      </details>
+    </div>
 
-      <div>@content</div>
+    <div class="helloKitty">@content</div>
 
     <script
       src='@routes.Assets.versioned("javascripts/main.js")'
