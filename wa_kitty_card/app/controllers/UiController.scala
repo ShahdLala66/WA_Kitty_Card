@@ -56,7 +56,7 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
             case "purple" => "#9370DB"
             case "blue"   => "#2196F3"
             case "red"    => "#F44336"
-            case "white"  => "rgba(69, 69, 69, 1)"
+            case "white"  => "rgba(255, 255, 255, 1)"
             case _        => "#CCCCCC"
           }
 

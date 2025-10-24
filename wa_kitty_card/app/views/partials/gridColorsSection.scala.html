@@ -1,23 +1,14 @@
 @(gridData: Seq[(Int, Int, String, String, String)])
 
-<div class="grid-colors-section">
-  <table class="grid-table" border="6.69px" bgcolor="#FFFFFF">
-    <tbody>
-      @for(row <- 0 to 2) {
-      <tr>
-        @for(col <- 0 to 2) { @defining(gridData.find(t => t._1 == col && t._2
-        == row)) { cellData => @cellData match { case Some((x, y, cardInfo,
-        htmlColor, suitName)) => {
-        <td width="85" height="85">
-          <font color="@htmlColor">
-            <div>(@x, @y)</div>
-            <div>@cardInfo</div>
-            <div>@suitName</div>
-          </font>
-        </td>
-        } } } }
-      </tr>
-      }
-    </tbody>
-  </table>
+<div class="grid-wrapper">
+  <div class="grid">
+    @for(row <- 0 to 2) { @for(col <- 0 to 2) { @defining(gridData.find(t =>
+    t._1 == col && t._2 == row)) { cellData => @cellData match { case Some((x,
+    y, cardInfo, htmlColor, suitName)) => {
+    <div class="grid-item" style="--card-color: @{htmlColor}">
+      <div>(@x, @y)</div>
+      <div>@cardInfo</div>
+    </div>
+    } } } } }
+  </div>
 </div>

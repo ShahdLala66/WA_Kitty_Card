@@ -1,5 +1,5 @@
 body {
-    background: linear-gradient(to bottom, #a1ccea 0%, #ffecee 50%, #fca6c0 100%);
+    background: linear-gradient(to bottom, @primary-blue 0%, @pink-light 50%, @pink-dark 100%);
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
@@ -7,10 +7,10 @@ body {
 
 .cloud {
     position: absolute;
-    background: white;
+    background: @white;
     border-radius: 100px;
     opacity: 0.8;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 16px @black-shadow-light;
     animation: float 20s ease-in-out infinite;
     cursor: pointer;
     transition: transform 0.3s ease;
@@ -24,7 +24,7 @@ body {
 .cloud::after {
     content: '';
     position: absolute;
-    background: white;
+    background: @white;
     border-radius: 100px;
 }
 
@@ -82,7 +82,7 @@ body {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(0 4px 6px @black-shadow-dark);
     border-radius: 10px;
 }
 
@@ -91,7 +91,7 @@ body {
     bottom: 100%;
     left: 50%;
     transform: translateX(-50%) translateY(-10px);
-    background: white;
+    background: @white;
     border-radius: 20px;
     padding: 10px 15px;
     min-width: 120px;

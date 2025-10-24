@@ -1,0 +1,36 @@
+@import "_colors.less";
+
+
+.grid-wrapper {
+  border: 2vw solid @primary-blue;
+  border-radius: 25px;
+  box-shadow:
+    0 6px 20px fade(@black-shadow-dark, 20%),
+    inset 0 0 8px fade(@primary-blue, 15%);
+  display: inline-block;
+}
+
+.grid {
+    display: grid;
+    grid-template-rows: 15vw 15vw 15vw;
+    grid-template-columns: 15vw 15vw 15vw;
+    justify-content: center;
+}
+
+.grid-item {
+    grid-row: span 1;
+    grid-column: span 1;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px fade(@black-shadow-dark, 20%);
+    padding: 10px;
+    border: 1.5px solid fade(@primary-blue, 60%);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    background-color: var(--card-color);
+    opacity: 0.5;
+    margin: 0;
+}
+
+.grid-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px fade(@black-shadow-dark, 25%);
+}
