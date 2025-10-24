@@ -1,6 +1,8 @@
 body {
     font-family: 'comic sans ms', sans-serif;
-    background-color: #FFE8F0;
+    /* background removed - using background.css gradient */
+    margin: 0;
+    padding: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
