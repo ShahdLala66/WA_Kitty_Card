@@ -1,16 +1,10 @@
-/* Sky Background with Gradient */
 body {
-    background: linear-gradient(to bottom, 
-        #87CEEB 0%,     /* Sky blue at top */
-        #B0E0E6 50%,    /* Powder blue in middle */
-        #FFE8F0 100%    /* Pink at bottom */
-    );
+    background: linear-gradient(to bottom, #a1ccea 0%, #ffecee 50%, #fca6c0 100%);
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
 }
 
-/* Cloud Base Styles */
 .cloud {
     position: absolute;
     background: white;
@@ -22,13 +16,11 @@ body {
     transition: transform 0.3s ease;
 }
 
-/* Cloud hover effect */
 .cloud:hover {
     transform: translateY(-5px);
     opacity: 0.9;
 }
 
-/* Cloud shapes using pseudo-elements */
 .cloud::after {
     content: '';
     position: absolute;
@@ -58,18 +50,18 @@ body {
     animation-delay: -5s;
 }
 
-
-/* Floating animation for clouds */
 @keyframes float {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateY(0px);
     }
+
     50% {
         transform: translateY(-20px);
     }
 }
 
-/* Cat Container on Cloud */
 .cat-container {
     position: absolute;
     top: 200%;
@@ -94,7 +86,6 @@ body {
     border-radius: 10px;
 }
 
-/* Thought Bubble */
 .thought-bubble {
     position: absolute;
     bottom: 100%;
@@ -115,7 +106,6 @@ body {
     z-index: 100;
 }
 
-/* Thought bubble active state */
 .thought-bubble.active {
     opacity: 1;
     transform: translateX(-50%) translateY(-20px);

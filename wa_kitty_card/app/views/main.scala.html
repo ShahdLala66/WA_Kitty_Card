@@ -15,6 +15,11 @@
       href='@routes.Assets.versioned("stylesheets/background.css")'
     />
     <link
+      rel="stylesheet"
+      media="screen"
+      href='@routes.Assets.versioned("stylesheets/nav-menu.css")'
+    />
+    <link
       rel="shortcut icon"
       type="image/png"
       href='@routes.Assets.versioned("images/zayne-icon.png")'
@@ -22,36 +27,26 @@
   </head>
 
   <body>
-    <div>
-      <details open>
-        <summary>
-          <b>Player</b>
-        </summary>
-        <a href="@routes.UiController.helloKitty()">Information</a><br />
-        <a href="@routes.UiController.combinedView()">Game View</a><br />
-        <a href="@routes.UiController.enterNames()">Enter Names</a><br /><br />
-      </details>
+    <nav class="top-nav">
+      <ul class="tab-list">
+        <li class="tab"><a href="@routes.UiController.helloKitty()">Information</a></li>
+        <li class="tab"><a href="@routes.UiController.combinedView()">Game View</a></li>
+        <li class="tab debug-tab">
+          <div class="debug-trigger">Debug ▼</div>
 
-      <details open>
-        <summary>
-          <b>Debug</b>
-        </summary>
+          <ul class="sub-menu">
+            <li><a href="@routes.UiController.playersState()">Players State</a></li>
+            <li><a href="@routes.UiController.gridColors()">Grid</a></li>
+            <li><a href="@routes.UiController.playerHandView()">Players Hand</a></li>
+            <li><a href="@routes.UiController.listEvents()">List Events</a></li>
+            <li><a href="@routes.UiController.loadingScreen()">Loading Screen</a></li>
+            <li><a href="@routes.UiController.enterNames()">Enter Names</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
 
-        <details open>
-          <summary>
-            <b>Game View</b>
-          </summary>
-          <a href="@routes.UiController.playersState()">Players State</a><br />
-          <a href="@routes.UiController.gridColors()">Grid</a><br />
-          <a href="@routes.UiController.playerHandView()">Players Hand</a><br />
-        </details>
-
-        <a href="@routes.UiController.listEvents()">List Events</a><br />
-        <a href="@routes.UiController.loadingScreen()">Loading Screen</a><br />
-      </details>
-    </div>
-
-    <div class="helloKitty">@content</div>
+    <div class="content">@content</div>
 
     <script
       src='@routes.Assets.versioned("javascripts/main.js")'
