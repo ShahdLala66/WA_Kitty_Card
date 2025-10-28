@@ -1,11 +1,4 @@
-@base-size: 0.625em;
-@padding-v: @base-size * 1.5;
-@padding-h: @base-size * 2;
-@border-radius: @base-size * 1.5;
-@box-shadow-blur: @base-size * 0.2;
-@submenu-min-width: @base-size * 15;
-@backdrop-blur: @base-size * 0.8;
-@z-index: 1000;
+@import "_colors.less";
 
 /* Navigation */
 .top-nav {
@@ -15,6 +8,7 @@
     left: 0;
     width: 100%;
     box-shadow: 0 @box-shadow-blur @base-size @black-shadow-light;
+    background: @white-transparent;
     z-index: @z-index;
 }
 
