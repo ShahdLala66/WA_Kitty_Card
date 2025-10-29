@@ -1,13 +1,13 @@
 @(cards: Seq[String]) @defining(cards) { cards =>
-
-<div class="player-hand-section">
-  <table border="1.69" bgcolor="#FFFFFF">
-    <tr>
-      @for(card <- cards) {
-      <td width="85" height="119">@card</td>
-      }
-    </tr>
-  </table>
+<div class="background-player-hand">
+  <div class="player-hand-section">
+    <table>
+      <tr>
+        @for(card <- cards) {
+        <td>@card</td>
+        }
+      </tr>
+    </table>
+  </div>
 </div>
-
 }

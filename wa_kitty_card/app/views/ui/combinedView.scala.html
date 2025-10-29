@@ -3,11 +3,8 @@ currentPlayerHand: Seq[String]) @main("Combined View") {
 
 <div class=combined-container>
   @partials.playerStateSection(state)
-  <hr />
   @partials.gridColorsSection(gridData)
-  <br />
   @partials.playerHandSection(currentPlayerHand)
-  <br />
 </div>
 
 }
