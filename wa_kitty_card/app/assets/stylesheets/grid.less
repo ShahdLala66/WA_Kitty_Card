@@ -118,7 +118,6 @@ input[type="radio"] {
   opacity: 0.5;
 }
 
-// Show cat gif permanently when card is placed
 .grid-item.card-placed::after {
   content: "";
   position: absolute;
@@ -130,17 +129,18 @@ input[type="radio"] {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  opacity: 0.5;
   pointer-events: none;
   z-index: 1;
 }
 
 // Player 1 gif (Zayne) muss man eig tauschen bin aber jetzt müdee
 .grid-item.card-placed[data-player="player1"]::after {
+  opacity: 1;
   background-image: url('/assets/images/player-one.gif');
 }
 
 // Player 2 gif (Xavier)
 .grid-item.card-placed[data-player="player2"]::after {
+  opacity: 1;
   background-image: url('/assets/images/player-two.gif');
 }

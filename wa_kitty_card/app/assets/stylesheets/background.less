@@ -1,4 +1,4 @@
-/* Hintergrund */
+// Hintergrund
 body {
     background: linear-gradient(to bottom, @primary-blue 0%, @pink-light 50%, @pink-dark 100%);
     min-height: 100vh;
@@ -6,14 +6,14 @@ body {
     position: relative;
 }
 
-/* Layer */
+// Layer
 .decor-layer {
     inset: 0;
     pointer-events: none;
     z-index: @z-index + 1;
 }
 
-/* ========== WOLKE ========== */
+// Wolke
 .cloud {
     position: absolute;
     width: 15vw;
@@ -24,8 +24,6 @@ body {
     background: linear-gradient(to bottom right, #ffffff 0%, #f5f9ff 100%);
     border-radius: 8vw;
 
-
-    /* Soft "fluffy" add-ons */
     &::before,
     &::after {
         content: "";
@@ -48,7 +46,6 @@ body {
         left: 2vw;
     }
 
-    /* Schwebebewegung */
     animation: cloudFloat 6s ease-in-out infinite alternate;
     will-change: transform;
 }
@@ -63,7 +60,7 @@ body {
     }
 }
 
-/* ========== KATZE ========== */
+// Katze
 .cat-container {
     position: absolute;
     top: 20%;
@@ -88,7 +85,6 @@ body {
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.25));
 }
 
-/* ========== SPRECHBLASE ========== */
 .thought-bubble {
     position: absolute;
     bottom: 100%;

@@ -1,13 +1,48 @@
-@(cards: Seq[String]) @defining(cards) { cards =>
-<div class="background-player-hand">
-  <div class="player-hand-section">
-    <table>
-      <tr>
-        @for(card <- cards) {
-        <td>@card</td>
-        }
-      </tr>
-    </table>
-  </div>
-</div>
+@(cards: Seq[String])
+
+@defining(cards) { cards =>
+  @* Helper function to convert card string to image path *@
+  @defining((cardStr: String) => {
+    val parts = cardStr.split(" of ")
+    if (parts.length == 2) {
+      val value = parts(0) match {
+        case "One" => "1"
+        case "Two" => "2"
+        case "Three" => "3"
+        case "Four" => "4"
+        case "Five" => "5"
+        case "Six" => "6"
+        case "Seven" => "7"
+        case _ => "1"
+      }
+      val color = parts(1) match {
+        case "Blue" => "Blau"
+        case "Brown" => "Braun"
+        case "Green" => "Grün"
+        case "Purple" => "Lila"
+        case "Red" => "Rot"
+        case _ => "Blau"
+      }
+      s"/assets/images/cards/$value/$value-$color.png"
+    } else {
+      "" // fallback if parsing fails
+    }
+  }) { getCardImage =>
+    <div class="background-player-hand">
+      <div class="player-hand-section">
+        <table>
+          <tr>
+            @for(card <- cards) {
+              <td>
+                <div class="card-display">
+                  <img src="@getCardImage(card)" alt="@card" class="card-image" />
+                  <div class="card-label">@card</div>
+                </div>
+              </td>
+            }
+          </tr>
+        </table>
+      </div>
+    </div>
+  }
 }

@@ -1,15 +1,5 @@
 @import "_colors.less";
 
-@card-width: 7vw;
-@card-height: 18vh;
-@card-spacing: 0.5rem;
-@card-border-radius: 0.75rem;
-@card-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-@card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.25);
-@card-transition: all 0.3s ease;
-@hand-padding: 2rem;
-@hand-border-radius: 1.5rem;
-
 .player-hand-section {
 
 
@@ -36,20 +26,20 @@
       height: @card-height;
       min-width: @card-width;
       min-height: @card-height;
-            background: @white;
+      background: @white;
       border: 2px solid @pink-light;
       border-radius: @card-border-radius;
       box-shadow: @card-shadow;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 0.5rem;
       
       font-size: 1rem;
       font-weight: 600;
       color: @font-dark;
       text-align: center;
       
-      /* Hover-Effekt */
       &:hover {
         transform: scale(1.05);
         box-shadow: @card-shadow-hover;
@@ -63,6 +53,33 @@
       
     }
   }
+}
+
+// Card display with image and label
+.card-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: 0.25rem;
+}
+
+.card-image {
+  max-width: 100%;
+  max-height: 70%;
+  object-fit: contain;
+  border-radius: 0.5rem;
+}
+
+.card-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: @font-dark;
+  text-align: center;
+  word-wrap: break-word;
+  max-width: 100%;
 }
 
 .player-hand-section table td {

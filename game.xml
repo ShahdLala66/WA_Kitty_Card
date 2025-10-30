@@ -2,39 +2,27 @@
 <gameState>
                 <players>
                     <player>
-                        <name>Corina</name>
-                        <points>0</points>
+                        <name>dsfghj</name>
+                        <points>13</points>
                         <hand>
                             <card>
-                                <suit>Brown</suit>
-                                <value>Three</value>
-                                <color>Blue</color>
-                            </card><card>
                                 <suit>Purple</suit>
-                                <value>Three</value>
-                                <color>Purple</color>
-                            </card><card>
-                                <suit>Purple</suit>
-                                <value>Six</value>
+                                <value>One</value>
                                 <color>Red</color>
                             </card>
                         </hand>
                     </player><player>
-                        <name>Shahd</name>
-                        <points>0</points>
+                        <name>sdfghj</name>
+                        <points>8</points>
                         <hand>
                             <card>
-                                <suit>Brown</suit>
+                                <suit>Blue</suit>
                                 <value>Seven</value>
                                 <color>Red</color>
                             </card><card>
-                                <suit>Purple</suit>
-                                <value>Four</value>
-                                <color>Blue</color>
-                            </card><card>
-                                <suit>Red</suit>
+                                <suit>Blue</suit>
                                 <value>Six</value>
-                                <color>Brown</color>
+                                <color>Red</color>
                             </card>
                         </hand>
                     </player>
@@ -48,18 +36,26 @@
                     </cell><cell>
                         <x>0</x>
                         <y>1</y>
-                        <cellColor>White</cellColor>
+                        <cellColor>Purple</cellColor>
                         <card>Empty</card>
                     </cell><cell>
                         <x>0</x>
                         <y>2</y>
-                        <cellColor>White</cellColor>
-                        <card>Empty</card>
+                        <cellColor>Green</cellColor>
+                        <card>
+                            <suit>Green</suit>
+                            <value>Four</value>
+                            <color>Red</color>
+                        </card>
                     </cell><cell>
                         <x>1</x>
                         <y>0</y>
-                        <cellColor>Green</cellColor>
-                        <card>Empty</card>
+                        <cellColor>Blue</cellColor>
+                        <card>
+                            <suit>Blue</suit>
+                            <value>Four</value>
+                            <color>Brown</color>
+                        </card>
                     </cell><cell>
                         <x>1</x>
                         <y>1</y>
@@ -69,16 +65,20 @@
                         <x>1</x>
                         <y>2</y>
                         <cellColor>White</cellColor>
-                        <card>Empty</card>
+                        <card>
+                            <suit>Purple</suit>
+                            <value>Five</value>
+                            <color>Purple</color>
+                        </card>
                     </cell><cell>
                         <x>2</x>
                         <y>0</y>
-                        <cellColor>Purple</cellColor>
+                        <cellColor>White</cellColor>
                         <card>Empty</card>
                     </cell><cell>
                         <x>2</x>
                         <y>1</y>
-                        <cellColor>Blue</cellColor>
+                        <cellColor>White</cellColor>
                         <card>Empty</card>
                     </cell><cell>
                         <x>2</x>
