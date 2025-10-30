@@ -15,68 +15,27 @@
       href='@routes.Assets.versioned("images/zayne-icon.png")'
     />
   </head>
-  <body bgcolor="FFE8F0">
-    <table width="100%" border="1">
-      <tr>
-        <td width="200" valign="top">
-          <details open>
-            <summary>
-              <font size="4"><b>Player</b></font>
-            </summary>
-            &nbsp;<a href="@routes.UiController.helloKitty()"
-              ><font size="4" color="black">Information</font></a
-            ><br />
-            &nbsp;<a href="@routes.UiController.combinedView()"
-              ><font size="4" color="black">Game View</font></a
-            ><br />
-            &nbsp;<a href="@routes.UiController.enterNames()"
-              ><font size="4" color="black">Enter Names</font></a
-            ><br /><br />
-          </details>
 
-          <details open>
-            <summary>
-              <font size="4"><b>Debug</b></font>
-            </summary>
+  <body>
+    <nav class="top-nav">
+      <ul class="tab-list">
+        <li class="tab"><a href="@routes.UiController.helloKitty()">Information</a></li>
+        <li class="tab"><a href="@routes.UiController.combinedView()">Game View</a></li>
+        <li class="tab debug-tab">
+          <div class="debug-trigger">Debug</div>
 
-            <table>
-              <tr>
-                <td width="20"></td>
-                <td>
-                  <details open>
-                    <summary>
-                      <font size="4"><b>Game View</b></font>
-                    </summary>
-                    &nbsp;<a href="@routes.UiController.playersState()">
-                      <font size="4" color="black">Players State</font> </a
-                    ><br />
-                    &nbsp;<a href="@routes.UiController.gridColors()">
-                      <font size="4" color="black">Grid</font> </a
-                    ><br />
-                    &nbsp;<a href="@routes.UiController.playerHandView()">
-                      <font size="4" color="black">Players Hand</font> </a
-                    ><br />
-                  </details>
-                </td>
-              </tr>
-            </table>
+          <ul class="sub-menu">
+            <li><a href="@routes.UiController.playersState()">Players State</a></li>
+            <li><a href="@routes.UiController.gridColors()">Grid</a></li>
+            <li><a href="@routes.UiController.playerHandView()">Players Hand</a></li>
+            <li><a href="@routes.UiController.listEvents()">List Events</a></li>
+            <li><a href="@routes.UiController.loadingScreen()">Loading Screen</a></li>
+            <li><a href="@routes.UiController.enterNames()">Enter Names</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
 
-            &nbsp;<a href="@routes.UiController.listEvents()">
-              <font size="4" color="black">List Events</font> </a
-            ><br />
-            &nbsp;<a href="@routes.UiController.loadingScreen()">
-              <font size="4" color="black">Loading Screen</font> </a
-            ><br />
-          </details>
-        </td>
-
-        <td valign="top">@content</td>
-      </tr>
-    </table>
-
-    <script
-      src='@routes.Assets.versioned("javascripts/main.js")'
-      type="text/javascript"
-    ></script>
+    <div class="content">@content</div>
   </body>
 </html>
