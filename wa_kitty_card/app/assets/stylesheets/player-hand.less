@@ -1,0 +1,117 @@
+@import "_colors.less";
+
+.player-hand-section {
+
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: @card-spacing;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    border: 0 !important;
+    
+    tr {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: @card-spacing;
+    }
+    
+    td {
+      width: @card-width;
+      height: @card-height;
+      min-width: @card-width;
+      min-height: @card-height;
+      background: @white;
+      border: 2px solid @pink-light;
+      border-radius: @card-border-radius;
+      box-shadow: @card-shadow;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+      
+      font-size: 1rem;
+      font-weight: 600;
+      color: @font-dark;
+      text-align: center;
+      
+      &:hover {
+        transform: scale(1.05);
+        box-shadow: @card-shadow-hover;
+        border-color: @pink-dark;
+        z-index: 10;
+        
+        &::before {
+          opacity: 1;
+        }
+      }
+      
+    }
+  }
+}
+
+// Card display with image and label
+.card-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: 0.25rem;
+}
+
+.card-image {
+  max-width: 100%;
+  max-height: 70%;
+  object-fit: contain;
+  border-radius: 0.5rem;
+}
+
+.card-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: @font-dark;
+  text-align: center;
+  word-wrap: break-word;
+  max-width: 100%;
+}
+
+.player-hand-section table td {
+  &.selected {
+    border-color: @primary-blue;
+    background: linear-gradient(135deg, @white, @primary-blue);
+    transform: translateY(-6px);
+    box-shadow: 0 6px 20px rgba(161, 204, 234, 0.4);
+  }
+  
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(0.5);
+    
+    &:hover {
+      transform: none;
+      box-shadow: @card-shadow;
+    }
+  }
+
+}
+
+.background-player-hand {
+  background: @white-transparent;
+  backdrop-filter: blur(10px);
+  border-radius: @border-radius;
+  box-shadow: 0 @box-shadow-blur @base-size @black-shadow-light;
+  margin: 2vh;
+  padding: 1rem 3rem;
+  text-align: left;
+  line-height: 1.6;
+  transition: transform @transition-fast ease, box-shadow @transition-fast ease;
+  width: clamp(60vw, 50vw, 40vw);
+}

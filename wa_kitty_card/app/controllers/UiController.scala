@@ -51,12 +51,12 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
       .map(_.flatMap { case (x, y, card, suitColor) =>
         Option(suitColor).map { color =>
           val htmlColor = color.toString.toLowerCase match {
-            case "green"  => "#4CAF50"
-            case "brown"  => "#8B4513"
-            case "purple" => "#9370DB"
-            case "blue"   => "#2196F3"
-            case "red"    => "#F44336"
-            case "white"  => "rgba(69, 69, 69, 1)"
+            case "green"  => "#a8e5aaff"
+            case "brown"  => "#d29b73ff"
+            case "purple" => "#bfa8eeff"
+            case "blue"   => "#a1cdf1ff"
+            case "red"    => "#f5b5b5ff"
+            case "white"  => "rgba(224, 222, 222, 1)"
             case _        => "#CCCCCC"
           }
 

@@ -1,36 +1,27 @@
 @import play.api.mvc.RequestHeader 
 @(message: String, routes: Seq[(String,
 String, String)])(implicit request: RequestHeader) @main("404") {
-    
-<div align="center">
-  <div>
-    <h1>@message</h1>
-  </div>
+
+<div>
+  <h1>@message</h1>
+  <h3>Verfügbare Routen:</h3>
 
   <div>
-    <h3>Verfügbare Routen:</h3>
-    <table border="1" cellpadding="5">
-      <thead align="left">
-        <tr>
-          <th>Method</th>
-          <th>Path</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for((method, path, action) <- routes) {
-        <tr>
-          <td>@method</td>
-          <td><code>@path</code></td>
-          <td>@action</td>
-        </tr>
-        }
-      </tbody>
-    </table>
+    <div class="info-card-routes">
+      @for((method, path, action) <- routes) {
+      <div class="route-item">
+        <span class="route-method">@method</span>
+        <span class="route-path">@path</span>
+        <span class="route-action">@action</span>
+      </div>
+      }
+    </div>
   </div>
-  <img
-    width="100"
-    src="https://github.com/user-attachments/assets/efecb4e8-2e53-4586-8bd7-b79ecacc3ab6"
-  />
+
+  <div class="error-image">
+    <img
+      src="https://github.com/user-attachments/assets/efecb4e8-2e53-4586-8bd7-b79ecacc3ab6"
+    />
+  </div>
 </div>
 }
