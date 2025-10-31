@@ -4,9 +4,14 @@
 <html lang="en">
   <head>
     <title>@title</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link
+      rel="stylesheet"
+      media="screen"
+      href='@routes.Assets.versioned("stylesheets/bootstrap/bootstrap.min.css")'
+    />
     <link
       rel="stylesheet"
       media="screen"
@@ -17,36 +22,97 @@
       type="image/png"
       href='@routes.Assets.versioned("images/zayne-icon.png")'
     />
-
   </head>
 
   <body>
-    <nav class="navbar navbar-expand-lg fixed-top">
+    <nav class="navbar navbar-expand-sm navbar-light bg-light fixed-top">
       <div class="container-fluid">
-        <a class="navbar-brand" href="@routes.UiController.helloKitty()">Kitty Card</a>
-        
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="@routes.UiController.combinedView()">Game View</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button">
-              Debug
-            </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="@routes.UiController.playersState()">Players State</a></li>
-              <li><a class="dropdown-item" href="@routes.UiController.gridColors()">Grid</a></li>
-              <li><a class="dropdown-item" href="@routes.UiController.playerHandView()">Players Hand</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="@routes.UiController.listEvents()">List Events</a></li>
-              <li><a class="dropdown-item" href="@routes.UiController.loadingScreen()">Loading Screen</a></li>
-              <li><a class="dropdown-item" href="@routes.UiController.enterNames()">Enter Names</a></li>
-            </ul>
-          </li>
-        </ul>
+        <a class="navbar-brand" href="@routes.UiController.helloKitty()"
+          >Kitty Card</a
+        >
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNavDropdown"
+          aria-controls="navbarNavDropdown"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="@routes.UiController.combinedView()"
+                >Game View</a
+              >
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Debug
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="@routes.UiController.playersState()"
+                    >Players State</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="@routes.UiController.gridColors()"
+                    >Grid</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="@routes.UiController.playerHandView()"
+                    >Players Hand</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="@routes.UiController.listEvents()"
+                    >List Events</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="@routes.UiController.loadingScreen()"
+                    >Loading Screen</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="@routes.UiController.enterNames()"
+                    >Enter Names</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
 
-    <div class="content">@content</div>
+    <div class="content mt-5">@content</div>
+
+    <script src='@routes.Assets.versioned("javascripts/bootstrap/dist/js/bootstrap.bundle.min.js")'></script>
   </body>
 </html>

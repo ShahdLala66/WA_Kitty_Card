@@ -1,51 +1,46 @@
 @import "colors";
 
-nav.navbar {
-    backdrop-filter: blur($backdrop-blur);
-    box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light;
-    background: $white-transparent;
+nav.navbar.navbar-light {
+    backdrop-filter: blur($backdrop-blur) !important;
+    box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light !important;
+    background: $white-transparent !important;
 }
 
 nav.navbar .navbar-brand {
-    font-weight: bold;
-    color: $font-dark;
+    font-weight: bold !important;
+    color: $font-dark !important;
 }
 
 nav.navbar .nav-link {
-    color: $font-dark;
+    color: $font-dark !important;
     border-radius: $border-radius;
     transition: background-color 0.3s ease;
     
     &:hover {
-        background: rgba($white-transparent, 0.5);
-        color: $font-dark;
+        background: rgba($white-transparent, 0.5) !important;
+        color: $font-dark !important;
     }
 }
 
 nav.navbar .dropdown-menu {
-    display: none;
-    background: $white-transparent;
+    background: $white-transparent !important;
     backdrop-filter: blur($backdrop-blur);
-    border: none;
+    border: none !important;
     border-radius: $border-radius;
-    box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light;
+    box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light !important;
     padding: 0.5rem;
 }
 
-nav.navbar .dropdown:hover .dropdown-menu {
-    display: block;
-}
-
 nav.navbar .dropdown-item {
-    color: $font-dark;
+    color: $font-dark !important;
     border-radius: calc($border-radius * 0.5);
     
     &:hover {
-        background: rgba($white-transparent, 0.8);
-        color: $font-dark;
+        background: rgba($white-transparent, 0.8) !important;
+        color: $font-dark !important;
     }
 }
 
 nav.navbar .dropdown-divider {
-    border-color: rgba($font-dark, 0.1);
+    border-color: rgba($font-dark, 0.1) !important;
 }
