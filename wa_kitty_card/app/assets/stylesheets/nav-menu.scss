@@ -1,73 +1,51 @@
 @import "colors";
 
-.top-nav {
-    max-height: 10vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
+nav.navbar {
+    backdrop-filter: blur($backdrop-blur);
     box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light;
     background: $white-transparent;
-    z-index: $z-index;
 }
 
-.top-nav::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    backdrop-filter: blur($backdrop-blur);
-    z-index: -1;
+nav.navbar .navbar-brand {
+    font-weight: bold;
+    color: $font-dark;
 }
 
-.tab-list {
-    display: flex;
-    justify-content: center;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+nav.navbar .nav-link {
+    color: $font-dark;
+    border-radius: $border-radius;
+    transition: background-color 0.3s ease;
+    
+    &:hover {
+        background: rgba($white-transparent, 0.5);
+        color: $font-dark;
+    }
 }
 
-.tab {
-    margin: 0 $base-size;
-}
-
-.tab a,
-.debug-trigger {
-    display: block;
-    padding: $padding-v $padding-h;
-    text-decoration: none;
-    border-radius: $border-radius $border-radius $border-radius $border-radius;
-}
-
-.tab a:hover,
-.debug-trigger:hover {
-    background: $white-transparent;
-}
-
-.debug-tab {
-    position: relative;
-    overflow: visible;
-}
-
-.debug-tab:hover .sub-menu {
-    display: block;
-}
-
-.sub-menu {
+nav.navbar .dropdown-menu {
     display: none;
-    position: absolute;
-    min-width: $submenu-min-width;
-    border-radius: 0 0 $border-radius $border-radius;
-    list-style: none;
-    padding: 0;
-    background-color: $white-transparent;
+    background: $white-transparent;
+    backdrop-filter: blur($backdrop-blur);
+    border: none;
+    border-radius: $border-radius;
+    box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light;
+    padding: 0.5rem;
 }
 
-.sub-menu::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    backdrop-filter: blur($backdrop-blur);
-    border-radius: inherit;
-    z-index: -1;
+nav.navbar .dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+nav.navbar .dropdown-item {
+    color: $font-dark;
+    border-radius: calc($border-radius * 0.5);
+    
+    &:hover {
+        background: rgba($white-transparent, 0.8);
+        color: $font-dark;
+    }
+}
+
+nav.navbar .dropdown-divider {
+    border-color: rgba($font-dark, 0.1);
 }

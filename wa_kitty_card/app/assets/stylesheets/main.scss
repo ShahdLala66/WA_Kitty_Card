@@ -7,6 +7,8 @@
 @import "error-handler";
 @import "loadingScreen";
 
+@import "bootstrap/scss/bootstrap";
+
 body {
   font-family: $font-display;
   color: $font-dark;
@@ -16,7 +18,9 @@ body {
   min-height: 100vh;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-family: $font-display;
   color: #2d2d2d;
   margin-bottom: 1rem;
@@ -28,17 +32,18 @@ h1 {
   backdrop-filter: blur(10px);
   line-height: 1.6;
   transition: transform $transition-fast ease, box-shadow $transition-fast ease;
-  
-  width: 100vw;
-  padding: 2vh 100vw;
+  border-radius: $border-radius;
+  width: 100%;
+  padding: 1.2vh 3rem;
   box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light;
   margin-top: 10vh;
+
   &:hover {
     transform: translateY(-0.2vh);
     box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light*1.8;
   }
 }
-  
+
 
 h2 {
   font-size: 1.6rem;
