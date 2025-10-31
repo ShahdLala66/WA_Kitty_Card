@@ -1,0 +1,19 @@
+.loader {
+  width: 20px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  position: relative;
+  margin: auto;
+  transform-origin: 50% -200%;
+  background: radial-gradient(at 30% 30%,#0000,#000a) red;
+  animation: l8 1s cubic-bezier(.5,-200,.5,200) infinite;
+}
+.loader:before {
+  content: "";
+  position: absolute;
+  inset: -200% 8px 100%;
+  background: #ddd; 
+}
+@keyframes l8 { 
+    100% {transform:rotate(1deg)} 
+}

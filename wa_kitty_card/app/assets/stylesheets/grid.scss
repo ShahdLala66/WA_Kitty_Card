@@ -1,0 +1,146 @@
+@import "colors";
+
+// Hide radio buttons (wichtig für später maybe idk)
+input[type="radio"] {
+  position: absolute;
+  top: -9999em;
+}
+
+.border {
+  border: .5vw solid rgb(174, 145, 129);
+  display: inline-block;
+  border-radius: 10px;
+}
+.grid-wrapper {
+  border: 4vw solid  rgb(205, 216, 225);
+  border-bottom: 10vw solid  rgb(205, 216, 225);
+  border-radius: 2px;
+  display: inline-block;
+  position: relative;
+}
+
+.grid-wrapper::after {
+  content: "";
+  position: absolute;
+  bottom: -12vw; 
+  left: -2vw;     
+  width: 20vw;   
+  height: 20vw;
+  background-image: url('/assets/images/cupecakes.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 1;    
+}
+
+.grid {
+  display: grid;
+  grid-template-rows: 13.5vw 13.5vw 13.5vw;
+  grid-template-columns: 13.5vw 13.5vw 13.5vw;
+  justify-content: center;
+  background-color: transparent;
+}
+
+.grid-item {
+  grid-row: span 1;
+  grid-column: span 1;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba($black-shadow-dark, 0.2);
+  padding: 10px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background-color: var(--card-color);
+  opacity: .5;
+  margin: 5%;
+  position: relative;
+}
+
+.grid-item:hover {
+  box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light;
+}
+
+.grid-item .card-info-display {
+  position: relative;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.grid-item label,
+.grid-item .tile-overlay {
+  display: block;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.10);
+  font-family: Raleway, Courier, 'Courier New', Sans, sans-serif;
+  font-weight: bolder;
+  border-radius: 12px;
+}
+
+.grid-item .tile-overlay {
+  display: none;
+  overflow: hidden;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85);
+}
+
+.grid-item label:hover {
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.grid-item label::before,
+.grid-item .tile-overlay::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: 80%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.grid-item .tile-overlay::before {
+  width: 100%;
+  height: 100%;
+}
+
+.grid-item label[data-player='player1']:hover::before {
+  background-image: url('/assets/images/player-one.gif');
+  opacity: 0.5;
+}
+
+.grid-item label[data-player='player2']:hover::before {
+  background-image: url('/assets/images/player-two.gif');
+  opacity: 0.5;
+}
+
+.grid-item.card-placed::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+// Player 1 gif (Zayne) muss man eig tauschen bin aber jetzt müdee
+.grid-item.card-placed[data-player="player1"]::after {
+  opacity: 1;
+  background-image: url('/assets/images/player-one.gif');
+}
+
+// Player 2 gif (Xavier)
+.grid-item.card-placed[data-player="player2"]::after {
+  opacity: 1;
+  background-image: url('/assets/images/player-two.gif');
+}
