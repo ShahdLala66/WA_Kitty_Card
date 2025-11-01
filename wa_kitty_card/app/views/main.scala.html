@@ -38,12 +38,17 @@
           data-bs-target="#navbarNavDropdown"
           aria-controls="navbarNavDropdown"
           aria-expanded="false"
-          aria-label="Toggle navigation"
         >
-          <span class="navbar-toggler-icon"></span>
+          <img
+            src='@routes.Assets.versioned("images/gorot.png")'
+            class="navbar-toggler-icon-img"
+          />
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <div
+          class="collapse navbar-collapse justify-content-end me-5"
+          id="navbarNavDropdown"
+        >
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
               <a class="nav-link" href="@routes.UiController.combinedView()"
@@ -82,7 +87,7 @@
                     >Players Hand</a
                   >
                 </li>
-                <li><hr class="dropdown-divider" /></li>
+                <li></li>
                 <li>
                   <a
                     class="dropdown-item"
