@@ -2,58 +2,46 @@
 
 .player-hand-section {
 
-
-  table {
+  .player-hand-row {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: $card-spacing;
-    margin: 0;
+    margin: auto;
     padding: 0;
-    border: none;
-    background: transparent;
-    border: 0 !important;
-    
-    tr {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: $card-spacing;
-    }
-    
-    td {
-      width: $card-width;
-      height: $card-height;
-      min-width: $card-width;
-      min-height: $card-height;
-      background: $white;
-      border: 2px solid $pink-light;
-      border-radius: $card-border-radius;
-      box-shadow: $card-shadow;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.5rem;
-      
-      font-size: 1rem;
-      font-weight: 600;
-      color: $font-dark;
-      text-align: center;
-      
-      &:hover {
-        transform: scale(1.05);
-        box-shadow: $card-shadow-hover;
-        border-color: $pink-dark;
-        z-index: 10;
-        
-        &::before {
-          opacity: 1;
-        }
-      }
-      
+    gap: $card-spacing;
+  }
+
+  .card-container {
+    width: clamp(70px, #{$card-width}, 160px);
+    min-width: 60px;
+    max-width: 220px;
+    display: inline-flex;
+    align-items: stretch;
+  }
+
+  .card-display {
+    flex: 1 1 auto;
+    aspect-ratio: 2 / 3;
+    background: $white;
+    border: 2px solid $pink-light;
+    border-radius: $card-border-radius;
+    box-shadow: $card-shadow;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: $font-dark;
+    text-align: center;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: $card-shadow-hover;
+      border-color: $pink-dark;
+      z-index: 10;
     }
   }
 }
+
 
 // Card display with image and label
 .card-display {
@@ -108,7 +96,7 @@
   backdrop-filter: blur(10px);
   border-radius: $border-radius;
   box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light;
-  margin: 2vh;
+  margin: auto;
   padding: 1rem 3rem;
   text-align: left;
   line-height: 1.6;

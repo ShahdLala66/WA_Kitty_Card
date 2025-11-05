@@ -35,8 +35,9 @@ input[type="radio"] {
 
 .grid {
   display: grid;
-  grid-template-rows: 13.5vw 13.5vw 13.5vw;
-  grid-template-columns: 13.5vw 13.5vw 13.5vw;
+  grid-template-columns: repeat(3, minmax(80px, 13.5vw));
+  grid-auto-rows: 1fr;
+  gap: 1vw;
   justify-content: center;
   background-color: transparent;
 }
@@ -50,7 +51,8 @@ input[type="radio"] {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   background-color: var(--card-color);
   opacity: .5;
-  margin: 5%;
+  margin: 0;
+  aspect-ratio: 1 / 1;
   position: relative;
 }
 
@@ -108,15 +110,6 @@ input[type="radio"] {
   height: 100%;
 }
 
-.grid-item label[data-player='player1']:hover::before {
-  background-image: url('/assets/images/player-one.gif');
-  opacity: 0.5;
-}
-
-.grid-item label[data-player='player2']:hover::before {
-  background-image: url('/assets/images/player-two.gif');
-  opacity: 0.5;
-}
 
 .grid-item.card-placed::after {
   content: "";
@@ -143,4 +136,23 @@ input[type="radio"] {
 .grid-item.card-placed[data-player="player2"]::after {
   opacity: 1;
   background-image: url('/assets/images/player-two.gif');
+}
+
+
+@media screen and (max-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(60px, 28vw));
+    gap: 2.5vw;
+  }
+
+  .grid-item {
+    padding: 6px;
+    font-size: 0.75rem;
+  }
+
+  .card-info-display {
+    font-size: 0.8rem;
+
+  }
+  
 }
