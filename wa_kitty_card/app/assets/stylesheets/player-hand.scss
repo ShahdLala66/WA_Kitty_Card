@@ -9,9 +9,9 @@
   }
 
   .card-container {
-    width: clamp(70px, #{$card-width}, 160px);
-    min-width: 60px;
-    max-width: 220px;
+    width: clamp(100px, #{$card-width}, 200px);
+    min-width: 90px;
+    max-width: 280px;
     display: inline-flex;
     align-items: stretch;
   }
@@ -20,7 +20,7 @@
     flex: 1 1 auto;
     aspect-ratio: 2 / 3;
     background: $white;
-    border: 2px solid $pink-light;
+    border: 3px solid rgb(174, 145, 129);
     border-radius: $card-border-radius;
     box-shadow: $card-shadow;
     display: flex;

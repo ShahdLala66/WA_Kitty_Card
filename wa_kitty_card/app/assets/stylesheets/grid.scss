@@ -24,10 +24,10 @@
 .grid-wrapper::after {
   content: "";
   position: absolute;
-  bottom: -12vw;
-  left: -2vw;
-  width: 20vw;
-  height: 20vw;
+  bottom: -100px;
+  left: -20px;
+  width: 150px;
+  height: 150px;
   background-image: url('/assets/images/cupecakes.png');
   background-size: contain;
   background-repeat: no-repeat;
