@@ -1,0 +1,58 @@
+@import "colors";
+
+.player-hand-section {
+  .player-hand-row {
+    width: 100%;
+    margin: auto;
+    padding: 0;
+    gap: $card-spacing;
+  }
+
+  .card-container {
+    width: clamp(100px, #{$card-width}, 200px);
+    min-width: 90px;
+    max-width: 280px;
+    display: inline-flex;
+    align-items: stretch;
+  }
+
+  .card-display {
+    flex: 1 1 auto;
+    aspect-ratio: 2 / 3;
+    background: $white;
+    border: 3px solid rgb(174, 145, 129);
+    border-radius: $card-border-radius;
+    box-shadow: $card-shadow;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: $font-dark;
+    text-align: center;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: $card-shadow-hover;
+      border-color: $pink-dark;
+      z-index: 10;
+    }
+  }
+}
+
+.card-image {
+  max-width: 100%;
+  max-height: 70%;
+  object-fit: contain;
+  border-radius: 0.5rem;
+}
+
+.card-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: $font-dark;
+  text-align: center;
+  word-wrap: break-word;
+  max-width: 100%;
+}
