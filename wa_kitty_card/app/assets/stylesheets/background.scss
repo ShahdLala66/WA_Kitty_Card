@@ -1,6 +1,5 @@
 @import "colors";
 
-// Hintergrund
 body {
     background: linear-gradient(to bottom, $primary-blue 0%, $pink-light 50%, $pink-dark 100%);
     min-height: 100vh;
@@ -8,105 +7,81 @@ body {
     position: relative;
 }
 
-// Layer
-.decor-layer {
-    inset: 0;
-    pointer-events: none;
-    z-index: $z-index + 1;
-}
-
-// Wolke
 .cloud {
+  position: absolute;
+  width: 15vw;
+  height: 6vw;
+  left: 70vw;
+  top: 40vh;
+
+  background: linear-gradient(to bottom right, #ffffff 0%, #f5f9ff 100%);
+  border-radius: 8vw;
+
+  &::before,
+  &::after {
+    content: "";
     position: absolute;
-    width: 15vw;
+    background: inherit;
+    border-radius: 50%;
+    box-shadow: inherit;
+  }
+
+  &::before {
+    width: 5vw;
+    height: 5vw;
+    top: -2.5vw;
+  }
+
+  &::after {
+    width: 6vw;
     height: 6vw;
-    left: 70vw;
-    top: 40vh;
+    top: -3vw;
+    left: 2vw;
+  }
 
-    background: linear-gradient(to bottom right, #ffffff 0%, #f5f9ff 100%);
-    border-radius: 8vw;
-
-    &::before,
-    &::after {
-        content: "";
-        position: absolute;
-        background: inherit;
-        border-radius: 50%;
-        box-shadow: inherit;
-    }
-
-    &::before {
-        width: 5vw;
-        height: 5vw;
-        top: -2.5vw;
-    }
-
-    &::after {
-        width: 6vw;
-        height: 6vw;
-        top: -3vw;
-        left: 2vw;
-    }
-
-    animation: cloudFloat 6s ease-in-out infinite alternate;
-    will-change: transform;
+  animation: cloudFloat 6s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
-@keyframes cloudFloat {
-    0% {
-        transform: translateY(0);
-    }
-
-    100% {
-        transform: translateY(-2vh);
-    }
-}
-
-// Katze
 .cat-container {
-    position: absolute;
-    top: 20%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 8vw;
-    height: 8vw;
-    cursor: pointer;
-    pointer-events: auto;
-    transition: transform 0.3s ease;
-    z-index: 10;
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 8vw;
+  pointer-events: auto;
+  transition: transform 0.3s ease;
+  z-index: 10;
 }
 
 .cat-container:hover {
-    transform: translate(-50%, -50%) scale(1.1);
+  transform: translate(-50%, -50%) scale(1.1);
 }
 
 .cat-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.25));
+  height: 100%;
 }
 
 .thought-bubble {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translate(-50%, -10px);
-    background: #fff;
-    border-radius: 20px;
-    padding: 10px 15px;
-    min-width: 120px;
-    text-align: center;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-    color: #333;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    opacity: 0;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    pointer-events: none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, -10px);
+  background: #fff;
+  border-radius: 20px;
+  padding: 10px 15px;
+  min-width: 120px;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.7rem, 2vw, 1rem);
+  color: #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
 }
 
 .cat-container:hover .thought-bubble {
-    opacity: 1;
-    transform: translate(-50%, -25px);
+  opacity: 1;
+  transform: translate(-50%, -25px);
 }

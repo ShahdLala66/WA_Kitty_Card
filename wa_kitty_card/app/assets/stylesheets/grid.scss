@@ -1,158 +1,77 @@
 @import "colors";
 
-// Hide radio buttons (wichtig für später maybe idk)
-input[type="radio"] {
-  position: absolute;
-  top: -9999em;
+.grid-border {
+  border: 5px solid rgb(174, 145, 129) !important;
+  display: block !important;
+  border-radius: $border-radius / 2 !important;
+  padding: 0;
+  margin: 0 auto;
+  width: 90%;
+  box-sizing: border-box;
 }
 
-.border {
-  border: .5vw solid rgb(174, 145, 129);
-  display: inline-block;
-  border-radius: 10px;
-}
 .grid-wrapper {
-  border: 4vw solid  rgb(205, 216, 225);
-  border-bottom: 10vw solid  rgb(205, 216, 225);
-  border-radius: 2px;
-  display: inline-block;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  border: 30px solid rgb(205, 216, 225);
+  border-bottom: 80px solid rgb(205, 216, 225);
+  border-radius: $border-radius / 2;
   position: relative;
+  box-sizing: border-box;
 }
 
 .grid-wrapper::after {
   content: "";
   position: absolute;
-  bottom: -12vw; 
-  left: -2vw;     
-  width: 20vw;   
+  bottom: -12vw;
+  left: -2vw;
+  width: 20vw;
   height: 20vw;
   background-image: url('/assets/images/cupecakes.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  z-index: 1;    
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(80px, 13.5vw));
-  grid-auto-rows: 1fr;
-  gap: 1vw;
-  justify-content: center;
-  background-color: transparent;
+  z-index: 1;
 }
 
 .grid-item {
-  grid-row: span 1;
-  grid-column: span 1;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba($black-shadow-dark, 0.2);
-  padding: 10px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  background-color: var(--card-color);
-  opacity: .5;
-  margin: 0;
-  aspect-ratio: 1 / 1;
+  background-color: var(--card-color) !important;
+  border: none !important;
   position: relative;
+  aspect-ratio: 1 / 1;
+}
+
+.grid-item .small {
+  font-size: 0.7rem;
+  line-height: 1.2;
+  text-align: center;
 }
 
 .grid-item:hover {
-  box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light;
+  box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light !important;
+  transform: scale(1.02);
 }
-
-.grid-item .card-info-display {
-  position: relative;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.grid-item label,
-.grid-item .tile-overlay {
-  display: block;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background: rgba(0, 0, 0, 0.10);
-  font-family: Raleway, Courier, 'Courier New', Sans, sans-serif;
-  font-weight: bolder;
-  border-radius: 12px;
-}
-
-.grid-item .tile-overlay {
-  display: none;
-  overflow: hidden;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85);
-}
-
-.grid-item label:hover {
-  cursor: pointer;
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.grid-item label::before,
-.grid-item .tile-overlay::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80%;
-  height: 80%;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.grid-item .tile-overlay::before {
-  width: 100%;
-  height: 100%;
-}
-
 
 .grid-item.card-placed::after {
   content: "";
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   pointer-events: none;
-  z-index: 1;
+  z-index: 10;
+  opacity: 1;
 }
 
-// Player 1 gif (Zayne) muss man eig tauschen bin aber jetzt müdee
 .grid-item.card-placed[data-player="player1"]::after {
-  opacity: 1;
   background-image: url('/assets/images/player-one.gif');
 }
 
-// Player 2 gif (Xavier)
 .grid-item.card-placed[data-player="player2"]::after {
-  opacity: 1;
   background-image: url('/assets/images/player-two.gif');
-}
-
-
-@media screen and (max-width: 600px) {
-  .grid {
-    grid-template-columns: repeat(3, minmax(60px, 28vw));
-    gap: 2.5vw;
-  }
-
-  .grid-item {
-    padding: 6px;
-    font-size: 0.75rem;
-  }
-
-  .card-info-display {
-    font-size: 0.8rem;
-
-  }
-  
 }

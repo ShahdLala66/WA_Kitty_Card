@@ -3,28 +3,12 @@
 @import "nav-menu";
 @import "grid";
 @import "player-hand";
-@import "player-state";
 @import "error-handler";
-@import "loadingScreen";
 
 @import "bootstrap/scss/bootstrap";
 
 body {
-  font-family: $font-display;
-  color: $font-dark;
-  margin: 0;
-  padding: 0;
   text-align: center;
-  min-height: 100vh;
-}
-
-h1,
-h2,
-h3 {
-  font-family: $font-display;
-  color: #2d2d2d;
-  margin-bottom: 1rem;
-  letter-spacing: 0.5px;
 }
 
 h1 {
@@ -42,11 +26,6 @@ h1 {
     transform: translateY(-0.2vh);
     box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light*1.8;
   }
-}
-
-
-h2 {
-  font-size: 1.6rem;
 }
 
 a {
@@ -79,6 +58,24 @@ a {
   }
 }
 
+.card {
+  background: $white-transparent !important;
+  backdrop-filter: blur(10px) !important;
+  box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light !important;
+  text-align: left !important;
+  transition: transform $transition-fast ease, box-shadow $transition-fast ease !important;
+
+  &:hover {
+    transform: translateY(-0.2vh);
+    box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light*1.8;
+  }
+}
+
+.card .card-body {
+  padding: 2rem 3rem !important;
+  line-height: 1.6 !important;
+}
+
 .section-title {
   text-align: center;
   font-family: $font-display;
@@ -88,7 +85,6 @@ a {
 
 ul {
   list-style-type: "🐾 ";
-  padding-left: 1.5rem;
 }
 
 .cute-button {
@@ -110,4 +106,62 @@ ul {
     transition: transform 0.3s ease;
   }
 
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: $font-dark;
+}
+
+.card-title::before,
+.card-title::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.18), transparent);
+  margin: 0 0.5rem;
+  border-radius: 2px;
+}
+
+.card-title strong {
+  display: inline-block;
+  padding: 0 0.6rem;
+  background: transparent;
+  position: relative;
+}
+
+.card-title strong::before,
+.card-title strong::after {
+  content: "୨ৎ";
+  display: inline-block;
+  margin: 0 0.25rem;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+.player-state-card {
+  margin: 0 auto;
+  max-height: 45px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+
+}
+
+.player-state-card .card-body {
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+.transparent-card {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
 }

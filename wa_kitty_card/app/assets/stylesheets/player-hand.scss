@@ -1,7 +1,6 @@
 @import "colors";
 
 .player-hand-section {
-
   .player-hand-row {
     width: 100%;
     margin: auto;
@@ -42,18 +41,6 @@
   }
 }
 
-
-// Card display with image and label
-.card-display {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  gap: 0.25rem;
-}
-
 .card-image {
   max-width: 100%;
   max-height: 70%;
@@ -68,38 +55,4 @@
   text-align: center;
   word-wrap: break-word;
   max-width: 100%;
-}
-
-.player-hand-section table td {
-  &.selected {
-    border-color: $primary-blue;
-    background: linear-gradient(135deg, $white, $primary-blue);
-    transform: translateY(-6px);
-    box-shadow: 0 6px 20px rgba(161, 204, 234, 0.4);
-  }
-  
-  &.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    filter: grayscale(0.5);
-    
-    &:hover {
-      transform: none;
-      box-shadow: $card-shadow;
-    }
-  }
-
-}
-
-.background-player-hand {
-  background: $white-transparent;
-  backdrop-filter: blur(10px);
-  border-radius: $border-radius;
-  box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light;
-  margin: auto;
-  padding: 1rem 3rem;
-  text-align: left;
-  line-height: 1.6;
-  transition: transform $transition-fast ease, box-shadow $transition-fast ease;
-  width: clamp(60vw, 50vw, 40vw);
 }

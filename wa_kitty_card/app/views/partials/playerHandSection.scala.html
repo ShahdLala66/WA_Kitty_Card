@@ -28,17 +28,25 @@
       "" // fallback if parsing fails
     }
   }) { getCardImage =>
-    <div class="background-player-hand">
-      <div class="player-hand-section">
-        <div class="player-hand-row d-flex flex-column flex-sm-row justify-content-center align-items-center gap-2">
-          @for(card <- cards) {
-            <div class="card-container d-inline-flex align-items-stretch me-2 mb-2">
-              <div class="card-display d-flex flex-column align-items-center justify-content-center">
-                <img src="@getCardImage(card)" alt="@card" class="card-image img-fluid" />
-                <div class="card-label">@card</div>
+    <div class="container py-4">
+      <div class="row">
+        <div class="col-12 mb-3">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <div class="player-hand-section">
+                  <div class="player-hand-row d-flex flex-column flex-sm-row justify-content-center align-items-center gap-2">
+                    @for(card <- cards) {
+                      <div class="card-container d-inline-flex align-items-stretch me-2 mb-2">
+                        <div class="card-display d-flex flex-column align-items-center justify-content-center">
+                          <img src="@getCardImage(card)" alt="@card" class="card-image img-fluid" />
+                          <div class="card-label">@card</div>
+                        </div>
+                      </div>
+                    }
+                  </div>
               </div>
             </div>
-          }
+          </div>
         </div>
       </div>
     </div>

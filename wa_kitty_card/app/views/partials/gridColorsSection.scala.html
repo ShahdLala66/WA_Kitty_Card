@@ -1,32 +1,23 @@
 @(gridData: Seq[(Int, Int, String, String, String)])
 
-@for(tileNum <- 1 to 9) {
-  <input type="radio" id="cell-@tileNum" name="game-cell" data-player="player1" />
-  <input type="radio" id="cell-@tileNum" name="game-cell" data-player="player2" />
-}
-
-<span class="border">
-<div class="grid-wrapper">
-  <div class="grid">
-    @for(row <- 0 to 2) {
-      @for(col <- 0 to 2) {
-        @defining(gridData.find(t => t._1 == col && t._2 == row)) { cellData =>
-          @cellData match {
-            case Some((x, y, cardInfo, htmlColor, suitName)) => {
-              @defining(row * 3 + col + 1) { tileNum =>
-                @defining(if ((x + y) % 2 == 0) "player1" else "player2") { playerClass =>
-                  <div class="grid-item @if(cardInfo != "Empty") {card-placed}" style="--card-color: @{htmlColor}" data-card="@cardInfo" data-suit="@suitName" data-player="@playerClass">
-                    <div class="card-info-display">
-                      <div>(@x, @y)</div>
-                      <div>@cardInfo</div>
-                    </div>
-
-                    <label for="cell-@tileNum" data-player="player1" class="color-label"></label>
-                    <label for="cell-@tileNum" data-player="player2" class="color-label"></label>
-                    <div class="tile-overlay"></div>
-                  </div>
-                }
-              }
+<div class="grid-border">
+  <div class="grid-wrapper">
+    @for(row <- 0 to 2; col <- 0 to 2) {
+      @defining(gridData.find(t => t._1 == col && t._2 == row)) { cellData =>
+        @cellData match {
+          case Some((x, y, cardInfo, htmlColor, suitName)) => {
+            @defining(if ((x + y) % 2 == 0) "player1" else "player2") { playerClass =>
+              <button type="button"
+                class="btn grid-item rounded-1 shadow @if(cardInfo != "Empty"){card-placed}"
+                style="--card-color: @{htmlColor}"
+                data-card="@cardInfo"
+                data-suit="@suitName"
+                data-player="@playerClass">
+                <div class="small text-muted position-relative">
+                  <div>(@x, @y)</div>
+                  <div>@cardInfo</div>
+                </div>
+              </button>
             }
           }
         }
@@ -34,4 +25,3 @@
     }
   </div>
 </div>
-</span>
