@@ -13,27 +13,11 @@
 .grid-wrapper {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-  border: 30px solid rgb(205, 216, 225);
-  border-bottom: 80px solid rgb(205, 216, 225);
-  border-radius: $border-radius / 2;
+
   position: relative;
   box-sizing: border-box;
 }
 
-.grid-wrapper::after {
-  content: "";
-  position: absolute;
-  bottom: -100px;
-  left: -20px;
-  width: 150px;
-  height: 150px;
-  background-image: url('/assets/images/cupecakes.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  z-index: 1;
-}
 
 .grid-item {
   background-color: var(--card-color) !important;
