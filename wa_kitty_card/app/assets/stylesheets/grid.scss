@@ -1,38 +1,31 @@
 @import "colors";
 
 .grid-border {
-  border: 5px solid rgb(174, 145, 129) !important;
-  display: block !important;
-  border-radius: $border-radius / 2 !important;
+  border: 5px solid rgb(174, 145, 129);
+  border-radius: $border-radius / 2;
   padding: 0;
   margin: 0 auto;
-  width: 90%;
+  width: min(40vh); 
+  aspect-ratio: 1 / 1; 
+  max-width: 500px;
+  border-bottom: 2vh solid rgb(134, 106, 66);
   box-sizing: border-box;
+  
+  transform: perspective(2000px) rotateX(25deg); 
+  transform-style: preserve-3d;
+  
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.15), 
+    0 5px 15px rgba(0, 0, 0, 0.1); 
 }
 
 .grid-wrapper {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-  border: 30px solid rgb(205, 216, 225);
-  border-bottom: 80px solid rgb(205, 216, 225);
-  border-radius: $border-radius / 2;
   position: relative;
   box-sizing: border-box;
-}
+  
 
-.grid-wrapper::after {
-  content: "";
-  position: absolute;
-  bottom: -100px;
-  left: -20px;
-  width: 150px;
-  height: 150px;
-  background-image: url('/assets/images/cupecakes.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  z-index: 1;
 }
 
 .grid-item {
@@ -40,6 +33,7 @@
   border: none !important;
   position: relative;
   aspect-ratio: 1 / 1;
+
 }
 
 .grid-item .small {
@@ -74,4 +68,11 @@
 
 .grid-item.card-placed[data-player="player2"]::after {
   background-image: url('/assets/images/player-two.gif');
+}
+
+@media  screen and (max-width: 576px) {
+  .grid-border {
+    width: min(90vw); 
+  }
+  
 }

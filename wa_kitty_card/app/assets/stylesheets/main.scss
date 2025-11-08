@@ -4,6 +4,7 @@
 @import "grid";
 @import "player-hand";
 @import "error-handler";
+@import "table";
 
 @import "bootstrap/scss/bootstrap";
 
@@ -72,8 +73,6 @@ a {
 }
 
 .card .card-body {
-  padding: 2rem 3rem !important;
-  line-height: 1.6 !important;
 }
 
 .section-title {
