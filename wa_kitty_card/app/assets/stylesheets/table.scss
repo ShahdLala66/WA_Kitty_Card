@@ -4,6 +4,7 @@
   height: 120vh;
   width: 100%;
   position: relative;
+  padding: 0 2rem;
 }
 
 
@@ -36,6 +37,7 @@
   justify-content: center;
   position: relative; 
   z-index: 2; 
+  margin: 0 1rem;
 }
 
 
@@ -44,5 +46,8 @@
     align-items: flex-start;
     padding-top: 10px;
   }
+
+  .game-layout {
+    padding: 0 ;   }
 
 }
