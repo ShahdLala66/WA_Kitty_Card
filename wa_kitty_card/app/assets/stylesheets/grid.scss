@@ -5,28 +5,35 @@
   border-radius: $border-radius / 2;
   padding: 0;
   margin: 0 auto;
-  
   width: min(40vh); 
   aspect-ratio: 1 / 1; 
   max-width: 500px;
-  
+  border-bottom: 2vh solid rgb(134, 106, 66);
   box-sizing: border-box;
+  
+  transform: perspective(2000px) rotateX(25deg); 
+  transform-style: preserve-3d;
+  
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.15), 
+    0 5px 15px rgba(0, 0, 0, 0.1); 
 }
 
 .grid-wrapper {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-
   position: relative;
   box-sizing: border-box;
-}
+  
 
+}
 
 .grid-item {
   background-color: var(--card-color) !important;
   border: none !important;
   position: relative;
   aspect-ratio: 1 / 1;
+
 }
 
 .grid-item .small {
@@ -61,4 +68,11 @@
 
 .grid-item.card-placed[data-player="player2"]::after {
   background-image: url('/assets/images/player-two.gif');
+}
+
+@media  screen and (max-width: 576px) {
+  .grid-border {
+    width: min(90vw); 
+  }
+  
 }
