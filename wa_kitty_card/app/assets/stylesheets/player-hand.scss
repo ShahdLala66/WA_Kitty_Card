@@ -6,12 +6,13 @@
     margin: auto;
     padding: 0;
     gap: $card-spacing;
+    flex-wrap: wrap;
   }
 
   .card-container {
-    width: clamp(100px, #{$card-width}, 200px);
-    min-width: 90px;
-    max-width: 280px;
+    width: clamp(120px, #{$card-width}, 220px);
+    min-width: 100px;
+    max-width: 300px;
     display: inline-flex;
     align-items: stretch;
   }
@@ -43,7 +44,7 @@
 
 .card-image {
   max-width: 100%;
-  max-height: 70%;
+  max-height: 80%;
   object-fit: contain;
   border-radius: 0.5rem;
 }

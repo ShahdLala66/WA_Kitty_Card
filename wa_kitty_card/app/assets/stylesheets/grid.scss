@@ -1,12 +1,15 @@
 @import "colors";
 
 .grid-border {
-  border: 5px solid rgb(174, 145, 129) !important;
-  display: block !important;
-  border-radius: $border-radius / 2 !important;
+  border: 5px solid rgb(174, 145, 129);
+  border-radius: $border-radius / 2;
   padding: 0;
   margin: 0 auto;
-  width: 90%;
+  
+  width: min(40vh); 
+  aspect-ratio: 1 / 1; 
+  max-width: 500px;
+  
   box-sizing: border-box;
 }
 

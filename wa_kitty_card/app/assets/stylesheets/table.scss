@@ -1,35 +1,48 @@
-.combined-container {
-  /* Keep content layout and spacing here; the background lives behind it */
+.game-layout {
+  display: grid;
+  grid-template-rows: 20vh 50vh 30vh 10vh; 
+  height: 120vh;
+  width: 100%;
   position: relative;
-  padding: 2rem 0; /* same vertical breathing room as before */
 }
 
-.table-surface {
-  /* Non-intrusive background element: absolutely positioned so it
-     doesn't affect grid/flex layouts inside .combined-container */
+
+.table-background {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 0;
-  bottom: 18vh;
+  left: 0;
+  top: 20vh; 
   width: 100vw;
+  height: 80vh; 
+  
+  background-color: rgb(252, 244, 208);
+  
+  background-image: 
+    linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+  
   pointer-events: none;
   z-index: -1;
+  
+  margin-left: 50%;
+  transform: translateX(-50%);
 }
 
-.table-surface::before {
-  /* The visual background spanning the viewport */
-  content: '';
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 0;
-  bottom: 0;
-  width: 100vw;
-  background-image: url('/assets/images/table.svg');
-  background-position: center;
-  background-repeat: no-repeat;
+.state-section, 
+.grid-section, 
+.hand-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; 
+  z-index: 2; 
+}
 
-  z-index: -1;
-  pointer-events: none;
+
+@media screen and (max-width: 576px) {
+  .hand-section {
+    align-items: flex-start;
+    padding-top: 10px;
+  }
+
 }
