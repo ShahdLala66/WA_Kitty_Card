@@ -1,9 +1,14 @@
 @import "colors";
 
+body {
+    padding-top: 15vh !important;
+}
+
 nav.navbar {
-    position: sticky;
+    position: fixed;
     background: $white-transparent !important;
     box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light !important;
+    transition: transform 0.3s ease-in-out;
 
     &::before {
         content: '';
