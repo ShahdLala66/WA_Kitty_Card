@@ -5,6 +5,7 @@
 @import "player-hand";
 @import "error-handler";
 @import "table";
+@import "card-placement";
 
 @import "bootstrap/scss/bootstrap";
 
@@ -70,9 +71,6 @@ a {
     transform: translateY(-0.2vh);
     box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light*1.8;
   }
-}
-
-.card .card-body {
 }
 
 .section-title {
