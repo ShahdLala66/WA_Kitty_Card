@@ -8,6 +8,32 @@
   justify-content: center;
 }
 
+.card-container {
+  width: clamp(120px, #{$card-width}, 220px);
+  min-width: 100px;
+  max-width: 300px;
+  
+  @media screen and (max-width: 576px) {
+    position: absolute;
+    width: 80px; 
+    
+    @for $i from 0 through 19 {
+      $row: floor($i / 5); 
+      $col: $i % 5; 
+      
+      &[data-card-index="#{$i}"] {
+        left: calc(50vw - 200px + #{$col * 40}px); 
+        top: #{$row * 60}px;
+        z-index: #{20 - $i};
+      }
+    }
+    
+    &:hover {
+      z-index: 21 !important;
+    }
+  }
+}
+
 .player-hand-row {
   display: flex;
   justify-content: center;
@@ -25,35 +51,9 @@
     position: relative;
     flex-direction: row;
     justify-content: center;
-    gap: 0; 
-    height: 200px; 
-  }
-}
-
-
-  .card-container {
-  width: clamp(120px, #{$card-width}, 220px);
-  min-width: 100px;
-  max-width: 300px;
-  
-  @media screen and (max-width: 576px) {
-    position: absolute;
-    width: 140px;
-    
-    @for $i from 0 through 19 {
-      $row: floor($i / 5); 
-      $col: $i % 5; 
-      
-      &[data-card-index="#{$i}"] {
-        left: #{$col * 60}px;
-        top: #{$row * 80}px;
-        z-index: #{20 - $i};
-      }
-    }
-    
-    &:hover {
-      z-index: 21 !important;
-    }
+    align-items: center;
+    gap: 0;
+    height: 250px;
   }
 }
 

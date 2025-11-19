@@ -17,6 +17,10 @@ nav.navbar {
         backdrop-filter: blur($backdrop-blur);
         z-index: -1;
     }
+
+    &.navbar-hidden {
+        transform: translateY(-100%);
+    }
 }
 
 nav.navbar .navbar-brand {
