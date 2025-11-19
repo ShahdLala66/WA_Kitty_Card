@@ -129,22 +129,76 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
 
   // GAME ACTIONS
 
+  def placeCard: Action[AnyContent] = Action { implicit request =>
+    request.body.asJson match {
+      case Some(json) =>
+          val cardIndex = (json \ "cardIndex").as[Int]
+          val x         = (json \ "x").as[Int]
+          val y         = (json \ "y").as[Int]
+
+          println(s"Placing card: index=$cardIndex, x=$x, y=$y")
+          Main.controller.handleCardPlacement(cardIndex, x, y)
+          getGameStateJson()
+
+    }
+  }
+
   def drawCard: Action[AnyContent] = Action { implicit request =>
     Main.controller.handleCommand("draw")
     Main.controller.askForInputAgain()
-    Redirect(routes.UiController.combinedView())
+    getGameStateJson()
   }
 
   def undo: Action[AnyContent] = Action { implicit request =>
     Main.controller.handleCommand("undo")
     Main.controller.askForInputAgain()
-    Redirect(routes.UiController.combinedView())
+    getGameStateJson()
   }
 
   def redo: Action[AnyContent] = Action { implicit request =>
     Main.controller.handleCommand("redo")
     Main.controller.askForInputAgain()
-    Redirect(routes.UiController.combinedView())
+    getGameStateJson()
+  }
+
+  private def getGameStateJson(): Result = {
+    import play.api.libs.json._
+
+    val stateOpt  = safe(Main.controller.getStateElements)
+    val playerOpt = safe(Main.controller.getCurrentplayer)
+    val gridData  = getGridState
+
+    if (stateOpt.isEmpty || gridData.isEmpty || playerOpt.isEmpty) {
+      Ok(
+        Json.obj(
+          "success" -> false,
+          "message" -> "Game state not available"
+        )
+      )
+    } else {
+      val state         = stateOpt.get
+      val currentPlayer = playerOpt.get
+      val handSeq       = getPlayerHand(currentPlayer)
+
+      val gridJson = gridData.map { case (x, y, cardInfo, htmlColor, suitName) =>
+        Json.obj(
+          "x"     -> x,
+          "y"     -> y,
+          "card"  -> cardInfo,
+          "color" -> htmlColor,
+          "suit"  -> suitName
+        )
+      }
+
+      Ok(
+        Json.obj(
+          "success" -> true,
+          "state"   -> state,
+          "grid"    -> gridJson,
+          "hand"    -> handSeq
+        )
+      )
+    }
   }
 
   private def safe[T](expr: => T): Option[T] =

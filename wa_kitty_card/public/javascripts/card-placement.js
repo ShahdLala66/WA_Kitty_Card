@@ -3,7 +3,10 @@
 
   let selectedCard = null;
 
-  $(document).ready(function() {
+  function initCardPlacement() {
+    $('.card-container').off('dragstart dragend click');
+    $('.grid-item').off('dragover dragenter dragleave drop click');
+
     $('.card-container')
       .attr('draggable', true)
       .on('dragstart', function(e) {
@@ -62,27 +65,39 @@
         $card.removeClass('selected');
         selectedCard = null;
       });
-  });
+  }
 
   function placeCard($grid, data) {
-    $grid
-      .addClass('card-placed has-card')
-      .removeClass('drag-over drop-valid drop-invalid')
-      .data('card', data.card);
-
     const coords = $grid.find('.text-muted div').first().text();
-    $grid.find('.text-muted').html(`
-      <div>${coords}</div>
-      <div class="fw-bold">${data.card}</div>
-    `);
+    const match = coords.match(/\((\d+),\s*(\d+)\)/);
+    
+    if (!match) {
+      console.error('Invalid coordinates:', coords);
+      alert('Invalid grid position');
+      return;
+    }
+    
+    const x = parseInt(match[1]);
+    const y = parseInt(match[2]);
+    const cardIndex = data.index;
 
-    $(`.card-container[data-card-index="${data.index}"]`).fadeOut(300, function() {
-      $(this).remove();
+    fetch('/placeCard', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ cardIndex: cardIndex, x: x, y: y })
+    })
+    .then(response => response.json())
+    .then(responseData => {
+      if (responseData.success) {
+        $grid.addClass('card-placed has-card').removeClass('drag-over drop-valid drop-invalid').data('card', data.card);
+        $grid.find('.text-muted').html(`<div>${coords}</div><div class="fw-bold">${data.card}</div>`);
+        $(`.card-container[data-card-index="${cardIndex}"]`).fadeOut(300, function() { $(this).remove(); });
+        if (window.updateGameStateFromAjax) window.updateGameStateFromAjax(responseData);
+      }
     });
   }
 
+  $(document).ready(function() { initCardPlacement(); });
+  window.initCardPlacement = initCardPlacement;
+
 })(jQuery);
-
-
-// Debug: Log grid clicks
-$(document).on('click', '.grid-item', function() { console.log('Grid clicked:', $(this).data('card'), 'Row/Col:', $(this).find('.text-muted div').first().text()); });

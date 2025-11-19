@@ -2,6 +2,7 @@
 GET     /                               controllers.UiController.helloKitty()
 GET     /combinedView                   controllers.UiController.combinedView()
 GET     /enterNames                     controllers.UiController.enterNames()
+POST    /placeCard                      controllers.UiController.placeCard()
 POST    /draw                           controllers.UiController.drawCard()
 POST    /undo                           controllers.UiController.undo()
 POST    /redo                           controllers.UiController.redo()
