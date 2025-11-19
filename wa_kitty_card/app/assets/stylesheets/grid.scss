@@ -71,9 +71,11 @@
   background-image: url('/assets/images/player-two.gif');
 }
 
-@media  screen and (max-width: 576px) {
+@media screen and (max-width: 576px) {
   .grid-border {
-    width: min(90vw); 
+    width: min(85vh, 40vh); 
+    transform: perspective(2000px) rotateX(15deg); 
   }
+
   
 }

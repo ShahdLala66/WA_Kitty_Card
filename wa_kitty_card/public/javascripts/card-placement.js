@@ -82,7 +82,3 @@
   }
 
 })(jQuery);
-
-
-// Debug: Log grid clicks
-$(document).on('click', '.grid-item', function() { console.log('Grid clicked:', $(this).data('card'), 'Row/Col:', $(this).find('.text-muted div').first().text()); });
