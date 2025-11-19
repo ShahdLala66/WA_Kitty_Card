@@ -30,7 +30,7 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
     } else {
       val state         = stateOpt.get
       val currentPlayer = playerOpt.get
-      val handSeq = getPlayerHand(currentPlayer)
+      val handSeq       = getPlayerHand(currentPlayer)
 
       Ok(views.html.ui.combinedView(state, gridData, handSeq))
     }
@@ -125,6 +125,26 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
       case _ =>
         Ok(views.html.debug.loadingScreen("Couldn't load current player's hand."))
     }
+  }
+
+  // GAME ACTIONS
+
+  def drawCard: Action[AnyContent] = Action { implicit request =>
+    Main.controller.handleCommand("draw")
+    Main.controller.askForInputAgain()
+    Redirect(routes.UiController.combinedView())
+  }
+
+  def undo: Action[AnyContent] = Action { implicit request =>
+    Main.controller.handleCommand("undo")
+    Main.controller.askForInputAgain()
+    Redirect(routes.UiController.combinedView())
+  }
+
+  def redo: Action[AnyContent] = Action { implicit request =>
+    Main.controller.handleCommand("redo")
+    Main.controller.askForInputAgain()
+    Redirect(routes.UiController.combinedView())
   }
 
   private def safe[T](expr: => T): Option[T] =
