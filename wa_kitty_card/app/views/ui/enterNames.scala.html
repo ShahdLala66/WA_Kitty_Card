@@ -1,16 +1,17 @@
-@() @main("Enter names") {
+@()(implicit request: play.api.mvc.RequestHeader)
 
+@main("Enter names") {
 <div class="enter-names">
   <h1>Enter Player Names</h1>
-  <form method="get">
+  <form id="player-names-form">
     <div>
-      <label for="name1">Name Player 1</label><br />
-      <input type="text" id="name1" required />
+      <label for="player1Name">Name Player 1</label><br />
+      <input type="text" id="player1Name" name="player1Name" required />
     </div>
     <br />
     <div>
-      <label for="name2">Name Player 2</label><br />
-      <input type="text" id="name2" required />
+      <label for="player2Name">Name Player 2</label><br />
+      <input type="text" id="player2Name" name="player2Name" required />
     </div>
     <br />
     <div>
@@ -19,4 +20,36 @@
   </form>
 </div>
 
+<script>
+  document.getElementById('player-names-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const player1Name = document.getElementById('player1Name').value;
+    const player2Name = document.getElementById('player2Name').value;
+
+    fetch('@routes.UiController.setPlayerNames()', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Csrf-Token': '@helper.CSRF.getToken.value'
+      },
+      body: JSON.stringify({
+        player1Name: player1Name,
+        player2Name: player2Name
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'OK' && data.redirect) {
+        window.location.href = data.redirect;
+      } else {
+        // Handle error
+        console.error('Error setting player names:', data);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  });
+</script>
 }
