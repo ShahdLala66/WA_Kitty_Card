@@ -4,21 +4,18 @@
   <div class="grid-wrapper">
     @for(row <- 0 to 2; col <- 0 to 2) {
       @defining(gridData.find(t => t._1 == col && t._2 == row)) { cellData =>
-        @cellData match {
-          case Some((x, y, cardInfo, htmlColor, suitName)) => {
-            @defining(if ((x + y) % 2 == 0) "player1" else "player2") { playerClass =>
-              <button type="button"
-                class="btn grid-item rounded-1 shadow @if(cardInfo != "Empty"){card-placed}"
-                style="--card-color: @{htmlColor}"
-                data-card="@cardInfo"
-                data-suit="@suitName"
-                data-player="@playerClass">
+      @cellData match {
+        case Some((x, y, cardInfo, htmlColor, suitName)) => {
+            <button type="button"
+              class="btn grid-item rounded-1 shadow @if(cardInfo != "Empty"){card-placed}"
+              style="--card-color: @{htmlColor}"
+              data-card="@cardInfo"
+              data-suit="@suitName">
                 <div class="small text-muted position-relative">
                   <div>(@x, @y)</div>
                   <div>@cardInfo</div>
                 </div>
               </button>
-            }
           }
         }
       }

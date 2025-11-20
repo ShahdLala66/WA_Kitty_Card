@@ -5,8 +5,7 @@ import play.api.mvc._
 import main_.Main
 import model.gameModelComp.PlayerInterface
 import scala.util.Try
-import play.api.libs.json.Json
-import play.api.libs.json.JsValue
+import play.api.libs.json.{Json, JsValue, JsObject}
 
 @Singleton
 class UiController @Inject() (cc: ControllerComponents) extends AbstractController(cc) {
@@ -52,7 +51,7 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
   }
 
   def setPlayerNames: Action[JsValue] = Action(parse.json) { implicit request: Request[JsValue] =>
-            Main.controller.setGameMode("m")
+    Main.controller.setGameMode("m")
 
     val player1Name = (request.body \ "player1Name").as[String]
     val player2Name = (request.body \ "player2Name").as[String]
@@ -156,13 +155,19 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
     } else {
       request.body.asJson match {
         case Some(json) =>
-            val cardIndex = (json \ "cardIndex").as[Int]
-            val x         = (json \ "x").as[Int]
-            val y         = (json \ "y").as[Int]
+          val cardIndex = (json \ "cardIndex").as[Int]
+          val x         = (json \ "x").as[Int]
+          val y         = (json \ "y").as[Int]
+          val currentPlayerName = safe(Main.controller.getCurrentplayer).map(_.getPlayerName).getOrElse("")
+          val player1Name = safe(Main.controller.getPlayer1).getOrElse("")
+          val playerNumber = if (currentPlayerName == player1Name) "player1" else "player2"
 
-            println(s"Placing card: index=$cardIndex, x=$x, y=$y")
-            Main.controller.handleCardPlacement(cardIndex, x, y)
-            getGameStateJson()
+          Main.controller.handleCardPlacement(cardIndex, x, y)
+          
+          val result = getGameStateJson()
+          val resultJson = result.asInstanceOf[play.api.mvc.Result].body.asInstanceOf[play.api.http.HttpEntity.Strict].data.utf8String
+          val jsonObj = Json.parse(resultJson).as[JsObject]
+          Ok(jsonObj ++ Json.obj("placedByPlayer" -> playerNumber, "placedAt" -> Json.obj("x" -> x, "y" -> y)))
 
       }
     }
@@ -213,7 +218,6 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
     else
       Redirect(routes.UiController.index())
   }
-
 
   private def getGameStateJson(): Result = {
     import play.api.libs.json._

@@ -90,6 +90,7 @@
     .then(responseData => {
       if (responseData.success) {
         $grid.addClass('card-placed has-card').removeClass('drag-over drop-valid drop-invalid').data('card', data.card);
+        if (responseData.placedByPlayer) $grid.attr('data-player', responseData.placedByPlayer);
         $grid.find('.text-muted').html(`<div>${coords}</div><div class="fw-bold">${data.card}</div>`);
         $(`.card-container[data-card-index="${cardIndex}"]`).fadeOut(300, function() { $(this).remove(); });
         if (window.updateGameStateFromAjax) window.updateGameStateFromAjax(responseData);
