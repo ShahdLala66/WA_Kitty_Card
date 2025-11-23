@@ -98,7 +98,4 @@
     });
   }
 
-  $(document).ready(function() { initCardPlacement(); });
-  window.initCardPlacement = initCardPlacement;
-
 })(jQuery);
