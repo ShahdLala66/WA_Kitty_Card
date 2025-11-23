@@ -5,6 +5,7 @@ import play.api.mvc._
 import main_.Main
 import model.gameModelComp.PlayerInterface
 import scala.util.Try
+import play.api.libs.json.{Json, JsValue, JsObject}
 
 @Singleton
 class UiController @Inject() (cc: ControllerComponents) extends AbstractController(cc) {
@@ -16,28 +17,47 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
     Ok(views.html.debug.listEvents(events))
   }
 
-  def helloKitty: Action[AnyContent] = Action {
+  def index: Action[AnyContent] = Action {
     Ok(views.html.ui.helloKitty("Welcome to the Kitty Card Game! :3"))
   }
 
+  def newGame: Action[AnyContent] = Action {
+    Main.controller.handleCommand("start")
+    Redirect(routes.UiController.enterNames())
+  }
+
   def combinedView: Action[AnyContent] = Action {
-    val stateOpt  = safe(Main.controller.getStateElements)
-    val gridData  = getGridState
-    val playerOpt = safe(Main.controller.getCurrentplayer)
-
-    if (stateOpt.isEmpty || gridData.isEmpty || playerOpt.isEmpty) {
-      Ok(views.html.debug.loadingScreen("I feel like im supposed to be loading something. . ."))
+    if (Main.controller.isGameOver) {
+      Redirect(routes.UiController.gameOverPage())
     } else {
-      val state         = stateOpt.get
-      val currentPlayer = playerOpt.get
-      val handSeq = getPlayerHand(currentPlayer)
+      val stateOpt  = safe(Main.controller.getStateElements)
+      val gridData  = getGridState
+      val playerOpt = safe(Main.controller.getCurrentplayer)
 
-      Ok(views.html.ui.combinedView(state, gridData, handSeq))
+      if (stateOpt.isEmpty || gridData.isEmpty || playerOpt.isEmpty) {
+        Ok(views.html.debug.loadingScreen("I feel like im supposed to be loading something. . ."))
+      } else {
+        val state         = stateOpt.get
+        val currentPlayer = playerOpt.get
+        val handSeq       = getPlayerHand(currentPlayer)
+
+        Ok(views.html.ui.combinedView(state, gridData, handSeq))
+      }
     }
   }
 
   def enterNames: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.ui.enterNames())
+  }
+
+  def setPlayerNames: Action[JsValue] = Action(parse.json) { implicit request: Request[JsValue] =>
+    Main.controller.setGameMode("m")
+
+    val player1Name = (request.body \ "player1Name").as[String]
+    val player2Name = (request.body \ "player2Name").as[String]
+    Main.controller.promptForPlayerName(player1Name, player2Name)
+
+    Ok(Json.obj("status" -> "OK", "redirect" -> routes.UiController.combinedView().url))
   }
 
   def loadingScreen: Action[AnyContent] = Action {
@@ -124,6 +144,118 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
         Ok(views.html.debug.playerHand(handSeq))
       case _ =>
         Ok(views.html.debug.loadingScreen("Couldn't load current player's hand."))
+    }
+  }
+
+  // GAME ACTIONS
+
+  def placeCard: Action[AnyContent] = Action { implicit request =>
+    if (Main.controller.isGameOver) {
+      Ok(Json.obj("gameOver" -> true))
+    } else {
+      request.body.asJson match {
+        case Some(json) =>
+          val cardIndex = (json \ "cardIndex").as[Int]
+          val x         = (json \ "x").as[Int]
+          val y         = (json \ "y").as[Int]
+          val currentPlayerName = safe(Main.controller.getCurrentplayer).map(_.getPlayerName).getOrElse("")
+          val player1Name = safe(Main.controller.getPlayer1).getOrElse("")
+          val playerNumber = if (currentPlayerName == player1Name) "player1" else "player2"
+
+          Main.controller.handleCardPlacement(cardIndex, x, y)
+          
+          val result = getGameStateJson()
+          val resultJson = result.asInstanceOf[play.api.mvc.Result].body.asInstanceOf[play.api.http.HttpEntity.Strict].data.utf8String
+          val jsonObj = Json.parse(resultJson).as[JsObject]
+          Ok(jsonObj ++ Json.obj("placedByPlayer" -> playerNumber, "placedAt" -> Json.obj("x" -> x, "y" -> y)))
+
+      }
+    }
+  }
+
+  def drawCard: Action[AnyContent] = Action { implicit request =>
+    if (Main.controller.isGameOver) {
+      Ok(Json.obj("gameOver" -> true))
+    } else {
+      Main.controller.handleCommand("draw")
+      Main.controller.askForInputAgain()
+      getGameStateJson()
+    }
+  }
+
+  def undo: Action[AnyContent] = Action { implicit request =>
+    if (Main.controller.isGameOver) {
+      Ok(Json.obj("gameOver" -> true))
+    } else {
+      Main.controller.handleCommand("undo")
+      Main.controller.askForInputAgain()
+      getGameStateJson()
+    }
+  }
+
+  def redo: Action[AnyContent] = Action { implicit request =>
+    if (Main.controller.isGameOver) {
+      Ok(Json.obj("gameOver" -> true))
+    } else {
+      Main.controller.handleCommand("redo")
+      Main.controller.askForInputAgain()
+      getGameStateJson()
+    }
+  }
+
+  def gameOverPage: Action[AnyContent] = Action {
+    if (Main.controller.isGameOver) {
+      val winnerName = Main.controller.getWinner().getOrElse("No one")
+      Ok(views.html.ui.gameOver(winnerName))
+    } else {
+      Redirect(routes.UiController.combinedView())
+    }
+  }
+
+  def gameOver: Action[AnyContent] = Action {
+    if (Main.controller.isGameOver)
+      Redirect(routes.UiController.gameOverPage())
+    else
+      Redirect(routes.UiController.index())
+  }
+
+  private def getGameStateJson(): Result = {
+    import play.api.libs.json._
+
+    val stateOpt  = safe(Main.controller.getStateElements)
+    val playerOpt = safe(Main.controller.getCurrentplayer)
+    val gridData  = getGridState
+
+    if (stateOpt.isEmpty || gridData.isEmpty || playerOpt.isEmpty) {
+      Ok(
+        Json.obj(
+          "success" -> false,
+          "message" -> "Game state not available"
+        )
+      )
+    } else {
+      val state         = stateOpt.get
+      val currentPlayer = playerOpt.get
+      val handSeq       = getPlayerHand(currentPlayer)
+
+      val gridJson = gridData.map { case (x, y, cardInfo, htmlColor, suitName) =>
+        Json.obj(
+          "x"     -> x,
+          "y"     -> y,
+          "card"  -> cardInfo,
+          "color" -> htmlColor,
+          "suit"  -> suitName
+        )
+      }
+
+      Ok(
+        Json.obj(
+          "success" -> true,
+          "state"   -> state,
+          "grid"    -> gridJson,
+          "hand"    -> handSeq
+        )
+      )
     }
   }
 

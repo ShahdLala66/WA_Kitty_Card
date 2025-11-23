@@ -1,0 +1,18 @@
+@(winnerName: String)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Over</title>
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+</head>
+<body>
+    <div class="game-over-container">
+        <h1>Game Over</h1>
+        <h2>Winner: @winnerName</h2>
+        <a href="@routes.UiController.newGame()" class="btn btn-primary">New Game</a>
+        <a href="@routes.UiController.index()" class="btn btn-secondary">Home</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+@import "colors";
+
+.game-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  padding: 20px;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+}
+
+.action-button {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  border: 2px solid #333;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.undo-button {
+  background-color: $pink-dark;
+  color: #333;
+}
+
+.redo-button {
+  background-color: $primary-blue;
+  color: #333;
+}
+
+.draw-button {
+  background-color: $green;
+  color: #333;
+}
+
+.button-text {
+  display: inline-block;
+  pointer-events: none;
+}
