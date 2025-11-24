@@ -1,6 +1,6 @@
 
 applications:
-- name: kittysss4d
+- name: kittycards
   memory: 1G
   instances: 1
   docker:
