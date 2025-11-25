@@ -1,0 +1,50 @@
+@import "_colors";
+
+.card-container {
+    cursor: grab;
+}
+
+.card-container:active {
+    cursor: grabbing;
+}
+
+.card-container.dragging {
+    opacity: 0.5;
+}
+
+.card-container.selected .card-display {
+    border-color: $font-dark;
+    border-width: 4px;
+}
+
+.grid-item {
+    position: relative;
+    border: 2px solid transparent;
+}
+
+.grid-item.drag-over,
+.grid-item.drop-valid,
+.grid-item.drop-invalid {
+    transform: none !important;
+    z-index: 10;
+}
+
+.grid-item.drag-over:hover,
+.grid-item.drop-valid:hover,
+.grid-item.drop-invalid:hover {
+    transform: none !important;
+}
+
+.grid-item.drop-valid {
+    border-color: #10b981 !important;
+}
+
+.grid-item.drop-invalid {
+    border-color: #ef4444 !important;
+    cursor: not-allowed;
+}
+
+.grid-item.has-card {
+    border-color: var(--card-color, #6b7280) !important;
+    border-width: 3px !important;
+}

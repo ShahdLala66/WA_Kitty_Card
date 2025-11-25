@@ -1,7 +1,6 @@
 @(cards: Seq[String])
 
 @defining(cards) { cards =>
-  @* Helper function to convert card string to image path *@
   @defining((cardStr: String) => {
     val parts = cardStr.split(" of ")
     if (parts.length == 2) {
@@ -25,23 +24,19 @@
       }
       s"/assets/images/cards/$value/$value-$color.png"
     } else {
-      "" // fallback if parsing fails
+      ""
     }
   }) { getCardImage =>
-    <div class="background-player-hand">
-      <div class="player-hand-section">
-        <table>
-          <tr>
-            @for(card <- cards) {
-              <td>
-                <div class="card-display">
-                  <img src="@getCardImage(card)" alt="@card" class="card-image" />
-                  <div class="card-label">@card</div>
-                </div>
-              </td>
-            }
-          </tr>
-        </table>
+    <div class="player-hand-section">
+      <div class="player-hand-row">
+        @for((card, index) <- cards.zipWithIndex) {
+          <div class="card-container" data-card-index="@index">
+            <div class="card-display">
+              <img src="@getCardImage(card)" alt="@card" class="card-image" />
+              <div class="card-label">@card</div>
+            </div>
+          </div>
+        }
       </div>
     </div>
   }

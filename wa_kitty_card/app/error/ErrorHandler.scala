@@ -25,13 +25,11 @@ class ErrorHandler @Inject() (
         val html = views.html.errors.error404("Page Not Found", docs)(request)
         Future.successful(NotFound(html))
       case _ =>
-        // delegate other client errors to Play's default handler
         defaultHandler.onClientError(request, statusCode, message)
     }
   }
 
   override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
-    // delegate server errors to Play's default handler
     defaultHandler.onServerError(request, exception)
   }
 

@@ -1,10 +1,27 @@
 @(state: Seq[String], gridData: Seq[(Int, Int, String, String, String)],
 currentPlayerHand: Seq[String]) @main("Combined View") {
 
-<div class=combined-container>
-  @partials.playerStateSection(state)
-  @partials.gridColorsSection(gridData)
-  @partials.playerHandSection(currentPlayerHand)
+<div class="game-layout">
+
+  <div class="state-section">
+    @partials.playerStateSection(state)
+  </div>
+
+  <div class="zayne-wood"></div>
+  <div class="grid-section">
+    @partials.gridColorsSection(gridData)
+  </div>
+
+  <div class="hand-section">
+    @partials.playerHandSection(currentPlayerHand)
+  </div>
+
+  <div class="table-background">
+    @partials.table()
+  </div>
+
+  @partials.gameActions()
+
 </div>
 
 }
