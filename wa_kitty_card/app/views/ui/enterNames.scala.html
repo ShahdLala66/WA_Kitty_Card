@@ -2,23 +2,100 @@
 
 @main("Enter names") {
 <div class="enter-names">
-  <h1>Enter Player Names</h1>
-  <form id="player-names-form" data-action="@routes.UiController.setPlayerNames()">
-    <div>
-      <label for="player1Name">Name Player 1</label><br />
-      <input type="text" id="player1Name" name="player1Name" required />
+  <h1>Kitty Card Game</h1>
+  
+  <!-- Game Mode Selection -->
+  <div class="game-mode-section">
+    <h2>Choose Game Mode</h2>
+    <div class="mode-buttons">
+      <button id="local-mode-btn" class="mode-btn active">Local Multiplayer</button>
+      <button id="online-mode-btn" class="mode-btn">Online Multiplayer</button>
     </div>
-    <br />
-    <div>
-      <label for="player2Name">Name Player 2</label><br />
-      <input type="text" id="player2Name" name="player2Name" required />
+  </div>
+
+  <!-- Local Multiplayer Form -->
+  <div id="local-form" class="game-form">
+    <h3>Local Game - Enter Player Names</h3>
+    <form id="player-names-form" data-action="@routes.UiController.setPlayerNames()">
+      <div>
+        <label for="player1Name">Name Player 1</label><br />
+        <input type="text" id="player1Name" name="player1Name" required />
+      </div>
+      <br />
+      <div>
+        <label for="player2Name">Name Player 2</label><br />
+        <input type="text" id="player2Name" name="player2Name" required />
+      </div>
+      <br />
+      <div>
+        <button type="submit">Start Game</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Online Multiplayer Section -->
+  <div id="online-form" class="game-form" style="display: none;">
+    <h3>Online Multiplayer</h3>
+    
+    <div class="online-options">
+      <!-- Create Game -->
+      <div class="create-game-section">
+        <h4>Create New Game</h4>
+        <div>
+          <label for="onlinePlayerName">Your Name</label><br />
+          <input type="text" id="onlinePlayerName" name="onlinePlayerName" placeholder="Enter your name" />
+        </div>
+        <br />
+        <button id="create-game-btn" class="game-btn">Create Game</button>
+        <div id="share-link-container" style="display: none;">
+          <p>Share this Game ID with your friend:</p>
+          <div id="share-link" class="game-link"></div>
+          <button id="copy-link-btn" class="small-btn">Copy ID</button>
+          <p id="waiting-message">Waiting for opponent to join...</p>
+        </div>
+      </div>
+
+      <div class="divider">OR</div>
+
+      <!-- Join Game -->
+      <div class="join-game-section">
+        <h4>Join Existing Game</h4>
+        <div>
+          <label for="joinPlayerName">Your Name</label><br />
+          <input type="text" id="joinPlayerName" name="joinPlayerName" placeholder="Enter your name" />
+        </div>
+        <br />
+        <div>
+          <label for="game-id-input">Game ID</label><br />
+          <input id="game-id-input" type="text" placeholder="Enter Game ID" />
+        </div>
+        <br />
+        <button id="join-game-btn" class="game-btn">Join Game</button>
+      </div>
     </div>
-    <br />
-    <div>
-      <button type="submit">Continue</button>
-    </div>
-  </form>
+  </div>
+
+  <div id="connection-status" class="status-message"></div>
 </div>
+
+<style>
+  .game-mode-section { margin-bottom: 20px; }
+  .mode-buttons { display: flex; gap: 10px; justify-content: center; margin: 15px 0; }
+  .mode-btn { padding: 10px 20px; cursor: pointer; border: 2px solid #ccc; background: #fff; border-radius: 5px; }
+  .mode-btn.active { border-color: #007bff; background: #007bff; color: #fff; }
+  .game-form { margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+  .online-options { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
+  .create-game-section, .join-game-section { flex: 1; min-width: 250px; padding: 15px; }
+  .divider { display: flex; align-items: center; font-weight: bold; color: #666; }
+  .game-link { padding: 10px; background: #f5f5f5; border-radius: 4px; font-family: monospace; word-break: break-all; margin: 10px 0; }
+  .game-btn { padding: 10px 20px; background: #28a745; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+  .game-btn:hover { background: #218838; }
+  .small-btn { padding: 5px 10px; font-size: 12px; cursor: pointer; }
+  .status-message { margin-top: 15px; padding: 10px; border-radius: 4px; }
+  .status-message.success { background: #d4edda; color: #155724; }
+  .status-message.error { background: #f8d7da; color: #721c24; }
+  #waiting-message { color: #666; font-style: italic; }
+</style>
 
 <script src="@routes.Assets.versioned("javascripts/enter-names.js")" type="text/javascript"></script>
 }

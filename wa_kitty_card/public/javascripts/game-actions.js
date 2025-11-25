@@ -6,6 +6,26 @@
     const redoBtn = document.getElementById('redo-btn');
     const drawBtn = document.getElementById('draw-btn');
 
+    // Check if we're in online mode
+    const isOnlineMode = localStorage.getItem('gameMode') === 'online';
+    // Use server-assigned player number if available, fallback to localStorage
+    const serverPlayerNumber = window.serverPlayerNumber || 0;
+    const playerNumber = serverPlayerNumber > 0 ? serverPlayerNumber.toString() : localStorage.getItem('playerNumber');
+    const gameId = localStorage.getItem('gameId');
+    
+    // Store the resolved player number in localStorage and window
+    if (serverPlayerNumber > 0) {
+      localStorage.setItem('playerNumber', serverPlayerNumber.toString());
+    }
+    window.myPlayerNumber = parseInt(playerNumber) || 0;
+    
+    console.log('[game-actions] Player number:', window.myPlayerNumber, 'Online mode:', isOnlineMode);
+
+    // Reconnect to WebSocket if in online mode
+    if (isOnlineMode && gameId) {
+      connectToGame(gameId);
+    }
+
     if (undoBtn) {
       undoBtn.addEventListener('click', function() {
         performAction('/undo', undoBtn);
@@ -25,14 +45,35 @@
     }
 
     function performAction(url, button) {
+      // Check if it's my turn in online mode
+      const isOnline = localStorage.getItem('gameMode') === 'online';
+      if (isOnline) {
+        // We'll let the server validate whose turn it is
+        console.log('[performAction] Online mode, player:', playerNumber);
+      }
+      
       button.disabled = true;
       const originalText = button.querySelector('.button-text').textContent;
       button.querySelector('.button-text').textContent = 'Loading...';
 
-      fetch(url, { method: 'POST', headers: { 'Accept': 'application/json' } })
+      // Add player number as query param for online mode - ALWAYS include it
+      const actionUrl = playerNumber ? `${url}?playerNumber=${playerNumber}` : url;
+
+      fetch(actionUrl, { method: 'POST', headers: { 'Accept': 'application/json' } })
       .then(response => response.json())
       .then(data => {
-        if (data.success) updateGameState(data);
+        if (data.success) {
+          updateGameState(data);
+          // In online mode, broadcast the action to opponent
+          if (isOnlineMode && window.gameSocket) {
+            window.gameSocket.send(JSON.stringify({
+              type: 'gameAction',
+              action: url,
+              playerNumber: playerNumber,
+              state: data
+            }));
+          }
+        }
       })
       .finally(() => {
         button.disabled = false;
@@ -43,7 +84,20 @@
     function updateGameState(data) {
       if (data.state) updatePlayerState(data.state);
       if (data.grid) updateGrid(data.grid);
-      if (data.hand) updateHand(data.hand);
+      // Only update hand if the response is for this player
+      // Check if playerNumber in response matches our session player number
+      const myNumber = window.myPlayerNumber || parseInt(localStorage.getItem('playerNumber')) || 0;
+      const responsePlayerNumber = data.playerNumber || 0;
+      
+      console.log('[updateGameState] My player:', myNumber, 'Response player:', responsePlayerNumber);
+      
+      // Update hand if it's our own data (playerNumber matches or not specified)
+      if (data.hand && (responsePlayerNumber === 0 || responsePlayerNumber === myNumber)) {
+        console.log('[updateGameState] Updating hand for player', myNumber);
+        updateHand(data.hand);
+      } else if (data.hand) {
+        console.log('[updateGameState] Skipping hand update - not my data');
+      }
     }
 
     window.updateGameStateFromAjax = updateGameState;
@@ -90,5 +144,94 @@
       });
       if (window.initCardPlacement) window.initCardPlacement();
     }
+
+    function connectToGame(gameId) {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const ws = new WebSocket(`${protocol}//${window.location.host}/game/${gameId}/ws`);
+
+      ws.onopen = () => {
+        console.log('Connected to game session');
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log('Game message:', data);
+
+        switch (data.type) {
+          case 'playerAssigned':
+            localStorage.setItem('playerNumber', data.playerNumber);
+            break;
+
+          case 'gameAction':
+            // Opponent performed an action - only update grid and state, NOT hand
+            if (data.playerNumber !== playerNumber && data.state) {
+              if (data.state.state) updatePlayerState(data.state.state);
+              if (data.state.grid) updateGrid(data.state.grid);
+              // DO NOT update hand - players only see their own cards
+            }
+            break;
+
+          case 'cardPlayed':
+            // Opponent played a card - update grid only
+            if (data.playerNumber !== playerNumber) {
+              // Refresh grid from server
+              refreshGridOnly();
+            }
+            break;
+
+          case 'turnChanged':
+            // Update current player indicator
+            if (data.currentPlayer) {
+              updateCurrentPlayerIndicator(data.currentPlayer);
+            }
+            break;
+
+          case 'playerLeft':
+            alert('Your opponent has disconnected.');
+            break;
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+
+      ws.onclose = () => {
+        console.log('Disconnected from game');
+      };
+
+      window.gameSocket = ws;
+    }
+
+    // Function to refresh only the grid (not hands)
+    async function refreshGridOnly() {
+      try {
+        const response = await fetch('/gridColors');
+        // The response updates the grid display
+        // This is handled by the page refresh or AJAX update
+      } catch (error) {
+        console.error('Failed to refresh grid:', error);
+      }
+    }
+
+    function updateCurrentPlayerIndicator(currentPlayer) {
+      const cardBodies = document.querySelectorAll('.player-state-card .card-body');
+      if (cardBodies.length >= 3) {
+        cardBodies[2].textContent = `Current Player: ${currentPlayer}`;
+      }
+    }
+
+    // Expose function to send card placement to opponent
+    window.broadcastCardPlacement = function(cardIndex, x, y) {
+      if (isOnlineMode && window.gameSocket) {
+        window.gameSocket.send(JSON.stringify({
+          type: 'cardPlayed',
+          cardIndex: cardIndex,
+          x: x,
+          y: y,
+          playerNumber: playerNumber
+        }));
+      }
+    };
   });
 })();

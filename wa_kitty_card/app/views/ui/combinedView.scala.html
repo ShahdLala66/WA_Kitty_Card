@@ -1,7 +1,7 @@
 @(state: Seq[String], gridData: Seq[(Int, Int, String, String, String)],
-currentPlayerHand: Seq[String]) @main("Combined View") {
+currentPlayerHand: Seq[String], playerNumber: Int = 0) @main("Combined View") {
 
-<div class="game-layout">
+<div class="game-layout" data-player-number="@playerNumber">
 
   <div class="state-section">
     @partials.playerStateSection(state)
@@ -12,7 +12,7 @@ currentPlayerHand: Seq[String]) @main("Combined View") {
     @partials.gridColorsSection(gridData)
   </div>
 
-  <div class="hand-section">
+  <div class="hand-section" data-player-id="@playerNumber">
     @partials.playerHandSection(currentPlayerHand)
   </div>
 
@@ -23,5 +23,28 @@ currentPlayerHand: Seq[String]) @main("Combined View") {
   @partials.gameActions()
 
 </div>
+
+<script>
+  // Store the server-side player number for client-side session binding
+  window.serverPlayerNumber = @playerNumber;
+  
+  // Verify session matches server-assigned player
+  (function() {
+    const sessionPlayerNumber = parseInt(localStorage.getItem('playerNumber') || '0');
+    const serverPlayerNumber = @playerNumber;
+    
+    console.log('[combinedView] Server player number:', serverPlayerNumber);
+    console.log('[combinedView] Session player number:', sessionPlayerNumber);
+    
+    if (serverPlayerNumber > 0 && sessionPlayerNumber > 0 && serverPlayerNumber !== sessionPlayerNumber) {
+      console.warn('[combinedView] Player number mismatch! Server:', serverPlayerNumber, 'Session:', sessionPlayerNumber);
+    }
+    
+    // Store server player number in localStorage if not already set
+    if (serverPlayerNumber > 0) {
+      localStorage.setItem('playerNumber', serverPlayerNumber.toString());
+    }
+  })();
+</script>
 
 }

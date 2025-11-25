@@ -4,6 +4,12 @@
   let selectedCard = null;
 
   function initCardPlacement() {
+    // Get player number from server-assigned value or localStorage
+    const serverPlayerNumber = window.serverPlayerNumber || 0;
+    const myPlayerNumber = serverPlayerNumber > 0 ? serverPlayerNumber : parseInt(localStorage.getItem('playerNumber')) || 0;
+    
+    console.log('[card-placement] Initialized for player:', myPlayerNumber);
+    
     $('.card-container').off('dragstart dragend click');
     $('.grid-item').off('dragover dragenter dragleave drop click');
 
@@ -52,7 +58,7 @@
           return false;
         }
         const data = JSON.parse(e.originalEvent.dataTransfer.getData('application/json'));
-        placeCard($grid, data);
+        placeCard($grid, data, myPlayerNumber);
         return false;
       })
       .on('click', function() {
@@ -61,13 +67,13 @@
         placeCard($(this), {
           index: $card.data('card-index'),
           card: $card.find('.card-label').text()
-        });
+        }, myPlayerNumber);
         $card.removeClass('selected');
         selectedCard = null;
       });
   }
 
-  function placeCard($grid, data) {
+  function placeCard($grid, data, playerNum) {
     const coords = $grid.find('.text-muted div').first().text();
     const match = coords.match(/\((\d+),\s*(\d+)\)/);
     
@@ -80,11 +86,20 @@
     const x = parseInt(match[1]);
     const y = parseInt(match[2]);
     const cardIndex = data.index;
+    
+    // Get player number for online multiplayer - use passed parameter or fallback
+    const playerNumber = playerNum || window.myPlayerNumber || parseInt(localStorage.getItem('playerNumber')) || 0;
+    const requestBody = { cardIndex: cardIndex, x: x, y: y };
+    if (playerNumber > 0) {
+      requestBody.playerNumber = playerNumber;
+    }
+    
+    console.log('[placeCard] Placing card for player:', playerNumber);
 
     fetch('/placeCard', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ cardIndex: cardIndex, x: x, y: y })
+      body: JSON.stringify(requestBody)
     })
     .then(response => response.json())
     .then(responseData => {
@@ -94,6 +109,11 @@
         $grid.find('.text-muted').html(`<div>${coords}</div><div class="fw-bold">${data.card}</div>`);
         $(`.card-container[data-card-index="${cardIndex}"]`).fadeOut(300, function() { $(this).remove(); });
         if (window.updateGameStateFromAjax) window.updateGameStateFromAjax(responseData);
+        
+        // Broadcast card placement to opponent in online mode
+        if (window.broadcastCardPlacement) {
+          window.broadcastCardPlacement(cardIndex, x, y);
+        }
       }
     });
   }

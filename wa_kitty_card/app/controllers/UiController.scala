@@ -26,22 +26,48 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
     Redirect(routes.UiController.enterNames())
   }
 
-  def combinedView: Action[AnyContent] = Action {
+  def combinedView: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     if (Main.controller.isGameOver) {
       Redirect(routes.UiController.gameOverPage())
     } else {
       val stateOpt  = safe(Main.controller.getStateElements)
       val gridData  = getGridState
-      val playerOpt = safe(Main.controller.getCurrentplayer)
+      
+      // Check if a specific player number is requested (for online multiplayer)
+      val playerNumberOpt = request.getQueryString("playerNumber").flatMap(s => scala.util.Try(s.toInt).toOption)
+      
+      println(s"[combinedView] playerNumber from query: $playerNumberOpt")
+      
+      // Get the appropriate player based on query param or fallback to current player
+      val playerOpt = playerNumberOpt match {
+        case Some(num) => 
+          val p = safe(Main.controller.getPlayerByNumber(num)).flatten
+          println(s"[combinedView] Got player by number $num: ${p.map(_.getPlayerName)}")
+          p
+        case None => 
+          val p = safe(Main.controller.getCurrentplayer)
+          println(s"[combinedView] Using current player: ${p.map(_.getPlayerName)}")
+          p
+      }
+      
+      // Resolve the player number for session binding
+      val resolvedPlayerNumber = playerNumberOpt.getOrElse {
+        val currentName = safe(Main.controller.getCurrentplayer).map(_.getPlayerName).getOrElse("")
+        val player1Name = safe(Main.controller.getPlayer1).getOrElse("")
+        if (currentName == player1Name) 1 else 2
+      }
 
       if (stateOpt.isEmpty || gridData.isEmpty || playerOpt.isEmpty) {
+        println(s"[combinedView] Missing data - state: ${stateOpt.isDefined}, grid: ${gridData.nonEmpty}, player: ${playerOpt.isDefined}")
         Ok(views.html.debug.loadingScreen("I feel like im supposed to be loading something. . ."))
       } else {
         val state         = stateOpt.get
-        val currentPlayer = playerOpt.get
-        val handSeq       = getPlayerHand(currentPlayer)
+        val player        = playerOpt.get
+        val handSeq       = getPlayerHand(player)
+        
+        println(s"[combinedView] Player ${player.getPlayerName} (ID: $resolvedPlayerNumber) hand: $handSeq")
 
-        Ok(views.html.ui.combinedView(state, gridData, handSeq))
+        Ok(views.html.ui.combinedView(state, gridData, handSeq, resolvedPlayerNumber))
       }
     }
   }
@@ -51,12 +77,19 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
   }
 
   def setPlayerNames: Action[JsValue] = Action(parse.json) { implicit request: Request[JsValue] =>
+    println(s"[setPlayerNames] Received request: ${request.body}")
+    
+    // Reset and start a new game
+    Main.controller.handleCommand("start")
     Main.controller.setGameMode("m")
 
     val player1Name = (request.body \ "player1Name").as[String]
     val player2Name = (request.body \ "player2Name").as[String]
+    
+    println(s"[setPlayerNames] Starting game with: $player1Name vs $player2Name")
     Main.controller.promptForPlayerName(player1Name, player2Name)
-
+    
+    println(s"[setPlayerNames] Game initialized, redirecting to combinedView")
     Ok(Json.obj("status" -> "OK", "redirect" -> routes.UiController.combinedView().url))
   }
 
@@ -158,13 +191,15 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
           val cardIndex = (json \ "cardIndex").as[Int]
           val x         = (json \ "x").as[Int]
           val y         = (json \ "y").as[Int]
+          // Get player number from request body for online multiplayer
+          val requestedPlayerNumber = (json \ "playerNumber").asOpt[Int]
           val currentPlayerName = safe(Main.controller.getCurrentplayer).map(_.getPlayerName).getOrElse("")
           val player1Name = safe(Main.controller.getPlayer1).getOrElse("")
           val playerNumber = if (currentPlayerName == player1Name) "player1" else "player2"
 
           Main.controller.handleCardPlacement(cardIndex, x, y)
           
-          val result = getGameStateJson()
+          val result = getGameStateJson(requestedPlayerNumber)
           val resultJson = result.asInstanceOf[play.api.mvc.Result].body.asInstanceOf[play.api.http.HttpEntity.Strict].data.utf8String
           val jsonObj = Json.parse(resultJson).as[JsObject]
           Ok(jsonObj ++ Json.obj("placedByPlayer" -> playerNumber, "placedAt" -> Json.obj("x" -> x, "y" -> y)))
@@ -177,9 +212,10 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
     if (Main.controller.isGameOver) {
       Ok(Json.obj("gameOver" -> true))
     } else {
+      val playerNumberOpt = request.getQueryString("playerNumber").flatMap(s => scala.util.Try(s.toInt).toOption)
       Main.controller.handleCommand("draw")
       Main.controller.askForInputAgain()
-      getGameStateJson()
+      getGameStateJson(playerNumberOpt)
     }
   }
 
@@ -187,9 +223,10 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
     if (Main.controller.isGameOver) {
       Ok(Json.obj("gameOver" -> true))
     } else {
+      val playerNumberOpt = request.getQueryString("playerNumber").flatMap(s => scala.util.Try(s.toInt).toOption)
       Main.controller.handleCommand("undo")
       Main.controller.askForInputAgain()
-      getGameStateJson()
+      getGameStateJson(playerNumberOpt)
     }
   }
 
@@ -197,9 +234,10 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
     if (Main.controller.isGameOver) {
       Ok(Json.obj("gameOver" -> true))
     } else {
+      val playerNumberOpt = request.getQueryString("playerNumber").flatMap(s => scala.util.Try(s.toInt).toOption)
       Main.controller.handleCommand("redo")
       Main.controller.askForInputAgain()
-      getGameStateJson()
+      getGameStateJson(playerNumberOpt)
     }
   }
 
@@ -219,12 +257,24 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
       Redirect(routes.UiController.index())
   }
 
-  private def getGameStateJson(): Result = {
+  private def getGameStateJson(playerNumberOpt: Option[Int] = None): Result = {
     import play.api.libs.json._
 
     val stateOpt  = safe(Main.controller.getStateElements)
-    val playerOpt = safe(Main.controller.getCurrentplayer)
     val gridData  = getGridState
+    
+    // Get the appropriate player based on player number or fallback to current player
+    val playerOpt = playerNumberOpt match {
+      case Some(num) => safe(Main.controller.getPlayerByNumber(num)).flatten
+      case None => safe(Main.controller.getCurrentplayer)
+    }
+    
+    // Determine which player number this is (1 or 2)
+    val resolvedPlayerNumber = playerNumberOpt.getOrElse {
+      val currentName = safe(Main.controller.getCurrentplayer).map(_.getPlayerName).getOrElse("")
+      val player1Name = safe(Main.controller.getPlayer1).getOrElse("")
+      if (currentName == player1Name) 1 else 2
+    }
 
     if (stateOpt.isEmpty || gridData.isEmpty || playerOpt.isEmpty) {
       Ok(
@@ -234,9 +284,14 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
         )
       )
     } else {
-      val state         = stateOpt.get
-      val currentPlayer = playerOpt.get
-      val handSeq       = getPlayerHand(currentPlayer)
+      val state   = stateOpt.get
+      val player  = playerOpt.get
+      val handSeq = getPlayerHand(player)
+      
+      // Get current player's number to indicate whose turn it is
+      val currentPlayerName = safe(Main.controller.getCurrentplayer).map(_.getPlayerName).getOrElse("")
+      val player1Name = safe(Main.controller.getPlayer1).getOrElse("")
+      val currentTurnPlayerNumber = if (currentPlayerName == player1Name) 1 else 2
 
       val gridJson = gridData.map { case (x, y, cardInfo, htmlColor, suitName) =>
         Json.obj(
@@ -253,7 +308,10 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
           "success" -> true,
           "state"   -> state,
           "grid"    -> gridJson,
-          "hand"    -> handSeq
+          "hand"    -> handSeq,
+          "playerNumber" -> resolvedPlayerNumber,
+          "currentTurnPlayer" -> currentTurnPlayerNumber,
+          "isMyTurn" -> (resolvedPlayerNumber == currentTurnPlayerNumber)
         )
       )
     }

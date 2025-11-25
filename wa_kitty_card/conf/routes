@@ -18,3 +18,8 @@ GET     /playersState                   controllers.UiController.playersState()
 GET     /gridColors                     controllers.UiController.gridColors()
 GET     /loadingScreen                  controllers.UiController.loadingScreen()
 GET     /playersHand                    controllers.UiController.playerHandView()
+
+# WebSocket multiplayer routes
+GET     /game/create              controllers.GameSocketController.createGame
+GET     /game/:gameId/ws          controllers.GameSocketController.gameSocket(gameId: String)
+GET     /game/:gameId/join        controllers.GameSocketController.joinGame(gameId: String)
