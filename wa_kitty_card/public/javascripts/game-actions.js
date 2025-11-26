@@ -1,7 +1,14 @@
 (function() {
   'use strict';
 
+  // Store current player's identity
+  let myPlayerNumber = null;
+
   document.addEventListener('DOMContentLoaded', function() {
+    // Initialize player identity
+    myPlayerNumber = sessionStorage.getItem('playerNumber') || new URLSearchParams(window.location.search).get('playerNumber');
+    console.log('[game-actions] Initialized with playerNumber:', myPlayerNumber);
+    
     const undoBtn = document.getElementById('undo-btn');
     const redoBtn = document.getElementById('redo-btn');
     const drawBtn = document.getElementById('draw-btn');
@@ -29,10 +36,31 @@
       const originalText = button.querySelector('.button-text').textContent;
       button.querySelector('.button-text').textContent = 'Loading...';
 
-      fetch(url, { method: 'POST', headers: { 'Accept': 'application/json' } })
+      // Get session info
+      const sessionId = sessionStorage.getItem('sessionId');
+      const playerId = sessionStorage.getItem('playerId');
+      
+      const requestOptions = { 
+        method: 'POST', 
+        headers: { 
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      };
+      
+      // Add session info to body if available
+      if (sessionId && playerId) {
+        requestOptions.body = JSON.stringify({ sessionId, playerId });
+      }
+
+      fetch(url, requestOptions)
       .then(response => response.json())
       .then(data => {
-        if (data.success) updateGameState(data);
+        if (data.success) {
+          updateGameState(data);
+        } else if (data.message) {
+          alert(data.message);
+        }
       })
       .finally(() => {
         button.disabled = false;
@@ -43,7 +71,9 @@
     function updateGameState(data) {
       if (data.state) updatePlayerState(data.state);
       if (data.grid) updateGrid(data.grid);
-      if (data.hand) updateHand(data.hand);
+      // REMOVED: Don't update hand from WebSocket broadcasts
+      // Each player keeps their own cards based on initial page load
+      // if (data.hand) updateHand(data.hand);
     }
 
     window.updateGameStateFromAjax = updateGameState;
@@ -72,7 +102,15 @@
       });
     }
 
-    function updateHand(hand) {
+    function updateHand(hand, forPlayerNumber) {
+      // CRITICAL: Only update hand if it's for THIS player
+      // This prevents opponent's cards from replacing our cards
+      if (forPlayerNumber && myPlayerNumber && forPlayerNumber !== myPlayerNumber) {
+        console.log(`[game-actions] Ignoring hand update for Player ${forPlayerNumber}, I am Player ${myPlayerNumber}`);
+        return;
+      }
+      
+      console.log(`[game-actions] Updating hand for Player ${myPlayerNumber}:`, hand);
       const handSection = document.querySelector('.player-hand-section .player-hand-row');
       if (!handSection) return;
       handSection.innerHTML = '';

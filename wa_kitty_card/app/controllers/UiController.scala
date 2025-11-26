@@ -6,9 +6,13 @@ import main_.Main
 import model.gameModelComp.PlayerInterface
 import scala.util.Try
 import play.api.libs.json.{Json, JsValue, JsObject}
+import play.api.libs.streams.ActorFlow
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.Materializer
+import actors.GameWebSocketActor
 
 @Singleton
-class UiController @Inject() (cc: ControllerComponents) extends AbstractController(cc) {
+class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSystem, mat: Materializer) extends AbstractController(cc) {
 
   // VIEWS
 
@@ -26,22 +30,43 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
     Redirect(routes.UiController.enterNames())
   }
 
-  def combinedView: Action[AnyContent] = Action {
+  def combinedView: Action[AnyContent] = Action { implicit request =>
     if (Main.controller.isGameOver) {
       Redirect(routes.UiController.gameOverPage())
     } else {
       val stateOpt  = safe(Main.controller.getStateElements)
       val gridData  = getGridState
       val playerOpt = safe(Main.controller.getCurrentplayer)
+      
+      // Get session info from cookies or query params
+      val sessionId = request.session.get("sessionId").orElse(request.getQueryString("sessionId"))
+      val playerId = request.session.get("playerId").orElse(request.getQueryString("playerId"))
+      val playerNumber = request.session.get("playerNumber").orElse(request.getQueryString("playerNumber"))
 
       if (stateOpt.isEmpty || gridData.isEmpty || playerOpt.isEmpty) {
         Ok(views.html.debug.loadingScreen("I feel like im supposed to be loading something. . ."))
       } else {
         val state         = stateOpt.get
         val currentPlayer = playerOpt.get
-        val handSeq       = getPlayerHand(currentPlayer)
+        
+        // Get the hand for the specific player viewing this page
+        val handSeq = (sessionId, playerId, playerNumber) match {
+          case (Some(sid), Some(pid), Some(pNum)) =>
+            // Session-based: show cards only for the player viewing
+            val viewingPlayerNumber = pNum.toInt
+            val viewingPlayer = Main.controller.getSessionPlayer(sid, viewingPlayerNumber)
+            viewingPlayer.map(p => getPlayerHand(p)).getOrElse(Seq.empty)
+          case _ =>
+            // Legacy mode: show current player's hand
+            getPlayerHand(currentPlayer)
+        }
 
         Ok(views.html.ui.combinedView(state, gridData, handSeq))
+          .withSession(
+            sessionId.map("sessionId" -> _).toSeq ++ 
+            playerId.map("playerId" -> _).toSeq ++
+            playerNumber.map("playerNumber" -> _).toSeq: _*
+          )
       }
     }
   }
@@ -58,6 +83,64 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
     Main.controller.promptForPlayerName(player1Name, player2Name)
 
     Ok(Json.obj("status" -> "OK", "redirect" -> routes.UiController.combinedView().url))
+  }
+  
+  // SESSION MANAGEMENT ________________________________________________
+  
+  def createGame: Action[JsValue] = Action(parse.json) { implicit request: Request[JsValue] =>
+    val playerName = (request.body \ "playerName").as[String]
+    val playerId = java.util.UUID.randomUUID().toString
+    
+    val sessionId = Main.controller.createGameSession()
+    Main.controller.joinGameSession(sessionId, playerName, playerId)
+    
+    Ok(Json.obj(
+      "status" -> "OK",
+      "sessionId" -> sessionId,
+      "playerId" -> playerId,
+      "playerNumber" -> 1
+    )).withSession(
+      "sessionId" -> sessionId,
+      "playerId" -> playerId,
+      "playerNumber" -> "1"
+    )
+  }
+  
+  def joinGame: Action[JsValue] = Action(parse.json) { implicit request: Request[JsValue] =>
+    val sessionId = (request.body \ "sessionId").as[String]
+    val playerName = (request.body \ "playerName").as[String]
+    val playerId = java.util.UUID.randomUUID().toString
+    
+    Main.controller.joinGameSession(sessionId, playerName, playerId) match {
+      case Some(playerNumber) =>
+        // Start the game if both players are ready
+        if (playerNumber == 2) {
+          Main.controller.setGameMode("m")
+          Main.controller.startGameSession(sessionId)
+        }
+        
+        Ok(Json.obj(
+          "status" -> "OK",
+          "sessionId" -> sessionId,
+          "playerId" -> playerId,
+          "playerNumber" -> playerNumber
+        )).withSession(
+          "sessionId" -> sessionId,
+          "playerId" -> playerId,
+          "playerNumber" -> playerNumber.toString
+        )
+      case None =>
+        BadRequest(Json.obj(
+          "status" -> "ERROR",
+          "message" -> "Unable to join game. Session may be full or not found."
+        ))
+    }
+  }
+  
+  def gameWebSocket(sessionId: String, playerId: String): WebSocket = WebSocket.accept[JsValue, JsValue] { request =>
+    ActorFlow.actorRef { out =>
+      GameWebSocketActor.props(out, sessionId, playerId)
+    }
   }
 
   def loadingScreen: Action[AnyContent] = Action {
@@ -158,17 +241,61 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
           val cardIndex = (json \ "cardIndex").as[Int]
           val x         = (json \ "x").as[Int]
           val y         = (json \ "y").as[Int]
-          val currentPlayerName = safe(Main.controller.getCurrentplayer).map(_.getPlayerName).getOrElse("")
-          val player1Name = safe(Main.controller.getPlayer1).getOrElse("")
-          val playerNumber = if (currentPlayerName == player1Name) "player1" else "player2"
-
-          Main.controller.handleCardPlacement(cardIndex, x, y)
           
-          val result = getGameStateJson()
-          val resultJson = result.asInstanceOf[play.api.mvc.Result].body.asInstanceOf[play.api.http.HttpEntity.Strict].data.utf8String
-          val jsonObj = Json.parse(resultJson).as[JsObject]
-          Ok(jsonObj ++ Json.obj("placedByPlayer" -> playerNumber, "placedAt" -> Json.obj("x" -> x, "y" -> y)))
+          // Try to get session info from JSON body, then from session, then from cookies
+          val sessionId = (json \ "sessionId").asOpt[String]
+            .orElse(request.session.get("sessionId"))
+          val playerId = (json \ "playerId").asOpt[String]
+            .orElse(request.session.get("playerId"))
+          
+          println(s"[DEBUG] placeCard - sessionId: $sessionId, playerId: $playerId")
+          
+          // Validate player turn if session info provided
+          val canPlay = (sessionId, playerId) match {
+            case (Some(sid), Some(pid)) => 
+              val result = Main.controller.isPlayerTurn(sid, pid)
+              println(s"[DEBUG] isPlayerTurn check: $result for sid=$sid, pid=$pid")
+              result
+            case _ => 
+              println(s"[DEBUG] No session info - allowing legacy mode")
+              true // Legacy mode without sessions
+          }
+          
+          if (!canPlay) {
+            Ok(Json.obj(
+              "success" -> false,
+              "message" -> "It's not your turn!"
+            ))
+          } else {
+            val currentPlayerName = safe(Main.controller.getCurrentplayer).map(_.getPlayerName).getOrElse("")
+            val player1Name = safe(Main.controller.getPlayer1).getOrElse("")
+            val playerNumber = if (currentPlayerName == player1Name) "player1" else "player2"
 
+            Main.controller.handleCardPlacement(cardIndex, x, y)
+            
+            val result = getGameStateJson()
+            val resultJson = result.asInstanceOf[play.api.mvc.Result].body.asInstanceOf[play.api.http.HttpEntity.Strict].data.utf8String
+            val jsonObj = Json.parse(resultJson).as[JsObject]
+            val response = jsonObj ++ Json.obj(
+              "placedByPlayer" -> playerNumber, 
+              "placedAt" -> Json.obj("x" -> x, "y" -> y),
+              "action" -> "placeCard"
+            )
+            
+            // Broadcast to other players in session
+            for {
+              sid <- sessionId
+              pid <- playerId
+            } {
+              system.eventStream.publish(
+                actors.GameWebSocketActor.BroadcastToSession(sid, response, Some(pid))
+              )
+            }
+            
+            Ok(response)
+          }
+        case None =>
+          BadRequest(Json.obj("success" -> false, "message" -> "Invalid request"))
       }
     }
   }
@@ -177,31 +304,57 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
     if (Main.controller.isGameOver) {
       Ok(Json.obj("gameOver" -> true))
     } else {
-      Main.controller.handleCommand("draw")
-      Main.controller.askForInputAgain()
-      getGameStateJson()
+      val jsonOpt = request.body.asJson
+      
+      // Try to get session info from JSON body, then from session
+      val sessionId = jsonOpt.flatMap(json => (json \ "sessionId").asOpt[String])
+        .orElse(request.session.get("sessionId"))
+      val playerId = jsonOpt.flatMap(json => (json \ "playerId").asOpt[String])
+        .orElse(request.session.get("playerId"))
+      
+      println(s"[DEBUG] drawCard - sessionId: $sessionId, playerId: $playerId")
+      
+      // Validate player turn if session info provided
+      val canPlay = (sessionId, playerId) match {
+        case (Some(sid), Some(pid)) => 
+          val result = Main.controller.isPlayerTurn(sid, pid)
+          println(s"[DEBUG] drawCard isPlayerTurn check: $result for sid=$sid, pid=$pid")
+          result
+        case _ => 
+          println(s"[DEBUG] drawCard - No session info, allowing legacy mode")
+          true
+      }
+      
+      if (!canPlay) {
+        Ok(Json.obj(
+          "success" -> false,
+          "message" -> "It's not your turn!"
+        ))
+      } else {
+        Main.controller.handleCommand("draw")
+        Main.controller.askForInputAgain()
+        
+        val response = getGameStateJson()
+        
+        // Broadcast to other players in session
+        for {
+          sid <- sessionId
+          pid <- playerId
+        } {
+          val responseJson = response.asInstanceOf[play.api.mvc.Result].body
+            .asInstanceOf[play.api.http.HttpEntity.Strict].data.utf8String
+          val jsonObj = Json.parse(responseJson).as[JsObject] ++ Json.obj("action" -> "drawCard")
+          system.eventStream.publish(
+            actors.GameWebSocketActor.BroadcastToSession(sid, jsonObj, Some(pid))
+          )
+        }
+        
+        response
+      }
     }
   }
 
-  def undo: Action[AnyContent] = Action { implicit request =>
-    if (Main.controller.isGameOver) {
-      Ok(Json.obj("gameOver" -> true))
-    } else {
-      Main.controller.handleCommand("undo")
-      Main.controller.askForInputAgain()
-      getGameStateJson()
-    }
-  }
-
-  def redo: Action[AnyContent] = Action { implicit request =>
-    if (Main.controller.isGameOver) {
-      Ok(Json.obj("gameOver" -> true))
-    } else {
-      Main.controller.handleCommand("redo")
-      Main.controller.askForInputAgain()
-      getGameStateJson()
-    }
-  }
+  
 
   def gameOverPage: Action[AnyContent] = Action {
     if (Main.controller.isGameOver) {
@@ -223,10 +376,9 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
     import play.api.libs.json._
 
     val stateOpt  = safe(Main.controller.getStateElements)
-    val playerOpt = safe(Main.controller.getCurrentplayer)
     val gridData  = getGridState
 
-    if (stateOpt.isEmpty || gridData.isEmpty || playerOpt.isEmpty) {
+    if (stateOpt.isEmpty || gridData.isEmpty) {
       Ok(
         Json.obj(
           "success" -> false,
@@ -234,9 +386,7 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
         )
       )
     } else {
-      val state         = stateOpt.get
-      val currentPlayer = playerOpt.get
-      val handSeq       = getPlayerHand(currentPlayer)
+      val state = stateOpt.get
 
       val gridJson = gridData.map { case (x, y, cardInfo, htmlColor, suitName) =>
         Json.obj(
@@ -253,7 +403,7 @@ class UiController @Inject() (cc: ControllerComponents) extends AbstractControll
           "success" -> true,
           "state"   -> state,
           "grid"    -> gridJson,
-          "hand"    -> handSeq
+           //"hand"    -> handSeq
         )
       )
     }

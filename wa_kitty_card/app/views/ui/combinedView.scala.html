@@ -2,6 +2,9 @@
 currentPlayerHand: Seq[String]) @main("Combined View") {
 
 <div class="game-layout">
+  <div class="player-info-banner" id="player-info-banner">
+    <span class="player-identity">You are: <strong id="player-identity-name">Player ?</strong></span>
+  </div>
 
   <div class="state-section">
     @partials.playerStateSection(state)
@@ -23,5 +26,19 @@ currentPlayerHand: Seq[String]) @main("Combined View") {
   @partials.gameActions()
 
 </div>
+<script>
+  // debug
+  (function() {
+    const playerNumber = sessionStorage.getItem('playerNumber') || new URLSearchParams(window.location.search).get('playerNumber');
+    const banner = document.getElementById('player-info-banner');
+    const identityName = document.getElementById('player-identity-name');
+    
+    if (playerNumber) {
+      identityName.textContent = 'Player ' + playerNumber;
+      banner.classList.add('player-' + playerNumber);
+      banner.style.display = 'block';
+    }
+  })();
+</script>
 
 }
