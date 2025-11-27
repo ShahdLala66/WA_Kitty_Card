@@ -99,51 +99,30 @@
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(requestBody)
     })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      return response.json();
-    })
+    .then(response => response.ok ? response.json() : Promise.reject(`HTTP ${response.status}`))
     .then(responseData => {
-      // Check if game is over
-      if (responseData.gameOver) {
-        window.location.href = '/gameOver';
-        return;
-      }
+      if (responseData.gameOver) return window.location.href = '/gameOver';
+      if (responseData.message) return alert(responseData.message);
       
-      if (responseData.success) {
-        $grid.addClass('card-placed has-card').removeClass('drag-over drop-valid drop-invalid').data('card', data.card);
-        if (responseData.placedByPlayer) {
-          $grid.attr('data-player', responseData.placedByPlayer);
-          if (window.GameWebSocket && window.GameWebSocket.saveGridPlacement) {
-            window.GameWebSocket.saveGridPlacement(x, y, responseData.placedByPlayer);
+      $grid.addClass('card-placed has-card').removeClass('drag-over drop-valid drop-invalid').data('card', data.card);
+      if (responseData.placedByPlayer) {
+        $grid.attr('data-player', responseData.placedByPlayer);
+        window.GameWebSocket.saveGridPlacement(x, y, responseData.placedByPlayer);
+      }
+      $grid.find('.text-muted').html(`<div>${coords}</div><div class="fw-bold">${data.card}</div>`);
+      window.GameWebSocket.setTurnState(false);
+      
+      $(`.card-container[data-card-index="${cardIndex}"]`).fadeOut(300, function() { 
+        $(this).remove();
+        if (responseData.hand && window.updateHand) {
+          window.updateHand(responseData.hand, sessionInfo.playerNumber);
+          if (responseData.state && responseData.state.length > 0) {
+            window.GameWebSocket.updateTurnIndicator(responseData.state[0]);
           }
         }
-        $grid.find('.text-muted').html(`<div>${coords}</div><div class="fw-bold">${data.card}</div>`);
-        
-        window.GameWebSocket.setTurnState(false);
-        
-        $(`.card-container[data-card-index="${cardIndex}"]`).fadeOut(300, function() { 
-          $(this).remove();
-          
-          if (responseData.hand && window.updateHand) {
-            const sessionInfo = window.GameWebSocket.getSessionInfo();
-            window.updateHand(responseData.hand, sessionInfo.playerNumber);
-            
-            if (responseData.state && responseData.state.length > 0) {
-              window.GameWebSocket.updateTurnIndicator(responseData.state[0]);
-            }
-          }
-        });
-      } else if (responseData.message) {
-        alert(responseData.message);
-      }
+      });
     })
-    .catch(err => {
-      console.error('[card-placement] Error placing card:', err);
-      alert('Failed to place card: ' + err.message);
-    });
+    .catch(err => alert('Failed to place card: ' + err));
   }
 
   $(document).ready(function() { 

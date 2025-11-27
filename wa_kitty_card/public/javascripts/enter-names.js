@@ -1,7 +1,6 @@
 (function() {
   'use strict';
 
-  //nochmal überprüfen ob legal 
   document.addEventListener('DOMContentLoaded', function() {
     const createGameBtn = document.getElementById('create-game-btn');
     const joinGameBtn = document.getElementById('join-game-btn');
@@ -19,141 +18,88 @@
     let playerNumber = null;
     let websocket = null;
     
-    // Toggle between create and join forms
-    createGameBtn.addEventListener('click', function() {
-      createGameBtn.classList.add('active');
-      joinGameBtn.classList.remove('active');
-      createGameForm.style.display = 'block';
-      joinGameForm.style.display = 'none';
+    const toggleForms = (showCreate) => {
+      createGameBtn.classList.toggle('active', showCreate);
+      joinGameBtn.classList.toggle('active', !showCreate);
+      createGameForm.style.display = showCreate ? 'block' : 'none';
+      joinGameForm.style.display = showCreate ? 'none' : 'block';
       errorMessage.style.display = 'none';
-    });
+    };
     
-    joinGameBtn.addEventListener('click', function() {
-      joinGameBtn.classList.add('active');
-      createGameBtn.classList.remove('active');
-      joinGameForm.style.display = 'block';
-      createGameForm.style.display = 'none';
-      errorMessage.style.display = 'none';
-    });
+    createGameBtn.addEventListener('click', () => toggleForms(true));
+    joinGameBtn.addEventListener('click', () => toggleForms(false));
     
-    // Create game
-    createForm.addEventListener('submit', function(event) {
-      event.preventDefault();
-      const playerName = document.getElementById('create-player-name').value;
-      
+    createForm.addEventListener('submit', (e) => {
+      e.preventDefault();
       fetch('/createGame', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ playerName: playerName })
+        body: JSON.stringify({ playerName: document.getElementById('create-player-name').value })
       })
       .then(response => response.json())
       .then(data => {
-        if (data.status === 'OK') {
-          sessionId = data.sessionId;
-          playerId = data.playerId;
-          playerNumber = data.playerNumber;
-          
-          // Store in sessionStorage
-          sessionStorage.setItem('sessionId', sessionId);
-          sessionStorage.setItem('playerId', playerId);
-          sessionStorage.setItem('playerNumber', playerNumber);
-          
-          // Show waiting room
-          createForm.style.display = 'none';
-          waitingRoom.style.display = 'block';
-          gameIdInput.value = sessionId;
-          
-          // Connect to WebSocket
-          connectWebSocket();
-        } else {
-          showError('Failed to create game. Please try again.');
-        }
+        if (data.status !== 'OK') return showError('Failed to create game. Please try again.');
+        
+        ({ sessionId, playerId, playerNumber } = data);
+        sessionStorage.setItem('sessionId', sessionId);
+        sessionStorage.setItem('playerId', playerId);
+        sessionStorage.setItem('playerNumber', playerNumber);
+        
+        createForm.style.display = 'none';
+        waitingRoom.style.display = 'block';
+        gameIdInput.value = sessionId;
+        connectWebSocket();
       })
-      .catch(err => {
-        showError('Error creating game: ' + err.message);
-      });
+      .catch(err => showError('Error creating game: ' + err.message));
     });
     
-    // Join game
-    joinForm.addEventListener('submit', function(event) {
-      event.preventDefault();
+    joinForm.addEventListener('submit', (e) => {
+      e.preventDefault();
       const gameId = document.getElementById('join-game-id').value.trim().toUpperCase();
       const playerName = document.getElementById('join-player-name').value;
       
       fetch('/joinGame', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: gameId, playerName: playerName })
+        body: JSON.stringify({ sessionId: gameId, playerName })
       })
       .then(response => response.json())
       .then(data => {
-        if (data.status === 'OK') {
-          sessionId = data.sessionId;
-          playerId = data.playerId;
-          playerNumber = data.playerNumber;
-          
-          // Store in sessionStorage
-          sessionStorage.setItem('sessionId', sessionId);
-          sessionStorage.setItem('playerId', playerId);
-          sessionStorage.setItem('playerNumber', playerNumber);
-          
-          // Connect to WebSocket and redirect
-          connectWebSocket();
-          
-          // Game should start automatically, redirect to game view with session info
-          setTimeout(() => {
-            window.location.href = `/combinedView?sessionId=${sessionId}&playerId=${playerId}&playerNumber=${playerNumber}`;
-          }, 500);
-        } else {
-          showError(data.message || 'Failed to join game. Please check the Game ID.');
-        }
+        if (data.status !== 'OK') return showError(data.message || 'Failed to join game. Please check the Game ID.');
+        
+        ({ sessionId, playerId, playerNumber } = data);
+        sessionStorage.setItem('sessionId', sessionId);
+        sessionStorage.setItem('playerId', playerId);
+        sessionStorage.setItem('playerNumber', playerNumber);
+        
+        connectWebSocket();
+        setTimeout(() => window.location.href = `/combinedView?sessionId=${sessionId}&playerId=${playerId}&playerNumber=${playerNumber}`, 500);
       })
-      .catch(err => {
-        showError('Error joining game: ' + err.message);
-      });
+      .catch(err => showError('Error joining game: ' + err.message));
     });
     
-    // Copy game ID
-    copyGameIdBtn.addEventListener('click', function() {
+    copyGameIdBtn.addEventListener('click', () => {
       gameIdInput.select();
       document.execCommand('copy');
       copyGameIdBtn.textContent = 'Copied!';
-      setTimeout(() => {
-        copyGameIdBtn.textContent = 'Copy ID';
-      }, 2000);
+      setTimeout(() => copyGameIdBtn.textContent = 'Copy ID', 2000);
     });
     
     function connectWebSocket() {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.host}/ws/${sessionId}/${playerId}`;
+      websocket = new WebSocket(`${protocol}//${window.location.host}/ws/${sessionId}/${playerId}`);
       
-      websocket = new WebSocket(wsUrl);
-      
-      websocket.onopen = function() {
-      };
-      
-      websocket.onmessage = function(event) {
+      websocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        
-        if (data.type === 'player-joined') {
-          // If we're waiting and player 2 joined, redirect to game
-          if (waitingRoom.style.display !== 'none') {
-            window.location.href = `/combinedView?sessionId=${sessionId}&playerId=${playerId}&playerNumber=${playerNumber}`;
-          }
+        if (data.type === 'player-joined' && waitingRoom.style.display !== 'none') {
+          window.location.href = `/combinedView?sessionId=${sessionId}&playerId=${playerId}&playerNumber=${playerNumber}`;
         }
-      };
-      
-      websocket.onerror = function(error) {
-        console.error('WebSocket error:', error);
-      };
-      
-      websocket.onclose = function() {
       };
     }
     
-    function showError(message) {
+    const showError = (message) => {
       errorMessage.textContent = message;
       errorMessage.style.display = 'block';
-    }
+    };
   });
 })();

@@ -38,31 +38,21 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
       val gridData  = getGridState
       val playerOpt = safe(Main.controller.getCurrentplayer)
       
-      val sessionId = request.session.get("sessionId").orElse(request.getQueryString("sessionId"))
-      val playerId = request.session.get("playerId").orElse(request.getQueryString("playerId"))
-      val playerNumber = request.session.get("playerNumber").orElse(request.getQueryString("playerNumber"))
+      def getParam(key: String) = request.session.get(key).orElse(request.getQueryString(key))
+      val (sessionId, playerId, playerNumber) = (getParam("sessionId"), getParam("playerId"), getParam("playerNumber"))
 
       if (stateOpt.isEmpty || gridData.isEmpty || playerOpt.isEmpty) {
         Ok(views.html.debug.loadingScreen("I feel like im supposed to be loading something. . ."))
       } else {
-        val state         = stateOpt.get
-        val currentPlayer = playerOpt.get
-        
         val handSeq = (sessionId, playerId, playerNumber) match {
           case (Some(sid), Some(pid), Some(pNum)) =>
-            val viewingPlayerNumber = pNum.toInt
-            val viewingPlayer = Main.controller.getSessionPlayer(sid, viewingPlayerNumber)
-            viewingPlayer.map(p => getPlayerHand(p)).getOrElse(Seq.empty)
-          case _ =>
-            getPlayerHand(currentPlayer)
+            Main.controller.getSessionPlayer(sid, pNum.toInt).map(getPlayerHand).getOrElse(Seq.empty)
+          case _ => getPlayerHand(playerOpt.get)
         }
 
-        Ok(views.html.ui.combinedView(state, gridData, handSeq))
-          .withSession(
-            sessionId.map("sessionId" -> _).toSeq ++ 
-            playerId.map("playerId" -> _).toSeq ++
-            playerNumber.map("playerNumber" -> _).toSeq: _*
-          )
+        Ok(views.html.ui.combinedView(stateOpt.get, gridData, handSeq))
+          .withSession(Seq(sessionId.map("sessionId" -> _), playerId.map("playerId" -> _), 
+                          playerNumber.map("playerNumber" -> _)).flatten*)
       }
     }
   }
@@ -233,27 +223,17 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
     } else {
       request.body.asJson match {
         case Some(json) =>
-          val cardIndex = (json \ "cardIndex").as[Int]
-          val x         = (json \ "x").as[Int]
-          val y         = (json \ "y").as[Int]
+          val (cardIndex, x, y) = ((json \ "cardIndex").as[Int], (json \ "x").as[Int], (json \ "y").as[Int])
+          def getParam(key: String) = (json \ key).asOpt[String].orElse(request.session.get(key))
+          val (sessionId, playerId) = (getParam("sessionId"), getParam("playerId"))
           
-          val sessionId = (json \ "sessionId").asOpt[String]
-            .orElse(request.session.get("sessionId"))
-          val playerId = (json \ "playerId").asOpt[String]
-            .orElse(request.session.get("playerId"))
-          
-          val canPlay = (sessionId, playerId) match {
-            case (Some(sid), Some(pid)) => 
-              Main.controller.isPlayerTurn(sid, pid)
-            case _ => 
-              true
-          }
+          val canPlay = (for {
+            sid <- sessionId
+            pid <- playerId
+          } yield Main.controller.isPlayerTurn(sid, pid)).getOrElse(true)
           
           if (!canPlay) {
-            Ok(Json.obj(
-              "success" -> false,
-              "message" -> "It's not your turn!"
-            ))
+            Ok(Json.obj("success" -> false, "message" -> "It's not your turn!"))
           } else {
             val currentPlayerName = safe(Main.controller.getCurrentplayer).map(_.getPlayerName).getOrElse("")
             val player1Name = safe(Main.controller.getPlayer1).getOrElse("")
@@ -289,21 +269,17 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
                 sid <- sessionId
                 pid <- playerId
               } {
-                val otherPlayerNum = Main.controller.getPlayerNumberForSession(sid, pid).map(n => if (n == 1) 2 else 1)
                 val otherPlayerHand = for {
-                  pNum <- otherPlayerNum
+                  pNum <- Main.controller.getPlayerNumberForSession(sid, pid).map(n => if (n == 1) 2 else 1)
                   player <- Main.controller.getSessionPlayer(sid, pNum)
                 } yield player.getHand.map(_.toString)
                 
-                val responseWithOtherHand = jsonObj ++ Json.obj(
-                  "placedByPlayer" -> playerNumber, 
-                  "placedAt" -> Json.obj("x" -> x, "y" -> y),
-                  "action" -> "placeCard",
-                  "hand" -> otherPlayerHand.getOrElse(Seq.empty),
-                  "gameOver" -> Main.controller.isGameOver
-                )
                 system.eventStream.publish(
-                  actors.GameWebSocketActor.BroadcastToSession(sid, responseWithOtherHand, Some(pid))
+                  actors.GameWebSocketActor.BroadcastToSession(sid, jsonObj ++ Json.obj(
+                    "placedByPlayer" -> playerNumber, "placedAt" -> Json.obj("x" -> x, "y" -> y),
+                    "action" -> "placeCard", "hand" -> otherPlayerHand.getOrElse(Seq.empty),
+                    "gameOver" -> Main.controller.isGameOver
+                  ), Some(pid))
                 )
               }
               
@@ -321,25 +297,17 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
       Ok(Json.obj("gameOver" -> true))
     } else {
       val jsonOpt = request.body.asJson
+      def getParam(key: String) = jsonOpt.flatMap(json => (json \ key).asOpt[String]).orElse(request.session.get(key))
+      val (sessionId, playerId) = (getParam("sessionId"), getParam("playerId"))
       
-      val sessionId = jsonOpt.flatMap(json => (json \ "sessionId").asOpt[String])
-        .orElse(request.session.get("sessionId"))
-      val playerId = jsonOpt.flatMap(json => (json \ "playerId").asOpt[String])
-        .orElse(request.session.get("playerId"))
-      
-      val canPlay = (sessionId, playerId) match {
-        case (Some(sid), Some(pid)) => 
-          Main.controller.isPlayerTurn(sid, pid)
-        case _ => 
-          true
-      }
-      
-      if (!canPlay) {
-        Ok(Json.obj(
-          "success" -> false,
-          "message" -> "It's not your turn!"
-        ))
-      } else {
+      val canPlay = (for {
+        sid <- sessionId
+        pid <- playerId
+      } yield Main.controller.isPlayerTurn(sid, pid)).getOrElse(true)
+    
+    if (!canPlay) {
+      Ok(Json.obj("success" -> false, "message" -> "It's not your turn!"))
+    } else {
         val playerNumberOpt = for {
           sid <- sessionId
           pid <- playerId
@@ -373,8 +341,6 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
       }
     }
   }
-
-  
 
   def gameOverPage: Action[AnyContent] = Action {
     if (Main.controller.isGameOver) {
