@@ -10,6 +10,7 @@
   function initGameSession() {
     const urlParams = new URLSearchParams(window.location.search);
     
+    // wir schauen erst in sessionStorage, dann in den URL-Parametern
     sessionId = sessionStorage.getItem('sessionId') || urlParams.get('sessionId');
     playerId = sessionStorage.getItem('playerId') || urlParams.get('playerId');
     playerNumber = sessionStorage.getItem('playerNumber') || urlParams.get('playerNumber');
@@ -31,7 +32,10 @@
     
     const placements = JSON.parse(gridState);
     placements.forEach(placement => {
-      const gridItem = document.querySelector(`.grid-item[data-card]:nth-child(${placement.y * 3 + placement.x + 1})`);
+      let gridItem = document.querySelector(`.grid-item[data-x="${placement.x}"][data-y="${placement.y}"]`);
+      if (!gridItem) {
+        gridItem = document.querySelector(`.grid-item[data-card]:nth-child(${placement.y * 3 + placement.x + 1})`);
+      }
       if (gridItem && gridItem.classList.contains('card-placed')) {
         gridItem.setAttribute('data-player', placement.player);
       }
@@ -50,8 +54,23 @@
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     websocket = new WebSocket(`${protocol}//${window.location.host}/ws/${sessionId}/${playerId}`);
     
-    websocket.onmessage = (event) => handleWebSocketMessage(JSON.parse(event.data));
-    websocket.onclose = () => setTimeout(connectWebSocket, 3000);
+    websocket.onopen = function() {
+      console.log('Game WebSocket connected');
+    };
+    
+    websocket.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+      handleWebSocketMessage(data);
+    };
+    
+    websocket.onerror = function(error) {
+      console.error('WebSocket error:', error);
+    };
+    
+    websocket.onclose = function() {
+      console.log('WebSocket closed');
+      setTimeout(connectWebSocket, 3000);
+    };
   }
 
   function handleWebSocketMessage(data) {
@@ -60,36 +79,37 @@
       return;
     }
     
-    if (!data.action) return;
-    
     if (data.state && window.updatePlayerState) window.updatePlayerState(data.state);
     if (data.grid && window.updateGrid) window.updateGrid(data.grid);
+    if (data.hand && window.updateHand) window.updateHand(data.hand, playerNumber);
     
-    switch(data.action) {
-      case 'placeCard':
-        if (data.placedAt) updateGridCell(data.placedAt.x, data.placedAt.y, data);
-        isMyTurn = true;
-        break;
-      case 'drawCard':
-        if (data.hand && window.updateHand) window.updateHand(data.hand, playerNumber);
-        isMyTurn = true;
-        break;
-      case 'undo':
-      case 'redo':
-        location.reload();
-        break;
+    if (data.action) {
+      switch(data.action) {
+        case 'placeCard':
+          if (data.placedAt) updateGridCell(data.placedAt.x, data.placedAt.y, data);
+          break;
+        case 'drawCard':
+          break;
+        case 'undo':
+        case 'redo':
+          location.reload();
+          break;
+      }
     }
     
-    if (data.hand && window.updateHand) window.updateHand(data.hand, null);
     if (data.state && data.state.length > 0) updateTurnIndicator(data.state[0]);
   }
 
   function updateGridCell(x, y, data) {
-    const $grid = $(`.grid-item`).filter(function() {
-      const coords = $(this).find('.text-muted div').first().text();
-      const match = coords.match(/\((\d+),\s*(\d+)\)/);
-      return match && parseInt(match[1]) === x && parseInt(match[2]) === y;
-    });
+    let $grid = $(`.grid-item[data-x="${x}"][data-y="${y}"]`);
+    
+    if ($grid.length === 0) {
+      $grid = $(`.grid-item`).filter(function() {
+        const coords = $(this).find('.text-muted div').first().text();
+        const match = coords.match(/\((\d+),\s*(\d+)\)/);
+        return match && parseInt(match[1]) === x && parseInt(match[2]) === y;
+      });
+    }
     
     if ($grid.length > 0 && data.grid) {
       const gridCell = data.grid.find(cell => cell.x === x && cell.y === y);

@@ -79,20 +79,18 @@
     
     const x = parseInt(match[1]);
     const y = parseInt(match[2]);
-    const cardIndex = data.index;
-
     const sessionInfo = window.GameWebSocket.getSessionInfo();
     
+    // Build request with optional session info
     const requestBody = { 
-      cardIndex: cardIndex, 
-      x: x, 
-      y: y
+      cardIndex: data.index, 
+      x, 
+      y,
+      ...(sessionInfo.sessionId && sessionInfo.playerId && {
+        sessionId: sessionInfo.sessionId,
+        playerId: sessionInfo.playerId
+      })
     };
-    
-    if (sessionInfo.sessionId && sessionInfo.playerId) {
-      requestBody.sessionId = sessionInfo.sessionId;
-      requestBody.playerId = sessionInfo.playerId;
-    }
 
     fetch('/placeCard', {
       method: 'POST',
@@ -104,21 +102,25 @@
       if (responseData.gameOver) return window.location.href = '/gameOver';
       if (responseData.message) return alert(responseData.message);
       
-      $grid.addClass('card-placed has-card').removeClass('drag-over drop-valid drop-invalid').data('card', data.card);
+      // Update grid UI
+      $grid.addClass('card-placed has-card')
+           .removeClass('drag-over drop-valid drop-invalid')
+           .data('card', data.card)
+           .find('.text-muted').html(`<div>${coords}</div><div class="fw-bold">${data.card}</div>`);
+      
       if (responseData.placedByPlayer) {
         $grid.attr('data-player', responseData.placedByPlayer);
         window.GameWebSocket.saveGridPlacement(x, y, responseData.placedByPlayer);
       }
-      $grid.find('.text-muted').html(`<div>${coords}</div><div class="fw-bold">${data.card}</div>`);
-      window.GameWebSocket.setTurnState(false);
       
-      $(`.card-container[data-card-index="${cardIndex}"]`).fadeOut(300, function() { 
+      // Remove played card and update hand
+      $(`.card-container[data-card-index="${data.index}"]`).fadeOut(300, function() { 
         $(this).remove();
         if (responseData.hand && window.updateHand) {
           window.updateHand(responseData.hand, sessionInfo.playerNumber);
-          if (responseData.state && responseData.state.length > 0) {
-            window.GameWebSocket.updateTurnIndicator(responseData.state[0]);
-          }
+        }
+        if (responseData.state && responseData.state.length > 0) {
+          window.GameWebSocket.updateTurnIndicator(responseData.state[0]);
         }
       });
     })

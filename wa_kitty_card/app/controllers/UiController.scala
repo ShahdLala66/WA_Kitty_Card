@@ -9,7 +9,7 @@ import play.api.libs.json.{Json, JsValue, JsObject}
 import play.api.libs.streams.ActorFlow
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.Materializer
-import actors.GameWebSocketActor
+import actors.GameWebSocketActorFactory
 
 @Singleton
 class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSystem, mat: Materializer) extends AbstractController(cc) {
@@ -124,7 +124,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
   
   def gameWebSocket(sessionId: String, playerId: String): WebSocket = WebSocket.accept[JsValue, JsValue] { request =>
     ActorFlow.actorRef { out =>
-      GameWebSocketActor.props(out, sessionId, playerId)
+      GameWebSocketActorFactory.create(out, sessionId, playerId)
     }
   }
 
@@ -275,7 +275,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
                 } yield player.getHand.map(_.toString)
                 
                 system.eventStream.publish(
-                  actors.GameWebSocketActor.BroadcastToSession(sid, jsonObj ++ Json.obj(
+                  actors.GameWebSocketActorFactory.BroadcastToSession(sid, jsonObj ++ Json.obj(
                     "placedByPlayer" -> playerNumber, "placedAt" -> Json.obj("x" -> x, "y" -> y),
                     "action" -> "placeCard", "hand" -> otherPlayerHand.getOrElse(Seq.empty),
                     "gameOver" -> Main.controller.isGameOver
@@ -333,7 +333,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
         } {
           val jsonWithoutHand = baseJson ++ Json.obj("action" -> "drawCard")
           system.eventStream.publish(
-            actors.GameWebSocketActor.BroadcastToSession(sid, jsonWithoutHand, Some(pid))
+            actors.GameWebSocketActorFactory.BroadcastToSession(sid, jsonWithoutHand, Some(pid))
           )
         }
         

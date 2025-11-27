@@ -3,15 +3,15 @@ package actors
 import org.apache.pekko.actor._
 import play.api.libs.json._
 
-object GameWebSocketActor {
-  def props(out: ActorRef, sessionId: String, playerId: String) = Props(new GameWebSocketActor(out, sessionId, playerId))
+object GameWebSocketActorFactory {
+  def create(out: ActorRef, sessionId: String, playerId: String) = Props(new GameWebSocketActor(out, sessionId, playerId))
   
   case class SendMessage(message: JsValue)
   case class BroadcastToSession(sessionId: String, message: JsValue, excludePlayerId: Option[String] = None)
 }
 
 class GameWebSocketActor(out: ActorRef, sessionId: String, playerId: String) extends Actor {
-  import GameWebSocketActor._
+  import GameWebSocketActorFactory._
   
   context.system.eventStream.subscribe(self, classOf[BroadcastToSession])
   
