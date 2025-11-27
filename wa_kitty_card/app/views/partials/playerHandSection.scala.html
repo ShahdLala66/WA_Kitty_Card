@@ -14,14 +14,7 @@
         case "Seven" => "7"
         case _ => "1"
       }
-      val color = parts(1) match {
-        case "Blue" => "Blau"
-        case "Brown" => "Braun"
-        case "Green" => "Grün"
-        case "Purple" => "Lila"
-        case "Red" => "Rot"
-        case _ => "Blau"
-      }
+      val color = parts(1)
       s"/assets/images/cards/$value/$value-$color.png"
     } else {
       ""

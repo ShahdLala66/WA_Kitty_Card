@@ -130,14 +130,12 @@
       websocket = new WebSocket(wsUrl);
       
       websocket.onopen = function() {
-        console.log('WebSocket connected');
       };
       
       websocket.onmessage = function(event) {
         const data = JSON.parse(event.data);
         
         if (data.type === 'player-joined') {
-          console.log('Player joined:', data.playerId);
           // If we're waiting and player 2 joined, redirect to game
           if (waitingRoom.style.display !== 'none') {
             window.location.href = `/combinedView?sessionId=${sessionId}&playerId=${playerId}&playerNumber=${playerNumber}`;
@@ -150,7 +148,6 @@
       };
       
       websocket.onclose = function() {
-        console.log('WebSocket closed');
       };
     }
     

@@ -87,41 +87,6 @@
   50% { opacity: 0.7; }
 }
 
-/* Player-specific card styling */
-.card-container[data-player="player1"] {
-  border: 2px solid #2196F3;
-}
-
-.card-container[data-player="player2"] {
-  border: 2px solid #FF9800;
-}
-
-.grid-item[data-player="player1"]::after {
-  content: "P1";
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background: #2196F3;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-size: 10px;
-  font-weight: bold;
-}
-
-.grid-item[data-player="player2"]::after {
-  content: "P2";
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background: #FF9800;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-size: 10px;
-  font-weight: bold;
-}
-
 /* Disable interaction when not player's turn */
 .card-container.disabled {
   opacity: 0.5;

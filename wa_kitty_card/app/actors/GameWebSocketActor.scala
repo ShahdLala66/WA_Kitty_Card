@@ -13,12 +13,10 @@ object GameWebSocketActor {
 class GameWebSocketActor(out: ActorRef, sessionId: String, playerId: String) extends Actor {
   import GameWebSocketActor._
   
-  // Register with the session manager
   context.system.eventStream.subscribe(self, classOf[BroadcastToSession])
   
   override def preStart(): Unit = {
     super.preStart()
-    // Notify that player connected
     val joinMessage = Json.obj(
       "type" -> "player-joined",
       "sessionId" -> sessionId,
@@ -30,7 +28,6 @@ class GameWebSocketActor(out: ActorRef, sessionId: String, playerId: String) ext
   override def postStop(): Unit = {
     super.postStop()
     context.system.eventStream.unsubscribe(self)
-    // Notify that player disconnected
     val leaveMessage = Json.obj(
       "type" -> "player-left",
       "sessionId" -> sessionId,
@@ -41,11 +38,9 @@ class GameWebSocketActor(out: ActorRef, sessionId: String, playerId: String) ext
   
   def receive = {
     case msg: JsValue =>
-      // Message from client
       handleClientMessage(msg)
       
     case BroadcastToSession(sid, message, excludeId) =>
-      // Broadcast message to this session
       if (sid == sessionId && !excludeId.contains(playerId)) {
         out ! message
       }
@@ -58,17 +53,14 @@ class GameWebSocketActor(out: ActorRef, sessionId: String, playerId: String) ext
     val msgType = (msg \ "type").asOpt[String]
     msgType match {
       case Some("game-action") =>
-        // Broadcast game actions to other players in the session
         context.system.eventStream.publish(
           BroadcastToSession(sessionId, msg, Some(playerId))
         )
       case Some("game-state-update") =>
-        // Broadcast state updates
         context.system.eventStream.publish(
           BroadcastToSession(sessionId, msg, Some(playerId))
         )
       case _ =>
-        // Unknown message type
     }
   }
 }
