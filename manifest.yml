@@ -1,0 +1,11 @@
+
+applications:
+- name: kittycards
+  memory: 1G
+  instances: 1
+  docker:
+    image: sha66/kitty-card-app:latest
+  env:
+    APPLICATION_SECRET: "Bvg0r/sFHacstzPdkEPP/cXzHxnz5uNwkqh7IbJxEkvQ6b74+xsW35y/CI/EsYBm9ZKsBy4lVfwiLJ9Q/43zjA=="
+    JAVA_TOOL_OPTIONS: "-Dpidfile.path=/dev/null -Dplay.http.secret.key=Bvg0r/sFHacstzPdkEPP/cXzHxnz5uNwkqh7IbJxEkvQ6b74+xsW35y/CI/EsYBm9ZKsBy4lVfwiLJ9Q/43zjA== -Dplay.filters.hosts.allowed.0=."
+
