@@ -1,10 +1,16 @@
 .game-layout {
   display: grid;
-  grid-template-rows: 15vh 5vh 50vh 15vh 15vh; 
-  height: 120vh;
+  grid-template-rows: 
+    minmax(15vh, auto)   
+    minmax(5vh, auto)    
+    minmax(50vh, auto)   
+    minmax(15vh, auto)   
+    minmax(15vh, auto);  
+  min-height: 100vh; 
   width: 100%;
   position: relative;
   padding: 0 2rem;
+  gap: 2vh; 
 }
 
 .zayne-wood {
@@ -33,9 +39,9 @@
 .table-background {
   position: absolute;
   left: 0;
-  top: 15vh; 
+  top: 25vh; 
   width: 100vw;
-  height: 85vh; 
+  height: calc(100% - 25vh); 
   
   background-color: rgb(252, 244, 208);
   
@@ -50,7 +56,6 @@
   margin-left: 50%;
   transform: translateX(-50%);
 }
-
 .state-section, 
 .grid-section, 
 .hand-section {
@@ -62,19 +67,27 @@
   margin: 0 1rem;
 }
 
-
-@media screen and (max-width: 576px) {
-  .hand-section {
-    align-items: flex-start;
-    padding-top: 10px;
-  }
-
+@media (max-width: 576px) {
   .game-layout {
-    padding: 0 ;
-    }
+    padding: 0;
+    grid-template-rows: 
+      minmax(12vh, auto)   
+      minmax(5vh, auto)
+      minmax(45vh, auto)
+      minmax(20vh, auto)   
+      minmax(10vh, auto);
+    gap: 1vh; 
+    min-height: 100vh;
+  }
+  
   .zayne-wood {
     margin-left: 0; 
     margin-right: 0;
   }
-
+  
+  .state-section, 
+  .grid-section, 
+  .hand-section {
+    margin: 0;
+  }
 }

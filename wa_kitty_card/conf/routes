@@ -1,7 +1,18 @@
 # user mode
-GET     /                               controllers.UiController.helloKitty()
+GET     /                               controllers.UiController.index()
 GET     /combinedView                   controllers.UiController.combinedView()
 GET     /enterNames                     controllers.UiController.enterNames()
+POST    /setPlayerNames                 controllers.UiController.setPlayerNames()
+POST    /createGame                     controllers.UiController.createGame()
+POST    /joinGame                       controllers.UiController.joinGame()
+GET     /ws/:sessionId/:playerId        controllers.UiController.gameWebSocket(sessionId: String, playerId: String)
+GET     /newGame                        controllers.UiController.newGame()
+GET     /gameOverPage                   controllers.UiController.gameOverPage()
+GET     /gameOver                       controllers.UiController.gameOver()
+POST    /placeCard                      controllers.UiController.placeCard()
+POST    /draw                           controllers.UiController.drawCard()
+# POST    /undo                           controllers.UiController.undo()
+# POST    /redo                           controllers.UiController.redo()
 
 # kernel mode
 GET     /assets/*file                   controllers.Assets.versioned(path="/public", file: Asset)

@@ -1,0 +1,19 @@
+@import "_colors";
+
+.info-card-routes {
+  background: @white-transparent;
+  backdrop-filter: blur(10px);
+  border-radius: @border-radius;
+  box-shadow: 0 @box-shadow-blur @base-size @black-shadow-light;
+  padding: 2rem 3rem;
+  text-align: left;
+  line-height: 1.6;
+  transition: transform @transition-fast ease, box-shadow @transition-fast ease;
+  width: clamp(60vw, 50vw, 40vw);
+  z-index: @z-index + 1000;
+
+  &:hover {
+    transform: translateY(-0.2vh);
+    box-shadow: 0 @box-shadow-blur @base-size (@black-shadow-light * 1.8);
+  }
+}

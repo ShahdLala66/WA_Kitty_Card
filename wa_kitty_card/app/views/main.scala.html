@@ -18,6 +18,11 @@
       href='@routes.Assets.versioned("stylesheets/main.css")'
     />
     <link
+      rel="stylesheet"
+      media="screen"
+      href='@routes.Assets.versioned("stylesheets/session-styles.css")'
+    />
+    <link
       rel="shortcut icon"
       type="image/png"
       href='@routes.Assets.versioned("images/zayne-icon.png")'
@@ -27,8 +32,7 @@
   <body>
     <nav class="navbar navbar-expand-sm navbar-light bg-light fixed-top">
       <div class="container-fluid">
-        <a class="navbar-brand" href="@routes.UiController.helloKitty()"
-          >Kitty Card</a
+        <a class="navbar-brand" href="@routes.UiController.index()"           >Kitty Card</a
         >
 
         <button
@@ -121,6 +125,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src='@routes.Assets.versioned("javascripts/bootstrap/dist/js/bootstrap.bundle.min.js")'></script>
     <script src='@routes.Assets.versioned("javascripts/navbar-scroll.js")'></script>
+    <script src='@routes.Assets.versioned("javascripts/game-websocket.js")'></script>
     <script src='@routes.Assets.versioned("javascripts/card-placement.js")'></script>
   </body>
 </html>
