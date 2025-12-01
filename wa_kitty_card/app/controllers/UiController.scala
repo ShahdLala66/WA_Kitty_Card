@@ -18,11 +18,11 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
 
   def listEvents: Action[AnyContent] = Action {
     val events = Main.controller.peekBufferedEvents().toString()
-    Ok(views.html.debug.listEvents(events))
+    Ok(views.html.vueIndex(Json.stringify(Json.obj("events" -> events))))
   }
 
   def index: Action[AnyContent] = Action {
-    Ok(views.html.ui.helloKitty("Welcome to the Kitty Card Game! :3"))
+    Ok(views.html.vueIndex(Json.stringify(Json.obj("message" -> "Welcome to the Kitty Card Game! :3"))))
   }
 
   def newGame: Action[AnyContent] = Action {
@@ -42,7 +42,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
       val (sessionId, playerId, playerNumber) = (getParam("sessionId"), getParam("playerId"), getParam("playerNumber"))
 
       if (stateOpt.isEmpty || gridData.isEmpty || playerOpt.isEmpty) {
-        Ok(views.html.debug.loadingScreen("I feel like im supposed to be loading something. . ."))
+        Ok(views.html.vueIndex(Json.stringify(Json.obj("loading" -> true, "message" -> "I feel like im supposed to be loading something. . ."))))
       } else {
         val handSeq = (sessionId, playerId, playerNumber) match {
           case (Some(sid), Some(pid), Some(pNum)) =>
@@ -50,7 +50,17 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
           case _ => getPlayerHand(playerOpt.get)
         }
 
-        Ok(views.html.ui.combinedView(stateOpt.get, gridData, handSeq))
+        val gridJson = gridData.map { case (x, y, cardInfo, htmlColor, suitName) =>
+          Json.arr(x, y, cardInfo, htmlColor, suitName)
+        }
+
+        val initialData = Json.obj(
+          "state" -> stateOpt.get,
+          "gridData" -> gridJson,
+          "currentPlayerHand" -> handSeq
+        )
+
+        Ok(views.html.vueIndex(Json.stringify(initialData)))
           .withSession(Seq(sessionId.map("sessionId" -> _), playerId.map("playerId" -> _), 
                           playerNumber.map("playerNumber" -> _)).flatten*)
       }
@@ -58,7 +68,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
   }
 
   def enterNames: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.ui.enterNames())
+    Ok(views.html.vueIndex("{}"))
   }
 
   def setPlayerNames: Action[JsValue] = Action(parse.json) { implicit request: Request[JsValue] =>
@@ -129,7 +139,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
   }
 
   def loadingScreen: Action[AnyContent] = Action {
-    Ok(views.html.debug.loadingScreen("Loading… or maybe just debugging the loading."))
+    Ok(views.html.vueIndex(Json.stringify(Json.obj("loading" -> true, "message" -> "Loading… or maybe just debugging the loading."))))
   }
 
   // GRID
@@ -162,9 +172,13 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
   def gridColors: Action[AnyContent] = Action {
     val grid = getGridState
     if (grid.isEmpty)
-      Ok(views.html.debug.loadingScreen("I swear it's almost done."))
-    else
-      Ok(views.html.debug.gridColors(grid))
+      Ok(views.html.vueIndex(Json.stringify(Json.obj("loading" -> true, "message" -> "I swear it's almost done."))))
+    else {
+      val gridJson = grid.map { case (x, y, cardInfo, htmlColor, suitName) =>
+        Json.arr(x, y, cardInfo, htmlColor, suitName)
+      }
+      Ok(views.html.vueIndex(Json.stringify(Json.obj("gridData" -> gridJson))))
+    }
   }
 
   // PLAYER
@@ -172,8 +186,8 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
   def playersState: Action[AnyContent] = Action {
     safe(Main.controller.getStateElements)
       .filter(_.size >= 2)
-      .map(state => Ok(views.html.debug.playersState(state)))
-      .getOrElse(Ok(views.html.debug.loadingScreen("Computing the secret to life, the universe, and everything.")))
+      .map(state => Ok(views.html.vueIndex(Json.stringify(Json.obj("state" -> state)))))
+      .getOrElse(Ok(views.html.vueIndex(Json.stringify(Json.obj("loading" -> true, "message" -> "Computing the secret to life, the universe, and everything.")))))
   }
 
   private def parseHand(handStr: String): Seq[String] = {
@@ -200,7 +214,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
       case Some(hand) if hand.nonEmpty =>
         Ok(s"Hand: [${hand.map(_.toString).mkString(", ")}]")
       case _ =>
-        Ok(views.html.debug.loadingScreen("I think I am, therefore, I am. I think."))
+        Ok(views.html.vueIndex(Json.stringify(Json.obj("loading" -> true, "message" -> "I think I am, therefore, I am. I think."))))
     }
   }
 
@@ -209,9 +223,9 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
     playerOpt match {
       case Some(p: PlayerInterface) =>
         val handSeq = getPlayerHand(p)
-        Ok(views.html.debug.playerHand(handSeq))
+        Ok(views.html.vueIndex(Json.stringify(Json.obj("currentPlayerHand" -> handSeq))))
       case _ =>
-        Ok(views.html.debug.loadingScreen("Couldn't load current player's hand."))
+        Ok(views.html.vueIndex(Json.stringify(Json.obj("loading" -> true, "message" -> "Couldn't load current player's hand."))))
     }
   }
 
@@ -345,7 +359,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
   def gameOverPage: Action[AnyContent] = Action {
     if (Main.controller.isGameOver) {
       val winnerName = Main.controller.getWinner().getOrElse("No one")
-      Ok(views.html.ui.gameOver(winnerName))
+      Ok(views.html.vueIndex(Json.stringify(Json.obj("winnerName" -> winnerName))))
     } else {
       Redirect(routes.UiController.combinedView())
     }

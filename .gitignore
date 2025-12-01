@@ -6,3 +6,7 @@ target/
 .idea/
 .project/
 .g8/
+node_modules/
+.DS_Store
+*.log
+*.class
