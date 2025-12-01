@@ -40,7 +40,7 @@
   align-items: center;
   gap: $card-spacing;
   flex-wrap: wrap;
-  width: 100%;
+  width: auto;
   max-width: 1200px;
   
   @media screen and (min-width: 577px) {
