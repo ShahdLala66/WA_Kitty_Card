@@ -10,11 +10,21 @@
 
     <div class="zayne-wood"></div>
     <div class="grid-section">
-      <GameGrid :gridData="gridData" @cellClicked="onGridCellClicked" />
+      <GameGrid 
+        :gridData="gridData" 
+        @cellClicked="onGridCellClicked"
+        @cardDropped="onCardDropped" 
+      />
     </div>
 
     <div class="hand-section">
-      <PlayerHand :cards="currentPlayerHand" @cardSelected="onCardSelected" />
+      <PlayerHand 
+        :cards="currentPlayerHand" 
+        :selectedCardIndex="selectedCardIndex"
+        :isMyTurn="isMyTurn"
+        @cardSelected="onCardSelected"
+        @dragEnd="onDragEnd" 
+      />
     </div>
 
     <div class="table-background">
@@ -54,7 +64,18 @@ export default {
       sessionId: null,
       playerId: null,
       playerNumber: null,
-      selectedCardIndex: null
+      selectedCardIndex: null,
+      isMyTurn: true
+    }
+  },
+  computed: {
+    currentPlayerName() {
+      return this.state && this.state.length > 0 ? this.state[0] : '';
+    }
+  },
+  watch: {
+    state(newState) {
+      this.updateTurnState(newState);
     }
   },
   mounted() {
@@ -73,6 +94,9 @@ export default {
       this.playerIdentity = 'Player ' + this.playerNumber;
       this.playerBannerClass = 'player-' + this.playerNumber;
       this.playerBannerDisplay = 'block';
+      
+      // Initialize turn state from loaded state
+      this.updateTurnState(this.state);
     }
     
     if (this.sessionId && this.playerId) {
@@ -91,7 +115,7 @@ export default {
           return;
         }
         if (data.state) this.state = data.state;
-        if (data.grid) this.gridData = data.grid.map(c => [c.x, c.y, c.card, c.color, c.suit]);
+        if (data.grid) this.gridData = data.grid.map(c => [c.x, c.y, c.card, c.color, c.suit, c.placedByPlayer || null]);
         if (data.hand) this.currentPlayerHand = data.hand;
       };
     },
@@ -102,6 +126,11 @@ export default {
       // Implement redo
     },
     draw() {
+      if (!this.isMyTurn) {
+        alert("It's not your turn!");
+        return;
+      }
+      
       fetch('/draw', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -109,7 +138,26 @@ export default {
       })
       .then(res => res.json())
       .then(data => {
-        if (data.success === false) alert(data.message);
+        if (data.gameOver) {
+          window.location.href = '/gameOverPage';
+          return;
+        }
+        if (data.success === false || data.message) {
+          alert(data.message || 'Failed to draw card');
+          return;
+        }
+        
+        // Update state, grid, and hand from response
+        if (data.state) this.state = data.state;
+        if (data.grid) {
+          this.gridData = data.grid.map(c => [
+            c.x, c.y, c.card, c.color, c.suit, c.placedByPlayer || null
+          ]);
+        }
+        if (data.hand) this.currentPlayerHand = data.hand;
+      })
+      .catch(err => {
+        alert('Failed to draw card: ' + err);
       });
     },
     onCardSelected(index) {
@@ -117,23 +165,101 @@ export default {
     },
     onGridCellClicked(x, y) {
       if (this.selectedCardIndex !== null) {
-        fetch('/placeCard', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            sessionId: this.sessionId, 
-            playerId: this.playerId,
-            cardIndex: this.selectedCardIndex,
-            x: x,
-            y: y
-          })
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success === false) alert(data.message);
-          else this.selectedCardIndex = null;
-        });
+        this.placeCard(this.selectedCardIndex, x, y);
       }
+    },
+    onCardDropped(x, y, cardIndex) {
+      this.placeCard(cardIndex, x, y);
+    },
+    onDragEnd() {
+      // Clear any drag state if needed
+    },
+    updateTurnState(stateArray) {
+      if (!stateArray || stateArray.length < 3 || !this.playerNumber) {
+        return;
+      }
+      
+      const currentPlayerName = stateArray[0];
+      const myPlayerName = stateArray[parseInt(this.playerNumber)];
+      
+      // Only update if we have valid player names (not "Waiting")
+      if (myPlayerName && myPlayerName !== 'Waiting') {
+        this.isMyTurn = currentPlayerName === myPlayerName;
+      }
+    },
+    placeCard(cardIndex, x, y) {
+      const requestBody = {
+        cardIndex: cardIndex,
+        x: x,
+        y: y
+      };
+      
+      if (this.sessionId && this.playerId) {
+        requestBody.sessionId = this.sessionId;
+        requestBody.playerId = this.playerId;
+      }
+      
+      fetch('/placeCard', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      })
+      .then(response => {
+        if (!response.ok) {
+          return Promise.reject(`HTTP ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.gameOver) {
+          window.location.href = '/gameOverPage';
+          return;
+        }
+        if (data.message) {
+          alert(data.message);
+          return;
+        }
+        
+        // Update state from response
+        if (data.state) {
+          this.state = data.state;
+        }
+        
+        // Update grid with full data including placedByPlayer
+        if (data.grid) {
+          this.gridData = data.grid.map(c => [
+            c.x, 
+            c.y, 
+            c.card, 
+            c.color, 
+            c.suit, 
+            c.placedByPlayer || data.placedByPlayer || null
+          ]);
+        } else if (data.placedByPlayer) {
+          // Fallback: update just the placed cell
+          const newGridData = [...this.gridData];
+          const cellIndex = newGridData.findIndex(cell => cell[0] === x && cell[1] === y);
+          if (cellIndex !== -1) {
+            newGridData[cellIndex] = [...newGridData[cellIndex]];
+            newGridData[cellIndex][5] = data.placedByPlayer;
+            this.gridData = newGridData;
+          }
+        }
+        
+        // Update hand from response
+        if (data.hand) {
+          this.currentPlayerHand = data.hand;
+        }
+        
+        // Clear selection on success
+        this.selectedCardIndex = null;
+      })
+      .catch(err => {
+        alert('Failed to place card: ' + err);
+      });
     }
   }
 }

@@ -14,6 +14,9 @@ import actors.GameWebSocketActorFactory
 @Singleton
 class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSystem, mat: Materializer) extends AbstractController(cc) {
 
+  // Track which player placed cards at which positions: (x, y) -> playerNumber
+  private val gridPlacements = scala.collection.mutable.Map[(Int, Int), String]()
+
   // VIEWS
 
   def listEvents: Action[AnyContent] = Action {
@@ -27,16 +30,20 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
 
   def newGame: Action[AnyContent] = Action {
     Main.controller.handleCommand("start")
+    gridPlacements.clear() // Clear placement tracking for new game
     Redirect(routes.UiController.enterNames())
   }
 
   def combinedView: Action[AnyContent] = Action { implicit request =>
-    if (Main.controller.isGameOver) {
+    val stateOpt  = safe(Main.controller.getStateElements)
+    val gridData  = getGridState
+    val playerOpt = safe(Main.controller.getCurrentplayer)
+    
+    // Only redirect to game over if game is actually over AND we have valid game state
+    // This prevents redirecting immediately after starting a new game
+    if (Main.controller.isGameOver && stateOpt.isDefined && playerOpt.isDefined) {
       Redirect(routes.UiController.gameOverPage())
     } else {
-      val stateOpt  = safe(Main.controller.getStateElements)
-      val gridData  = getGridState
-      val playerOpt = safe(Main.controller.getCurrentplayer)
       
       def getParam(key: String) = request.session.get(key).orElse(request.getQueryString(key))
       val (sessionId, playerId, playerNumber) = (getParam("sessionId"), getParam("playerId"), getParam("playerNumber"))
@@ -51,7 +58,8 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
         }
 
         val gridJson = gridData.map { case (x, y, cardInfo, htmlColor, suitName) =>
-          Json.arr(x, y, cardInfo, htmlColor, suitName)
+          val placedBy = gridPlacements.get((x, y)).orNull
+          Json.arr(x, y, cardInfo, htmlColor, suitName, placedBy)
         }
 
         val initialData = Json.obj(
@@ -175,7 +183,8 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
       Ok(views.html.vueIndex(Json.stringify(Json.obj("loading" -> true, "message" -> "I swear it's almost done."))))
     else {
       val gridJson = grid.map { case (x, y, cardInfo, htmlColor, suitName) =>
-        Json.arr(x, y, cardInfo, htmlColor, suitName)
+        val placedBy = gridPlacements.get((x, y)).orNull
+        Json.arr(x, y, cardInfo, htmlColor, suitName, placedBy)
       }
       Ok(views.html.vueIndex(Json.stringify(Json.obj("gridData" -> gridJson))))
     }
@@ -261,6 +270,8 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
                 "message" -> "Failed to place card. The position might be occupied or invalid."
               ))
             } else {
+              // Store which player placed this card
+              gridPlacements((x, y)) = playerNumber
               val handSeq = for {
                 sid <- sessionId
                 pid <- playerId
@@ -389,12 +400,14 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
       val state = stateOpt.get
 
       val gridJson = gridData.map { case (x, y, cardInfo, htmlColor, suitName) =>
+        val placedBy = gridPlacements.get((x, y))
         Json.obj(
           "x"     -> x,
           "y"     -> y,
           "card"  -> cardInfo,
           "color" -> htmlColor,
-          "suit"  -> suitName
+          "suit"  -> suitName,
+          "placedByPlayer" -> placedBy
         )
       }
 

@@ -98,3 +98,18 @@
   max-width: 100%;
   margin-top: 0.25rem;
 }
+
+.card-container.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  filter: grayscale(50%);
+  cursor: not-allowed;
+  
+  .card-display {
+    &:hover {
+      transform: none;
+      box-shadow: $card-shadow;
+      border-color: rgb(174, 145, 129);
+    }
+  }
+}

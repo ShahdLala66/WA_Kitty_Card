@@ -75,6 +75,12 @@ export default {
     Game,
     GameOver
   },
+  data() {
+    return {
+      lastScrollTop: 0,
+      scrollThreshold: 5
+    }
+  },
   computed: {
     currentView() {
       const path = window.location.pathname;
@@ -89,6 +95,33 @@ export default {
       // For simplicity, let's map debug paths to a simple JSON viewer or just Home for now if not implemented.
       if (['/playersState', '/gridColors', '/playersHand', '/listEvents'].includes(path)) return 'Game'; // Reusing Game or we could make a Debug component
       return 'Home';
+    }
+  },
+  mounted() {
+    window.addEventListener('scroll', this.handleScroll);
+  },
+  beforeUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
+  },
+  methods: {
+    handleScroll() {
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+      
+      if (currentScroll < 0) return;
+      if (Math.abs(this.lastScrollTop - currentScroll) <= this.scrollThreshold) return;
+      
+      const navbar = this.$el.querySelector('.navbar');
+      if (!navbar) return;
+      
+      const navbarHeight = navbar.offsetHeight;
+      
+      if (currentScroll > this.lastScrollTop && currentScroll > navbarHeight) {
+        navbar.classList.add('navbar-hidden');
+      } else if (currentScroll < this.lastScrollTop) {
+        navbar.classList.remove('navbar-hidden');
+      }
+      
+      this.lastScrollTop = currentScroll;
     }
   }
 }
