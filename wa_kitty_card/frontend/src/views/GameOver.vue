@@ -24,4 +24,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.game-over-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  min-height: 50vh;
+  padding: 2rem;
+
+  .btn {
+    margin: 0.5rem;
+  }
+}
 </style>

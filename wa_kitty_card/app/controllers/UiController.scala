@@ -95,6 +95,10 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
     val playerName = (request.body \ "playerName").as[String]
     val playerId = java.util.UUID.randomUUID().toString
     
+    // Start a new game to reset game over state
+    Main.controller.handleCommand("start")
+    gridPlacements.clear()
+    
     val sessionId = Main.controller.createGameSession()
     Main.controller.joinGameSession(sessionId, playerName, playerId)
     

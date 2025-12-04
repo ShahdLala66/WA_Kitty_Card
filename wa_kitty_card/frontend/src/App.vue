@@ -28,11 +28,6 @@ export default {
       if (path === '/enterNames') return 'EnterNames';
       if (path === '/combinedView') return 'Game';
       if (path === '/gameOverPage') return 'GameOver';
-      // Fallback or handle debug views if we made components for them
-      // For now, if it's a debug view, we might just show the JSON dump if we didn't make a component
-      // But since we are using a single entry point, we need to handle it.
-      // If the controller returns vueIndex for debug views, we need a generic 'Debug' component or reuse one.
-      // For simplicity, let's map debug paths to a simple JSON viewer or just Home for now if not implemented.
       if (['/playersState', '/gridColors', '/playersHand', '/listEvents'].includes(path)) return 'Game'; // Reusing Game or we could make a Debug component
       return 'Home';
     }
@@ -42,10 +37,13 @@ export default {
 
 <style lang="scss">
 @import "./styles/colors";
-@import "bootstrap/scss/bootstrap";
 
 #app {
   padding-top: 70px;
+}
+
+* {
+  font-family: $font-display !important;
 }
 
 body {
@@ -65,7 +63,8 @@ h1 {
   width: 100%;
   padding: 1.2vh 3rem;
   box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light;
-  margin-top: 10vh;
+  margin: 2rem auto;
+  text-align: center;
 
   &:hover {
     transform: translateY(-0.2vh);
@@ -125,6 +124,13 @@ a {
 
 ul {
   list-style-type: "🐾 ";
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
 }
 
 .cute-button {

@@ -99,6 +99,79 @@
                   color) gives no points.
                 </li>
               </ul>
+
+              <h4 class="mt-3"><em>About the card placement:</em></h4>
+              <ul>
+                <li>
+                  Careful where you place your card! If you place it in the wrong
+                  cell the cat will destroy it! Your turn will be canceled.
+                </li>
+              </ul>
+
+              <h4 class="mt-3"><em>About the winner:</em></h4>
+              <ul>
+                <li>The one with most Points will win.</li>
+                <li>
+                  If you get the ACE, you are lucky! You will be able to freeze your
+                  enemy! Although it might only give you one point, but a win is a
+                  win!
+                </li>
+                <li>Other modes to be added in the future (ahem Semester 5)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xxl-4 mb-3">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h2 class="card-title"><strong>LOOK!!!</strong></h2>
+              <p class="card-text">
+                After being asked what mode you wanna play, you get this:
+              </p>
+              <img
+                class="img-fluid mb-2"
+                width="300"
+                src="https://github.com/user-attachments/assets/d9a47570-83dd-42af-a7e9-470f9e398ab5"
+              />
+
+              <p class="card-text">Now for the Game itself!</p>
+              <img
+                class="img-fluid mb-2"
+                width="300"
+                src="https://github.com/user-attachments/assets/9f592665-8085-4664-b3d9-3281d1907bdd"
+              />
+
+              <p class="card-text">
+                Aren't the little kitties cute? Btw THEY'RE ALL MOVING!
+              </p>
+              <img
+                class="img-fluid mb-2"
+                width="300"
+                src="https://github.com/user-attachments/assets/4789d1dd-f420-4a28-9237-1f270d346c70"
+              />
+              <img
+                class="img-fluid mb-2"
+                width="300"
+                src="https://github.com/user-attachments/assets/f4761088-5c92-4b2a-ad1b-d7495532a261"
+              />
+
+              <p class="card-text">And Game Over:</p>
+              <img
+                class="img-fluid mb-2"
+                width="300"
+                src="https://github.com/user-attachments/assets/90c78aaa-d0af-455b-a8ae-c2bf2257085d"
+              />
+              <img
+                class="img-fluid mb-2"
+                width="300"
+                src="https://github.com/user-attachments/assets/0dabce1d-05ac-43b2-9b42-0b0db84bbe00"
+              />
+              <img
+                class="img-fluid mb-2"
+                width="300"
+                src="https://github.com/user-attachments/assets/efecb4e8-2e53-4586-8bd7-b79ecacc3ab6"
+              />
             </div>
           </div>
         </div>
