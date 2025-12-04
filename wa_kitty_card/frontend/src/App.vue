@@ -96,6 +96,169 @@ export default {
 
 <style lang="scss">
 /* Assuming a build setup that handles SCSS imports */
-@import "./styles/main.scss";
 @import "./styles/session-styles.scss";
+
+@import "@/styles/colors";
+@import "@/styles/background";
+@import "@/styles/nav-menu";
+@import "@/styles/error-handler";
+@import "@/styles/table";
+@import "@/styles/card-placement";
+
+@import "bootstrap/scss/bootstrap";
+
+body {
+  text-align: center;
+}
+
+h1 {
+  background: $white-transparent;
+  backdrop-filter: blur(10px);
+  line-height: 1.6;
+  transition: transform $transition-fast ease, box-shadow $transition-fast ease;
+  border-radius: $border-radius;
+  width: 100%;
+  padding: 1.2vh 3rem;
+  box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light;
+  margin-top: 10vh;
+
+  &:hover {
+    transform: translateY(-0.2vh);
+    box-shadow: 0 $box-shadow-blur $base-size $black-shadow-dark;
+  }
+}
+
+a {
+  color: $font-dark;
+  text-decoration: none;
+  transition: color $transition-fast ease;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.info-card {
+  background: $white-transparent;
+  backdrop-filter: blur(10px);
+  border-radius: $border-radius;
+  box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light;
+  padding: 2rem 3rem;
+  text-align: left;
+  line-height: 1.6;
+  transition: transform $transition-fast ease, box-shadow $transition-fast ease;
+  width: clamp(60vw, 50vw, 40vw);
+
+  &:hover {
+    transform: translateY(-0.2vh);
+    box-shadow: 0 $box-shadow-blur $base-size $black-shadow-dark;
+  }
+}
+
+.card {
+  background: $white-transparent !important;
+  backdrop-filter: blur(10px) !important;
+  box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light !important;
+  text-align: left !important;
+  transition: transform $transition-fast ease, box-shadow $transition-fast ease !important;
+
+  &:hover {
+    transform: translateY(-0.2vh);
+    box-shadow: 0 $box-shadow-blur $base-size $black-shadow-dark;
+  }
+}
+
+.section-title {
+  text-align: center;
+  font-family: $font-display;
+  margin-bottom: 1rem;
+  color: $font-dark;
+}
+
+ul {
+  list-style-type: "🐾 ";
+}
+
+.cute-button {
+  border: none;
+  background: $white-transparent;
+  border-radius: $border-radius;
+  box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light;
+  padding: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-0.2vh);
+    box-shadow: 0 $box-shadow-blur $base-size $black-shadow-dark;
+  }
+
+  img {
+    border-radius: 1rem;
+    transition: transform 0.3s ease;
+  }
+
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: $font-dark;
+}
+
+.card-title::before,
+.card-title::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.18), transparent);
+  margin: 0 0.5rem;
+  border-radius: 2px;
+}
+
+.card-title strong {
+  display: inline-block;
+  padding: 0 0.6rem;
+  background: transparent;
+  position: relative;
+}
+
+.card-title strong::before,
+.card-title strong::after {
+  content: "୨ৎ";
+  display: inline-block;
+  margin: 0 0.25rem;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+.player-state-card {
+  margin: 0 auto;
+  max-height: 45px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+
+}
+
+.player-state-card .card-body {
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+.transparent-card {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
 </style>

@@ -130,8 +130,15 @@ export default {
         })
         .then(res => res.json())
         .then(data => {
-          if (data.success === false) alert(data.message);
-          else this.selectedCardIndex = null;
+          if (data.success === false) {
+            alert(data.message);
+          } else {
+            // Update local state with response data
+            if (data.state) this.state = data.state;
+            if (data.grid) this.gridData = data.grid.map(c => [c.x, c.y, c.card, c.color, c.suit]);
+            if (data.hand) this.currentPlayerHand = data.hand;
+            this.selectedCardIndex = null;
+          }
         });
       }
     }
