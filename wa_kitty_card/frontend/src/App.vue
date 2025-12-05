@@ -1,8 +1,10 @@
 <template>
-  <div id="app">
+  <v-app>
     <NavBar />
-    <component :is="currentView" />
-  </div>
+    <v-main>
+      <component :is="currentView" />
+    </v-main>
+  </v-app>
 </template>
 
 <script>
@@ -38,10 +40,6 @@ export default {
 <style lang="scss">
 @import "./styles/colors";
 
-#app {
-  padding-top: 70px;
-}
-
 * {
   font-family: $font-display !important;
 }
@@ -52,6 +50,10 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
+}
+
+.v-application {
+  background: transparent !important;
 }
 
 h1 {
