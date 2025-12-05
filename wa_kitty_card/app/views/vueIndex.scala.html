@@ -1,0 +1,26 @@
+@(initialData: String = "{}")
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="@routes.Assets.versioned("images/zayne-icon.png")">
+    <title>Kitty Card</title>
+    <script>
+      window.initialData = @Html(initialData);
+    </script>
+    <!-- In a real production setup, these would point to the built assets -->
+    <!-- For now, we assume the dev server or a build process puts them here -->
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but kitty-card doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+    <script src="http://localhost:8080/js/chunk-vendors.js"></script>
+    <script src="http://localhost:8080/js/app.js"></script>
+  </body>
+</html>
