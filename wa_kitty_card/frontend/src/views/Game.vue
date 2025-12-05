@@ -1,10 +1,5 @@
 <template>
   <div class="game-layout">
-    <div class="player-info-banner" id="player-info-banner" :class="playerBannerClass"
-      :style="{ display: playerBannerDisplay }">
-      <span class="player-identity">You are: <strong id="player-identity-name">{{ playerIdentity }}</strong></span>
-    </div>
-
     <div class="state-section">
       <PlayerState :state="state" />
     </div>
@@ -254,87 +249,67 @@ export default {
 
 <style lang="scss" scoped>
 .game-layout {
-  display: grid;
-  grid-template-rows:
-    minmax(15vh, auto) minmax(5vh, auto) minmax(50vh, auto) minmax(15vh, auto) minmax(15vh, auto);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   min-height: 100vh;
   width: 100%;
   position: relative;
-  padding: 0 2rem;
-  gap: 2vh;
+  padding: 1rem;
+  gap: 2rem;
+  overflow-x: hidden;
 }
 
 .zayne-wood {
+  position: absolute;
+  top: 28vh;
+  left: 0;
+  width: 100%;
+  height: 15vh;
   background-color: rgb(170, 134, 86);
-
-  width: 100vw;
-  margin-left: -2rem;
-  margin-right: -2rem;
-
-  height: 10vh;
   border-bottom: solid 2vh rgb(134, 106, 66);
-
   background-image: linear-gradient(90deg,
       rgba(0, 0, 0, 0.1) 0%,
       transparent 30%,
       transparent 70%,
       rgba(0, 0, 0, 0.1) 100%);
-
   box-shadow:
     0 2px 5px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  z-index: 0;
 }
 
-.table-background {
-  position: absolute;
-  left: 0;
-  top: 25vh;
-  width: 100vw;
-  height: calc(100% - 25vh);
-
-  background-color: rgb(252, 244, 208);
-
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
-  background-size: 50px 50px;
-  border-bottom: 40px solid rgb(192, 160, 101);
-  pointer-events: none;
-  z-index: -1;
-
-  margin-left: 50%;
-  transform: translateX(-50%);
-}
-
-.state-section,
-.grid-section,
-.hand-section {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+.state-section {
+  width: 100%;
   z-index: 2;
-  margin: 0 1rem;
+  margin-top: 2vh;
+}
+
+.grid-section {
+  z-index: 2;
+  margin-top: 5vh;
+}
+
+.hand-section {
+  width: 100%;
+  z-index: 2;
+  margin-top: auto;
+  margin-bottom: 12vh;
 }
 
 @media (max-width: 576px) {
   .game-layout {
-    padding: 0;
-    grid-template-rows:
-      minmax(12vh, auto) minmax(5vh, auto) minmax(45vh, auto) minmax(20vh, auto) minmax(10vh, auto);
-    gap: 1vh;
-    min-height: 100vh;
+    padding: 0.5rem;
+    gap: 1rem;
   }
-
+  
   .zayne-wood {
-    margin-left: 0;
-    margin-right: 0;
+    top: 22vh;
+    height: 12vh;
   }
 
-  .state-section,
-  .grid-section,
-  .hand-section {
-    margin: 0;
+  .grid-section {
+    margin-top: 2vh;
   }
 }
 </style>
