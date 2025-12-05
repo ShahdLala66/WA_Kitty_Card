@@ -1,10 +1,31 @@
 <template>
-  <div class="game-over-container">
-    <h1>Game Over</h1>
-    <h2>Winner: {{ winnerName }}</h2>
-    <a href="/enterNames" class="btn btn-primary">New Game</a>
-    <a href="/" class="btn btn-secondary">Home</a>
-  </div>
+  <v-container class="fill-height d-flex flex-column align-center justify-center">
+    <v-card class="glass-card pa-8 text-center" elevation="4" min-width="300">
+      <h1 class="text-h2 font-weight-bold mb-4 text-primary">Game Over</h1>
+      <h2 class="text-h4 mb-8">Winner: {{ winnerName }}</h2>
+      
+      <div class="d-flex flex-column gap-4">
+        <v-btn
+          to="/enterNames"
+          color="primary"
+          size="large"
+          class="mb-4"
+          prepend-icon="mdi-replay"
+        >
+          New Game
+        </v-btn>
+        
+        <v-btn
+          to="/"
+          variant="outlined"
+          size="large"
+          prepend-icon="mdi-home"
+        >
+          Home
+        </v-btn>
+      </div>
+    </v-card>
+  </v-container>
 </template>
 
 <script>
@@ -24,17 +45,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.game-over-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  min-height: 50vh;
-  padding: 2rem;
+@import "@/styles/colors";
 
-  .btn {
-    margin: 0.5rem;
-  }
+.glass-card {
+  background: $white-transparent !important;
+  backdrop-filter: blur(10px);
+  border-radius: $border-radius;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 </style>
