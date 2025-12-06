@@ -73,6 +73,7 @@
               required
               color="deep-purple-lighten-1"
               class="mb-4"
+              autocomplete="off"
             ></v-text-field>
 
             <v-btn

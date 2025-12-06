@@ -1,16 +1,40 @@
 <template>
   <div class="game-actions">
-    <button id="undo-btn" class="action-button undo-button" type="button" @click="$emit('undo')">
-      <span class="button-text">Undo</span>
-    </button>
+    <v-btn
+      class="action-button text-none font-weight-bold"
+      color="#fca6c0"
+      @click="$emit('undo')"
+      elevation="4"
+      size="large"
+      rounded="lg"
+      border
+    >
+      Undo
+    </v-btn>
     
-    <button id="redo-btn" class="action-button redo-button" type="button" @click="$emit('redo')">
-      <span class="button-text">Redo</span>
-    </button>
+    <v-btn
+      class="action-button text-none font-weight-bold"
+      color="#a1ccea"
+      @click="$emit('redo')"
+      elevation="4"
+      size="large"
+      rounded="lg"
+      border
+    >
+      Redo
+    </v-btn>
     
-    <button id="draw-btn" class="action-button draw-button" type="button" @click="$emit('draw')">
-      <span class="button-text">Draw Card</span>
-    </button>
+    <v-btn
+      class="action-button text-none font-weight-bold"
+      color="#a8e6cf"
+      @click="$emit('draw')"
+      elevation="4"
+      size="large"
+      rounded="lg"
+      border
+    >
+      Draw Card
+    </v-btn>
   </div>
 </template>
 
@@ -36,34 +60,12 @@ export default {
 }
 
 .action-button {
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: bold;
-  border: 2px solid #333;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+  color: #333 !important;
+  border: 2px solid #333 !important;
+  transition: transform 0.2s ease;
 
-.undo-button {
-  background-color: $pink-dark;
-  color: #333;
+  &:hover {
+    transform: translateY(-2px);
+  }
 }
-
-.redo-button {
-  background-color: $primary-blue;
-  color: #333;
-}
-
-.draw-button {
-  background-color: $green;
-  color: #333;
-}
-
-.button-text {
-  display: inline-block;
-  pointer-events: none;
-}
-
 </style>

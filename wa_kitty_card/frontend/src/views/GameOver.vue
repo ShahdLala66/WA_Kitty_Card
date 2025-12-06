@@ -1,15 +1,21 @@
 <template>
-  <v-container class="fill-height d-flex flex-column align-center justify-center">
-    <v-card class="glass-card pa-8 text-center" elevation="4" min-width="300">
-      <h1 class="text-h2 font-weight-bold mb-4 text-primary">Game Over</h1>
-      <h2 class="text-h4 mb-8">Winner: {{ winnerName }}</h2>
+  <v-container class="fill-height d-flex align-center justify-center">
+    <v-card class="glass-card pa-6 d-flex flex-column align-center justify-center" width="100%" max-width="750" min-height="90%" elevation="4">
+      <v-card-title class="text-h2 font-weight-bold text-center mb-4 text-deep-purple-lighten-1">
+        Game Over
+      </v-card-title>
       
-      <div class="d-flex flex-column gap-4">
+      <div class="text-h4 mb-8 text-center">
+        Winner: <span class="font-weight-bold">{{ winnerName }}</span>
+      </div>
+      
+      <div class="d-flex flex-column gap-4 w-100" style="max-width: 400px;">
         <v-btn
           to="/enterNames"
-          color="primary"
+          color="deep-purple-lighten-1"
           size="large"
-          class="mb-4"
+          block
+          class="mb-4 text-h6"
           prepend-icon="mdi-replay"
         >
           New Game
@@ -19,7 +25,10 @@
           to="/"
           variant="outlined"
           size="large"
+          block
+          class="text-h6"
           prepend-icon="mdi-home"
+          color="deep-purple-lighten-1"
         >
           Home
         </v-btn>

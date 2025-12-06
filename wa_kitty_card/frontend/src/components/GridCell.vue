@@ -1,5 +1,5 @@
 <template>
-  <v-sheet class="grid-item d-flex justify-center rounded-0 cursor-pointer"
+  <v-sheet class="grid-item d-flex justify-center rounded cursor-pointer border"
     :class="[dragClasses, cardInfo !== 'Empty' ? 'align-end pb-1' : 'align-center']"
     :style="{ backgroundColor: htmlColor + ' !important' }"
     :data-card="cardInfo" 
@@ -82,7 +82,6 @@ export default {
 @import "@/styles/colors";
 
 .grid-item {
-  border: none !important;
   position: relative;
   aspect-ratio: 1 / 1;
   pointer-events: auto;

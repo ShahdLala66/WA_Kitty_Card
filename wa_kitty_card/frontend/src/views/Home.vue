@@ -4,20 +4,13 @@
 
     <div class="d-flex justify-center align-center my-8 position-relative" style="z-index: 2">
       <button class="cute-button" @click="$router.push('/enterNames')">
-        <img
-          class="button-image"
-          width="150"
-          src="/images/zayne-icon.png"
-        />
+        <img class="button-image" width="150" src="/images/zayne-icon.png" />
       </button>
     </div>
 
     <div class="cloud">
       <div class="cat-container">
-        <img
-          src="/images/ZayneChillingGif.gif"
-          alt="Cat on cloud"
-        />
+        <img src="/images/ZayneChillingGif.gif" alt="Cat on cloud" />
         <div class="thought-bubble">Welcome! 🐾</div>
       </div>
     </div>
@@ -127,6 +120,10 @@
                 <li>Other modes to be added in the future (ahem Semester 5)</li>
               </ul>
             </v-card-text>
+            <v-img class="mx-auto mb-4 rounded-lg elevation-2" width="300"
+              src="https://github.com/user-attachments/assets/0dabce1d-05ac-43b2-9b42-0b0db84bbe00"></v-img>
+            <v-img class="mx-auto mb-4 rounded-lg elevation-2" width="300"
+              src="https://github.com/user-attachments/assets/efecb4e8-2e53-4586-8bd7-b79ecacc3ab6"></v-img>
           </v-card>
         </v-col>
 
@@ -142,49 +139,24 @@
               <p class="mb-2">
                 After being asked what mode you wanna play, you get this:
               </p>
-              <v-img
-                class="mx-auto mb-4 rounded-lg elevation-2"
-                width="300"
-                src="https://github.com/user-attachments/assets/d9a47570-83dd-42af-a7e9-470f9e398ab5"
-              ></v-img>
+              <v-img class="mx-auto mb-4 rounded-lg elevation-2" width="300"
+                src="https://github.com/user-attachments/assets/d9a47570-83dd-42af-a7e9-470f9e398ab5"></v-img>
 
               <p class="mb-2">Now for the Game itself!</p>
-              <v-img
-                class="mx-auto mb-4 rounded-lg elevation-2"
-                width="300"
-                src="https://github.com/user-attachments/assets/9f592665-8085-4664-b3d9-3281d1907bdd"
-              ></v-img>
+              <v-img class="mx-auto mb-4 rounded-lg elevation-2" width="300"
+                src="https://github.com/user-attachments/assets/9f592665-8085-4664-b3d9-3281d1907bdd"></v-img>
 
               <p class="mb-2">
                 Aren't the little kitties cute? Btw THEY'RE ALL MOVING!
               </p>
-              <v-img
-                class="mx-auto mb-4 rounded-lg elevation-2"
-                width="300"
-                src="https://github.com/user-attachments/assets/4789d1dd-f420-4a28-9237-1f270d346c70"
-              ></v-img>
-              <v-img
-                class="mx-auto mb-4 rounded-lg elevation-2"
-                width="300"
-                src="https://github.com/user-attachments/assets/f4761088-5c92-4b2a-ad1b-d7495532a261"
-              ></v-img>
+              <v-img class="mx-auto mb-4 rounded-lg elevation-2" width="300"
+                src="https://github.com/user-attachments/assets/4789d1dd-f420-4a28-9237-1f270d346c70"></v-img>
+              <v-img class="mx-auto mb-4 rounded-lg elevation-2" width="300"
+                src="https://github.com/user-attachments/assets/f4761088-5c92-4b2a-ad1b-d7495532a261"></v-img>
 
               <p class="mb-2 mt-4">And Game Over:</p>
-              <v-img
-                class="mx-auto mb-4 rounded-lg elevation-2"
-                width="300"
-                src="https://github.com/user-attachments/assets/90c78aaa-d0af-455b-a8ae-c2bf2257085d"
-              ></v-img>
-              <v-img
-                class="mx-auto mb-4 rounded-lg elevation-2"
-                width="300"
-                src="https://github.com/user-attachments/assets/0dabce1d-05ac-43b2-9b42-0b0db84bbe00"
-              ></v-img>
-              <v-img
-                class="mx-auto mb-4 rounded-lg elevation-2"
-                width="300"
-                src="https://github.com/user-attachments/assets/efecb4e8-2e53-4586-8bd7-b79ecacc3ab6"
-              ></v-img>
+              <v-img class="mx-auto mb-4 rounded-lg elevation-2" width="300"
+                src="https://github.com/user-attachments/assets/90c78aaa-d0af-455b-a8ae-c2bf2257085d"></v-img>
             </v-card-text>
           </v-card>
         </v-col>
@@ -276,8 +248,13 @@ export default {
 }
 
 @keyframes cloudFloat {
-  from { transform: translateY(0); }
-  to { transform: translateY(-20px); }
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-20px);
+  }
 }
 
 .cat-container {

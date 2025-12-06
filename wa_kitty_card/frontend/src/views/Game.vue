@@ -256,13 +256,13 @@ export default {
   width: 100%;
   position: relative;
   padding: 1rem;
-  gap: 2rem;
+  gap: 0.5rem;
   overflow-x: hidden;
 }
 
 .zayne-wood {
   position: absolute;
-  top: 28vh;
+  top: 20vh;
   left: 0;
   width: 100%;
   height: 15vh;
@@ -282,34 +282,31 @@ export default {
 .state-section {
   width: 100%;
   z-index: 2;
-  margin-top: 2vh;
 }
 
 .grid-section {
   z-index: 2;
-  margin-top: 5vh;
 }
 
 .hand-section {
   width: 100%;
   z-index: 2;
-  margin-top: auto;
-  margin-bottom: 12vh;
+  margin-bottom: 8vh;
 }
 
 @media (max-width: 576px) {
   .game-layout {
     padding: 0.5rem;
-    gap: 1rem;
+    gap: 0.5rem;
   }
   
   .zayne-wood {
-    top: 22vh;
+    top: 18vh;
     height: 12vh;
   }
 
   .grid-section {
-    margin-top: 2vh;
+    margin-top: 1vh;
   }
 }
 </style>
