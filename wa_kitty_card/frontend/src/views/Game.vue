@@ -1,10 +1,12 @@
 <template>
   <div class="game-layout">
+    <div class="background">
     <div class="state-section">
-      <PlayerState :state="state" />
+      <PlayerState :state="state" :players="players" />
     </div>
-
+    </div>
     <div class="zayne-wood"></div>
+    <div class="table-background">
     <div class="grid-section">
       <GameGrid :gridData="gridData" @cellClicked="onGridCellClicked" @cardDropped="onCardDropped" />
     </div>
@@ -15,7 +17,7 @@
     </div>
 
     <GameActions @undo="undo" @redo="redo" @draw="draw" />
-
+</div>
   </div>
 </template>
 
@@ -39,6 +41,7 @@ export default {
       state: ['Player 1', 'Waiting', 'Waiting'],
       gridData: [],
       currentPlayerHand: [],
+      players: [],
       playerIdentity: 'Player ?',
       playerBannerClass: '',
       playerBannerDisplay: 'none',
@@ -99,6 +102,7 @@ export default {
         if (data.state) this.state = data.state;
         if (data.grid) this.gridData = data.grid.map(c => [c.x, c.y, c.card, c.color, c.suit, c.placedByPlayer || null]);
         if (data.hand) this.currentPlayerHand = data.hand;
+        if (data.players) this.players = data.players;
       };
     },
     undo() {
@@ -236,6 +240,11 @@ export default {
             this.currentPlayerHand = data.hand;
           }
 
+          // Update players scores from response
+          if (data.players) {
+            this.players = data.players;
+          }
+
           // Clear selection on success
           this.selectedCardIndex = null;
         })
@@ -249,64 +258,92 @@ export default {
 
 <style lang="scss" scoped>
 .game-layout {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
+  display: grid;
+  grid-template-rows: 60vh 5vh 50vh 25vh 45vh; 
+  height: 160vh;
   width: 100%;
   position: relative;
-  padding: 1rem;
-  gap: 0.5rem;
-  overflow-x: hidden;
+  padding: 0 2rem;
 }
+
 
 .zayne-wood {
-  position: absolute;
-  top: 20vh;
-  left: 0;
-  width: 100%;
-  height: 15vh;
-  background-color: rgb(170, 134, 86);
-  border-bottom: solid 2vh rgb(134, 106, 66);
-  background-image: linear-gradient(90deg,
-      rgba(0, 0, 0, 0.1) 0%,
+  background-color: #D4A574;
+  
+  width: 100vw;
+  margin-left: -2rem; 
+  margin-right: -2rem; 
+  
+  height: 10vh; 
+  border-bottom: solid 2vh #C89968;
+  
+  background-image: 
+    repeating-conic-gradient(
+      rgba(253, 197, 152, 0.5) 0deg,
+      transparent 69deg,
+      transparent 20deg,
+      rgba(245, 195, 155, 0.5) 15deg
+    ),
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.08) 0%,
       transparent 30%,
       transparent 70%,
-      rgba(0, 0, 0, 0.1) 100%);
-  box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  z-index: 0;
-}
-
-.state-section {
-  width: 100%;
-  z-index: 2;
-}
-
-.grid-section {
-  z-index: 2;
-}
-
-.hand-section {
-  width: 100%;
-  z-index: 2;
-  margin-bottom: 8vh;
-}
-
-@media (max-width: 576px) {
-  .game-layout {
-    padding: 0.5rem;
-    gap: 0.5rem;
-  }
+      rgba(0, 0, 0, 0.08) 100%
+    );
   
-  .zayne-wood {
-    top: 18vh;
-    height: 12vh;
+  box-shadow: 
+    0 2px 5px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.table-background {
+  position: absolute;
+  left: 0;
+  top: 70vh; 
+  width: 100vw;
+  height: 100vh; 
+  
+  background-color: rgb(252, 244, 208);
+  
+  background-image: 
+    linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+  border-bottom: 40px solid rgb(192, 160, 101);
+  pointer-events: none;
+  z-index: -1;
+  
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
+.state-section, 
+.grid-section, 
+.hand-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; 
+  z-index: 2; 
+  margin: 0 1rem;
+}
+
+
+@media screen and (max-width: 576px) {
+  .hand-section {
+    align-items: flex-start;
+    padding-top: 10px;
   }
 
-  .grid-section {
-    margin-top: 1vh;
+  .game-layout {
+    padding: 0 ;
+    }
+  .zayne-wood {
+    margin-left: 0; 
+    margin-right: 0;
   }
+
 }
+
 </style>

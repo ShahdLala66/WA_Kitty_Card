@@ -17,3 +17,6 @@ cd wa_kitty_card\frontend
 npm run serve
 
 -> http://localhost:8080/
+
+
+ npm install vuetify@^3.11.2
