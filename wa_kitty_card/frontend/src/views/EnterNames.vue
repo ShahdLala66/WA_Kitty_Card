@@ -11,7 +11,6 @@
       </v-tabs>
 
       <v-window v-model="mode">
-        <!-- Create Game Form -->
         <v-window-item value="create">
           <v-form @submit.prevent="createGame">
             <v-text-field
@@ -56,7 +55,6 @@
           </div>
         </v-window-item>
 
-        <!-- Join Game Form -->
         <v-window-item value="join">
           <v-form @submit.prevent="joinGame">  
             <v-text-field

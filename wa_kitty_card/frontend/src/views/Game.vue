@@ -1,12 +1,12 @@
 <template>
   <div class="game-layout">
-    <div class="background">
     <div class="state-section">
       <PlayerState :state="state" :players="players" />
     </div>
-    </div>
+    
     <div class="zayne-wood"></div>
-    <div class="table-background">
+    <div class="table-background"></div>
+    
     <div class="grid-section">
       <GameGrid :gridData="gridData" @cellClicked="onGridCellClicked" @cardDropped="onCardDropped" />
     </div>
@@ -17,7 +17,6 @@
     </div>
 
     <GameActions @undo="undo" @redo="redo" @draw="draw" />
-</div>
   </div>
 </template>
 
