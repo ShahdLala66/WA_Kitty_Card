@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import registerServiceWorker from './registerServiceWorker'
 
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
@@ -13,6 +14,11 @@ const vuetify = createVuetify({
 })
 
 const app = createApp(App)
+
+// Register service worker (works in production or when testing on localhost)
+const wb = registerServiceWorker()
+app.config.globalProperties.$workbox = wb
+
 app.use(router)
 app.use(vuetify)
 app.mount('#app')

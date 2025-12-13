@@ -1,5 +1,30 @@
 <template>
   <v-app>
+    <v-snackbar
+      v-model="updateAvailable"
+      :timeout="-1"
+      color="primary"
+      location="bottom"
+    >
+      A new version is available!
+      <template v-slot:actions>
+        <v-btn
+          color="white"
+          variant="text"
+          @click="refreshApp"
+        >
+          Update
+        </v-btn>
+        <v-btn
+          color="white"
+          variant="text"
+          @click="updateAvailable = false"
+        >
+          Later
+        </v-btn>
+      </template>
+    </v-snackbar>
+    
     <NavBar />
     <v-main>
       <router-view />
@@ -14,6 +39,31 @@ export default {
   name: 'App',
   components: {
     NavBar
+  },
+  data() {
+    return {
+      updateAvailable: false,
+      registration: null
+    }
+  },
+  created() {
+    // Listen for service worker updates
+    if (process.env.NODE_ENV === 'production' && this.$workbox) {
+      this.$workbox.addEventListener('waiting', () => {
+        this.updateAvailable = true
+      })
+    }
+  },
+  methods: {
+    refreshApp() {
+      this.updateAvailable = false
+      if (this.$workbox) {
+        this.$workbox.addEventListener('controlling', () => {
+          window.location.reload()
+        })
+        this.$workbox.messageSkipWaiting()
+      }
+    }
   }
 }
 </script>
