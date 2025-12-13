@@ -181,6 +181,22 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
       .getOrElse(Seq.empty)
   }
 
+  def getPlayersScore : Action[AnyContent] = Action {
+    val playersOpt = safe(Main.controller.getPlayers)
+    playersOpt match {
+      case Some(players) =>
+        val playersScore = players.map { player => 
+          Json.obj(
+            "name"  -> player.name,
+            "score" -> player.points
+          )
+        }
+        Ok(views.html.vueIndex(Json.stringify(Json.obj("playersScore" -> playersScore))))
+      case None =>
+        Ok(views.html.vueIndex(Json.stringify(Json.obj("loading" -> true, "message" -> "Calculating scores..."))))
+    }
+  }
+
   def gridColors: Action[AnyContent] = Action {
     val grid = getGridState
     if (grid.isEmpty)
@@ -333,10 +349,10 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
         sid <- sessionId
         pid <- playerId
       } yield Main.controller.isPlayerTurn(sid, pid)).getOrElse(true)
-    
-    if (!canPlay) {
-      Ok(Json.obj("success" -> false, "message" -> "It's not your turn!"))
-    } else {
+      
+      if (!canPlay) {
+        Ok(Json.obj("success" -> false, "message" -> "It's not your turn!"))
+      } else {
         val playerNumberOpt = for {
           sid <- sessionId
           pid <- playerId
@@ -370,6 +386,8 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
       }
     }
   }
+
+  
 
   def gameOverPage: Action[AnyContent] = Action {
     if (Main.controller.isGameOver) {
@@ -415,11 +433,24 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
         )
       }
 
+      // Get players with scores
+      val playersOpt = safe(Main.controller.getPlayers)
+      val playersJson = playersOpt.map { players =>
+        players.map { player =>
+          Json.obj(
+            "name"  -> player.name,
+            "score" -> player.points,
+            "color" -> (if (player.name == state(1)) "#FF6B6B" else "#4ECDC4")
+          )
+        }
+      }.getOrElse(Seq.empty)
+
       Ok(
         Json.obj(
           "success" -> true,
           "state"   -> state,
-          "grid"    -> gridJson
+          "grid"    -> gridJson,
+          "players" -> playersJson
         )
       )
     }

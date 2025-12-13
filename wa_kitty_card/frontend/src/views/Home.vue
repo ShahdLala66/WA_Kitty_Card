@@ -1,79 +1,80 @@
 <template>
-  <div class="home">
-    <h1>{{ message }}</h1>
+  <v-container fluid class="home fill-height d-flex flex-column align-center">
+    <h1 class="text-h2 font-weight-bold mb-6 text-center">{{ message }}</h1>
 
-    <div class="button-container">
-      <button class="cute-button">
-        <a href="/enterNames">
-          <img
-            class="button-image"
-            width="150"
-            src="/images/zayne-icon.png"
-          />
-        </a>
+    <div class="d-flex justify-center align-center my-8 position-relative" style="z-index: 2">
+      <button class="cute-button" @click="$router.push('/enterNames')">
+        <img class="button-image" width="150" src="/images/zayne-icon.png" />
       </button>
     </div>
 
     <div class="cloud">
       <div class="cat-container">
-        <img
-          src="/images/ZayneChillingGif.gif"
-          alt="Cat on cloud"
-        />
+        <img src="/images/ZayneChillingGif.gif" alt="Cat on cloud" />
         <div class="thought-bubble">Welcome! 🐾</div>
       </div>
     </div>
 
-    <div class="container py-4">
-      <div class="row">
-        <div class="col-12 col-md-12 col-xxl-4 mb-3">
-          <div class="card h-100 shadow-sm">
-            <div class="card-body">
-              <h2 class="card-title"><strong>General</strong></h2>
-              <p class="card-text">
+    <v-container class="py-4">
+      <v-row>
+        <!-- General Section -->
+        <v-col cols="12" md="12" xxl="4" class="mb-3">
+          <v-card class="h-100 glass-card" elevation="4">
+            <v-card-item>
+              <v-card-title class="text-h4 font-weight-bold text-center mb-4 card-title">
+                <strong>General</strong>
+              </v-card-title>
+            </v-card-item>
+            <v-card-text class="text-body-1">
+              <p class="mb-4">
                 When you start the game, you will be asked to choose a mode:
               </p>
 
-              <ul>
-                <li>Single</li>
-                <li>Multiplayer</li>
-              </ul>
+              <v-list density="compact" class="bg-transparent">
+                <v-list-item prepend-icon="mdi-paw">Single</v-list-item>
+                <v-list-item prepend-icon="mdi-paw">Multiplayer</v-list-item>
+              </v-list>
 
-              <p class="card-text">
+              <p class="mt-4">
                 Single player mode has a special feature but the game can NOT be
                 played as single player, as it needs two people. Then you will be
                 asked to load or save a game. If it’s your first time playing, you
                 need to start a new game.
               </p>
-            </div>
-          </div>
-        </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
 
-        <div class="col-12 col-md-6 col-xxl-4 mb-3">
-          <div class="card h-100 shadow-sm">
-            <div class="card-body">
-              <h2 class="card-title"><strong>Rules</strong></h2>
-              <h4 class="mt-3"><em>About Rounds:</em></h4>
-              <p class="card-text">
+        <!-- Rules Section -->
+        <v-col cols="12" md="6" xxl="4" class="mb-3">
+          <v-card class="h-100 glass-card" elevation="4">
+            <v-card-item>
+              <v-card-title class="text-h4 font-weight-bold text-center mb-4 card-title">
+                <strong>Rules</strong>
+              </v-card-title>
+            </v-card-item>
+            <v-card-text class="text-body-1">
+              <h4 class="text-h6 font-weight-bold mt-3 mb-2"><em>About Rounds:</em></h4>
+              <p class="mb-2">
                 At the start of each game, both players decide the order to play.
               </p>
-              <ul>
+              <ul class="pl-4 mb-4">
                 <li>The player going first receives 3 cards.</li>
                 <li>The player going second receives also 3 cards.</li>
               </ul>
 
-              <p class="card-text">
+              <p class="mb-4">
                 Players alternate turns, and each round, they can choose to either
                 [Play] a card or [Draw] a card. When all 9 cups are filled with
                 kitties, the player with more points wins the game.
               </p>
 
-              <h4 class="mt-3"><em>About Cards:</em></h4>
-              <p class="card-text">
+              <h4 class="text-h6 font-weight-bold mt-3 mb-2"><em>About Cards:</em></h4>
+              <p class="mb-2">
                 There are 4 colors of cards and 5 colors of cups, including the
                 white cup.
               </p>
-              <ul>
+              <ul class="pl-4 mb-4">
                 <li>There are the ACE and Bomb cards.</li>
                 <li>The ace card freezes the enemy! More rounds for you!</li>
                 <li>
@@ -83,8 +84,8 @@
                 </li>
               </ul>
 
-              <h4 class="mt-3"><em>About Points:</em></h4>
-              <ul>
+              <h4 class="text-h6 font-weight-bold mt-3 mb-2"><em>About Points:</em></h4>
+              <ul class="pl-4 mb-4">
                 <li>You can put your cards in any unoccupied cups.</li>
                 <li>
                   Place kitties in the cups and score points based on the cup color.
@@ -100,16 +101,16 @@
                 </li>
               </ul>
 
-              <h4 class="mt-3"><em>About the card placement:</em></h4>
-              <ul>
+              <h4 class="text-h6 font-weight-bold mt-3 mb-2"><em>About the card placement:</em></h4>
+              <ul class="pl-4 mb-4">
                 <li>
                   Careful where you place your card! If you place it in the wrong
                   cell the cat will destroy it! Your turn will be canceled.
                 </li>
               </ul>
 
-              <h4 class="mt-3"><em>About the winner:</em></h4>
-              <ul>
+              <h4 class="text-h6 font-weight-bold mt-3 mb-2"><em>About the winner:</em></h4>
+              <ul class="pl-4">
                 <li>The one with most Points will win.</li>
                 <li>
                   If you get the ACE, you are lucky! You will be able to freeze your
@@ -118,66 +119,50 @@
                 </li>
                 <li>Other modes to be added in the future (ahem Semester 5)</li>
               </ul>
-            </div>
-          </div>
-        </div>
+            </v-card-text>
+            <v-img class="mx-auto mb-4 rounded-lg elevation-2" width="300"
+              src="https://github.com/user-attachments/assets/0dabce1d-05ac-43b2-9b42-0b0db84bbe00"></v-img>
+            <v-img class="mx-auto mb-4 rounded-lg elevation-2" width="300"
+              src="https://github.com/user-attachments/assets/efecb4e8-2e53-4586-8bd7-b79ecacc3ab6"></v-img>
+          </v-card>
+        </v-col>
 
-        <div class="col-12 col-md-6 col-xxl-4 mb-3">
-          <div class="card h-100 shadow-sm">
-            <div class="card-body">
-              <h2 class="card-title"><strong>LOOK!!!</strong></h2>
-              <p class="card-text">
+        <!-- Images Section -->
+        <v-col cols="12" md="6" xxl="4" class="mb-3">
+          <v-card class="h-100 glass-card" elevation="4">
+            <v-card-item>
+              <v-card-title class="text-h4 font-weight-bold text-center mb-4 card-title">
+                <strong>LOOK!!!</strong>
+              </v-card-title>
+            </v-card-item>
+            <v-card-text class="text-body-1 text-center">
+              <p class="mb-2">
                 After being asked what mode you wanna play, you get this:
               </p>
-              <img
-                class="img-fluid mb-2"
-                width="300"
-                src="https://github.com/user-attachments/assets/d9a47570-83dd-42af-a7e9-470f9e398ab5"
-              />
+              <v-img class="mx-auto mb-4 rounded-lg elevation-2" width="300"
+                src="https://github.com/user-attachments/assets/d9a47570-83dd-42af-a7e9-470f9e398ab5"></v-img>
 
-              <p class="card-text">Now for the Game itself!</p>
-              <img
-                class="img-fluid mb-2"
-                width="300"
-                src="https://github.com/user-attachments/assets/9f592665-8085-4664-b3d9-3281d1907bdd"
-              />
+              <p class="mb-2">Now for the Game itself!</p>
+              <v-img class="mx-auto mb-4 rounded-lg elevation-2" width="300"
+                src="https://github.com/user-attachments/assets/9f592665-8085-4664-b3d9-3281d1907bdd"></v-img>
 
-              <p class="card-text">
+              <p class="mb-2">
                 Aren't the little kitties cute? Btw THEY'RE ALL MOVING!
               </p>
-              <img
-                class="img-fluid mb-2"
-                width="300"
-                src="https://github.com/user-attachments/assets/4789d1dd-f420-4a28-9237-1f270d346c70"
-              />
-              <img
-                class="img-fluid mb-2"
-                width="300"
-                src="https://github.com/user-attachments/assets/f4761088-5c92-4b2a-ad1b-d7495532a261"
-              />
+              <v-img class="mx-auto mb-4 rounded-lg elevation-2" width="300"
+                src="https://github.com/user-attachments/assets/4789d1dd-f420-4a28-9237-1f270d346c70"></v-img>
+              <v-img class="mx-auto mb-4 rounded-lg elevation-2" width="300"
+                src="https://github.com/user-attachments/assets/f4761088-5c92-4b2a-ad1b-d7495532a261"></v-img>
 
-              <p class="card-text">And Game Over:</p>
-              <img
-                class="img-fluid mb-2"
-                width="300"
-                src="https://github.com/user-attachments/assets/90c78aaa-d0af-455b-a8ae-c2bf2257085d"
-              />
-              <img
-                class="img-fluid mb-2"
-                width="300"
-                src="https://github.com/user-attachments/assets/0dabce1d-05ac-43b2-9b42-0b0db84bbe00"
-              />
-              <img
-                class="img-fluid mb-2"
-                width="300"
-                src="https://github.com/user-attachments/assets/efecb4e8-2e53-4586-8bd7-b79ecacc3ab6"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+              <p class="mb-2 mt-4">And Game Over:</p>
+              <v-img class="mx-auto mb-4 rounded-lg elevation-2" width="300"
+                src="https://github.com/user-attachments/assets/90c78aaa-d0af-455b-a8ae-c2bf2257085d"></v-img>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-container>
 </template>
 
 <script>
@@ -195,3 +180,123 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import "@/styles/colors";
+
+.glass-card {
+  background: $white-transparent !important;
+  backdrop-filter: blur(10px);
+  border-radius: $border-radius;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Keep existing custom animations/styles */
+.cute-button {
+  border: none;
+  background: $white-transparent;
+  border-radius: $border-radius;
+  box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light;
+  padding: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-0.2vh);
+    box-shadow: 0 $box-shadow-blur $base-size $black-shadow-dark;
+  }
+
+  img {
+    border-radius: 1rem;
+    transition: transform 0.3s ease;
+  }
+}
+
+.cloud {
+  position: absolute;
+  width: 15vw;
+  height: 6vw;
+  left: 70vw;
+  top: 20vh;
+  background: linear-gradient(to bottom right, #ffffff 0%, #f5f9ff 100%);
+  border-radius: 8vw;
+  z-index: 1;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    background: inherit;
+    border-radius: 50%;
+    box-shadow: inherit;
+  }
+
+  &::before {
+    width: 5vw;
+    height: 5vw;
+    top: -2.5vw;
+  }
+
+  &::after {
+    width: 6vw;
+    height: 6vw;
+    top: -3vw;
+    left: 2vw;
+  }
+
+  animation: cloudFloat 6s ease-in-out infinite alternate;
+}
+
+@keyframes cloudFloat {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-20px);
+  }
+}
+
+.cat-container {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 8vw;
+  pointer-events: auto;
+  transition: transform 0.3s ease;
+  z-index: 10;
+}
+
+.cat-container:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.cat-container img {
+  height: 100%;
+}
+
+.thought-bubble {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, -10px);
+  background: #fff;
+  border-radius: 20px;
+  padding: 10px 15px;
+  min-width: 120px;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.7rem, 2vw, 1rem);
+  color: #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.cat-container:hover .thought-bubble {
+  opacity: 1;
+  transform: translate(-50%, -25px);
+}
+</style>
