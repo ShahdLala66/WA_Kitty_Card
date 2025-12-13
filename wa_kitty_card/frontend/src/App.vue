@@ -1,46 +1,25 @@
 <template>
-  <div id="app">
+  <v-app>
     <NavBar />
-    <component :is="currentView" />
-  </div>
+    <v-main>
+      <router-view />
+    </v-main>
+  </v-app>
 </template>
 
 <script>
 import NavBar from './components/NavBar.vue'
-import Home from './views/Home.vue'
-import EnterNames from './views/EnterNames.vue'
-import Game from './views/Game.vue'
-import GameOver from './views/GameOver.vue'
 
 export default {
   name: 'App',
   components: {
-    NavBar,
-    Home,
-    EnterNames,
-    Game,
-    GameOver
-  },
-  computed: {
-    currentView() {
-      const path = window.location.pathname;
-      if (path === '/') return 'Home';
-      if (path === '/enterNames') return 'EnterNames';
-      if (path === '/combinedView') return 'Game';
-      if (path === '/gameOverPage') return 'GameOver';
-      if (['/playersState', '/gridColors', '/playersHand', '/listEvents'].includes(path)) return 'Game'; // Reusing Game or we could make a Debug component
-      return 'Home';
-    }
+    NavBar
   }
 }
 </script>
 
 <style lang="scss">
 @import "./styles/colors";
-
-#app {
-  padding-top: 70px;
-}
 
 * {
   font-family: $font-display !important;
@@ -52,6 +31,10 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
+}
+
+.v-application {
+  background: transparent !important;
 }
 
 h1 {

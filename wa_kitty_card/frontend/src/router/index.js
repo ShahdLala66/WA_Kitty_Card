@@ -11,17 +11,17 @@ const routes = [
     component: Home
   },
   {
-    path: '/enter-names',
+    path: '/enterNames',
     name: 'EnterNames',
     component: EnterNames
   },
   {
-    path: '/game',
+    path: '/combinedView',
     name: 'Game',
     component: Game
   },
   {
-    path: '/game-over',
+    path: '/gameOverPage',
     name: 'GameOver',
     component: GameOver
   }

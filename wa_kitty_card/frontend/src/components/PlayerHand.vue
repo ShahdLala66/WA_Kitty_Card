@@ -1,24 +1,25 @@
 <template>
-  <div class="player-hand-section">
-    <div class="player-hand-row">
-      <div 
-        v-for="(card, index) in cards" 
-        :key="index" 
-        class="card-container" 
-        :class="{ 'selected': selectedCardIndex === index, 'dragging': draggingIndex === index, 'disabled': !isMyTurn }"
-        :data-card-index="index"
-        :draggable="isMyTurn"
-        @dragstart="onDragStart($event, index, card)"
-        @dragend="onDragEnd"
-        @click="onCardClick(index)"
-      >
-        <div class="card-display">
-          <img :src="getCardImage(card)" :alt="card" class="card-image" />
-          <div class="card-label">{{ card }}</div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <v-sheet class="d-flex align-center justify-center fill-height bg-transparent pa-2">
+    <v-slide-group show-arrows center-active class="pa-4" style="max-width: 100%;">
+      <v-slide-group-item v-for="(card, index) in cards" :key="index">
+        <v-card :class="[
+          'ma-2',
+          'card-transition',
+          {
+            'selected-card': selectedCardIndex === index,
+            'disabled-card': !isMyTurn,
+            'dragging': draggingIndex === index
+          }
+        ]" height="200" width="140" :draggable="isMyTurn" @dragstart="onDragStart($event, index, card)"
+          @dragend="onDragEnd" @click="onCardClick(index)" elevation="4" rounded="lg" border>
+          <div class="d-flex flex-column align-center justify-center fill-height pa-2">
+            <v-img :src="getCardImage(card)" height="120" width="100%" contain class="mb-2"></v-img>
+            <div class="text-caption font-weight-bold text-center text-wrap">{{ card }}</div>
+          </div>
+        </v-card>
+      </v-slide-group-item>
+    </v-slide-group>
+  </v-sheet>
 </template>
 
 <script>
@@ -91,134 +92,43 @@ export default {
 <style lang="scss" scoped>
 @import "@/styles/colors";
 
-.player-hand-section {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+:deep(.v-slide-group__content) {
+  padding-top: 15px !important;
+  padding-bottom: 15px !important;
 }
 
-.card-container {
-  width: clamp(120px, #{$card-width}, 220px);
-  min-width: 100px;
-  max-width: 300px;
-  
-  @media screen and (max-width: 576px) {
-    position: absolute;
-    width: 80px; 
-    
-    @for $i from 0 through 19 {
-      $row: floor($i / 5); 
-      $col: $i % 5; 
-      
-      &[data-card-index="#{$i}"] {
-        left: calc(50vw - 200px + #{$col * 40}px); 
-        top: #{$row * 60}px;
-        z-index: #{20 - $i};
-      }
-    }
-    
-    &:hover {
-      z-index: 21 !important;
-    }
-  }
-}
-
-.player-hand-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: $card-spacing;
-  flex-wrap: wrap;
-  width: auto;
-  max-width: 1200px;
-  
-  @media screen and (min-width: 577px) {
-    flex-direction: row;
-  }
-  
-  @media screen and (max-width: 576px) {
-    position: relative;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 0;
-    height: 250px;
-  }
-}
-
-.card-display {
-  flex: 1 1 auto;
-  aspect-ratio: 2 / 3;
-  background: $white;
-  border: 3px solid rgb(174, 145, 129);
-  border-radius: $card-border-radius;
-  box-shadow: $card-shadow;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: $font-dark;
-  text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.card-transition {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  cursor: grab;
+  position: relative;
+  z-index: 1;
 
   &:hover {
-    transform: scale(1.05);
-    box-shadow: $card-shadow-hover;
-    border-color: $pink-dark;
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2) !important;
+    border-color: $pink-dark !important;
+    z-index: 100 !important;
   }
-}
 
-.card-image {
-  max-width: 100%;
-  max-height: 80%;
-  object-fit: contain;
-  border-radius: 0.5rem;
-}
-
-.card-label {
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: $font-dark;
-  text-align: center;
-  word-wrap: break-word;
-  max-width: 100%;
-  margin-top: 0.25rem;
-}
-
-.card-container.disabled {
-  pointer-events: none;
-  opacity: 0.5;
-  filter: grayscale(50%);
-  cursor: not-allowed;
-  
-  .card-display {
-    &:hover {
-      transform: none;
-      box-shadow: $card-shadow;
-      border-color: rgb(174, 145, 129);
-    }
-  }
-}
-
-.card-container {
-    cursor: grab;
-}
-
-.card-container:active {
+  &:active {
     cursor: grabbing;
+  }
 }
 
-.card-container.dragging {
-    opacity: 0.5;
+.selected-card {
+  border-color: $font-dark !important;
+  border-width: 3px !important;
+  transform: translateY(-10px);
 }
 
-.card-container.selected .card-display {
-    border-color: $font-dark;
-    border-width: 4px;
+.disabled-card {
+  pointer-events: none;
+  opacity: 0.6;
+  filter: grayscale(40%);
+  cursor: not-allowed;
+}
+
+.dragging {
+  opacity: 0.4;
 }
 </style>

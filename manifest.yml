@@ -8,7 +8,3 @@ applications:
   env:
     APPLICATION_SECRET: "Bvg0r/sFHacstzPdkEPP/cXzHxnz5uNwkqh7IbJxEkvQ6b74+xsW35y/CI/EsYBm9ZKsBy4lVfwiLJ9Q/43zjA=="
     JAVA_TOOL_OPTIONS: "-Dpidfile.path=/dev/null -Dplay.http.secret.key=Bvg0r/sFHacstzPdkEPP/cXzHxnz5uNwkqh7IbJxEkvQ6b74+xsW35y/CI/EsYBm9ZKsBy4lVfwiLJ9Q/43zjA=="
-  routes:
-    - route: kittycards.apps.sharina.tech
-  health-check-type: http
-  health-check-http-endpoint: /

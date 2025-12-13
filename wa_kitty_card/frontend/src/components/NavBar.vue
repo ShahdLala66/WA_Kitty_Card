@@ -1,59 +1,53 @@
 <template>
-  <nav class="navbar navbar-expand-sm navbar-light bg-light fixed-top">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="/">Kitty Card</a>
+  <div>
+    <v-app-bar scroll-behavior="hide" scroll-threshold="10" class="glass-navbar px-8">
+      <a href="/" class="text-decoration-none font-weight-bold text-h5" style="color: inherit;">Kitty Card</a>
 
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNavDropdown"
-        aria-controls="navbarNavDropdown"
-        aria-expanded="false"
-      >
-        <img
-          src="/images/gorot.png"
-          class="navbar-toggler-icon-img"
-        />
-      </button>
+      <v-spacer></v-spacer>
 
-      <div
-        class="collapse navbar-collapse justify-content-end me-5"
-        id="navbarNavDropdown"
-      >
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="/combinedView">Game View</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Debug
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <a class="dropdown-item" href="/playersState">Players State</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="/gridColors">Grid</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="/playersHand">Players Hand</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="/listEvents">List Events</a>
-              </li>
-            </ul>
-          </li>
-        </ul>
+      <!-- Desktop Menu -->
+      <div class="d-none d-sm-flex align-center nav-items-container">
+        <v-btn variant="text" href="/combinedView" class="nav-btn">Game View</v-btn>
+
+        <v-menu open-on-hover>
+          <template v-slot:activator="{ props }">
+            <v-btn variant="text" v-bind="props" class="nav-btn">
+              Debug ▾
+            </v-btn>
+          </template>
+          <div class="glass-menu d-flex flex-column pa-2">
+            <v-btn variant="text" href="/playersState" class="justify-start" block>Players State</v-btn>
+            <v-btn variant="text" href="/gridColors" class="justify-start" block>Grid</v-btn>
+            <v-btn variant="text" href="/playersHand" class="justify-start" block>Players Hand</v-btn>
+            <v-btn variant="text" href="/listEvents" class="justify-start" block>List Events</v-btn>
+          </div>
+        </v-menu>
       </div>
-    </div>
-  </nav>
+
+      <!-- Mobile Menu Button -->
+      <div class="d-flex d-sm-none">
+        <v-btn icon @click="drawer = !drawer">
+          <img src="/images/gorot.png" class="navbar-toggler-icon-img" alt="Menu" />
+        </v-btn>
+      </div>
+    </v-app-bar>
+
+    <!-- Mobile Navigation Drawer -->
+    <v-navigation-drawer
+      v-model="drawer"
+      location="right"
+      temporary
+      class="glass-drawer"
+    >
+      <v-list class="bg-transparent">
+        <v-list-item href="/combinedView" title="Game View" prepend-icon="mdi-gamepad-variant"></v-list-item>
+        <v-list-item href="/playersState" title="Players State" prepend-icon="mdi-account-group"></v-list-item>
+        <v-list-item href="/gridColors" title="Grid" prepend-icon="mdi-grid"></v-list-item>
+        <v-list-item href="/playersHand" title="Players Hand" prepend-icon="mdi-cards"></v-list-item>
+        <v-list-item href="/listEvents" title="List Events" prepend-icon="mdi-format-list-bulleted"></v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+  </div>
 </template>
 
 <script>
@@ -61,35 +55,7 @@ export default {
   name: 'NavBar',
   data() {
     return {
-      lastScrollTop: 0,
-      scrollThreshold: 5
-    }
-  },
-  mounted() {
-    window.addEventListener('scroll', this.handleScroll);
-  },
-  beforeUnmount() {
-    window.removeEventListener('scroll', this.handleScroll);
-  },
-  methods: {
-    handleScroll() {
-      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-      
-      if (currentScroll < 0) return;
-      if (Math.abs(this.lastScrollTop - currentScroll) <= this.scrollThreshold) return;
-      
-      const navbar = this.$el;
-      if (!navbar) return;
-      
-      const navbarHeight = navbar.offsetHeight;
-      
-      if (currentScroll > this.lastScrollTop && currentScroll > navbarHeight) {
-        navbar.classList.add('navbar-hidden');
-      } else if (currentScroll < this.lastScrollTop) {
-        navbar.classList.remove('navbar-hidden');
-      }
-      
-      this.lastScrollTop = currentScroll;
+      drawer: false
     }
   }
 }
@@ -98,73 +64,38 @@ export default {
 <style lang="scss" scoped>
 @import "@/styles/colors";
 
-body {
-    padding-top: 15vh !important;
+.glass-navbar {
+  background-color: $white-transparent !important;
+  backdrop-filter: blur($backdrop-blur);
+  color: $font-dark !important;
 }
 
-nav.navbar {
-    position: fixed;
-    background: $white-transparent !important;
-    box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light !important;
-    transition: transform 0.3s ease-in-out;
-
-    &::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        backdrop-filter: blur($backdrop-blur);
-        z-index: -1;
-    }
-
-    &.navbar-hidden {
-        transform: translateY(-100%);
-    }
+.glass-menu {
+  background-color: $white-transparent !important;
+  backdrop-filter: blur($backdrop-blur);
+  color: $font-dark !important;
+  border-radius: $border-radius/2 !important;
+  box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light !important;
+  width: 220px;
 }
 
-nav.navbar .navbar-brand {
-    font-weight: bold !important;
+.glass-drawer {
+  background-color: $white-transparent !important;
+  backdrop-filter: blur($backdrop-blur);
+  color: $font-dark !important;
 }
 
-nav.navbar .nav-link {
-    color: $font-dark !important;
-    border-radius: $border-radius;
-
-    &:hover {
-        background: $white-transparent !important;
-    }
-}
-
-nav.navbar .dropdown-menu {
-    background: $white-transparent !important;
-    border: none !important;
-    border-radius: $border-radius;
-    box-shadow: 0 $box-shadow-blur $base-size $black-shadow-light !important;
-
-    &::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        backdrop-filter: blur($backdrop-blur);
-        border-radius: inherit;
-        z-index: -1;
-    }
-}
-
-nav.navbar .dropdown-item {
-    color: $font-dark !important;
-
-    &:hover {
-        background: $white-transparent !important;
-        border-radius: $border-radius;
-    }
+.nav-btn {
+  width: 220px !important;
 }
 
 .navbar-toggler-icon-img {
-    width: 1.5em;
-    height: 1.5em;
+  width: 1.5em;
+  height: 1.5em;
 }
 
-.navbar-toggler:hover {
-    background: $white-transparent !important;
+.nav-items-container {
+  gap: 6vw;
+  margin-right: 6vw;
 }
 </style>
