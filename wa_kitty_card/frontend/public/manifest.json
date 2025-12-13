@@ -3,16 +3,29 @@
   "short_name": "Kitty Card",
   "description": "A fun card game featuring adorable kitties! Play strategic card battles with friends.",
   "start_url": "/",
-  "scope": "/",
   "display": "standalone",
   "theme_color": "#0476F2",
-  "background_color": "#ffffff",
+  "background_color": "#fff",
   "icons": [
     {
       "src": "/images/zayne-icon.png",
       "sizes": "187x187",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/ZayneChillingGif.gif",
+      "sizes": "498x498",
+      "type": "image/gif",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/images/nav-menu-background.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide"
     }
   ]
 }

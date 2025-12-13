@@ -1,12 +1,10 @@
 import { Workbox } from 'workbox-window'
 
 export default function registerServiceWorker() {
-  // Only register service worker in production OR when testing built files
-  if ('serviceWorker' in navigator && (process.env.NODE_ENV === 'production' || window.location.hostname === 'localhost')) {
+  if ('serviceWorker' in navigator) {
     const wb = new Workbox('/service-worker.js')
 
     wb.addEventListener('waiting', () => {
-      console.log('A new service worker is waiting')
       wb.addEventListener('controlling', () => {
         window.location.reload()
       })
@@ -15,9 +13,7 @@ export default function registerServiceWorker() {
       wb.messageSkipWaiting()
     })
 
-    wb.register().catch(err => {
-      console.error('Service worker registration failed:', err)
-    })
+    wb.register()
 
     return wb
   }
