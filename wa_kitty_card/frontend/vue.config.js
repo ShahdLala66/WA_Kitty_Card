@@ -1,12 +1,26 @@
 const { GenerateSW } = require('workbox-webpack-plugin')
 
 module.exports = {
+  // Proxy is only used in development mode when running 'npm run serve'
+  // Only proxy API calls to the backend; all other routes handled by Vue Router, actually not sure if thats what is needed ...
   devServer: {
     proxy: {
-      '^/': {
-        target: 'http://localhost:9000',
+      '^/api': {
+        target: process.env.VUE_APP_API_BASE_URL || 'http://localhost:9000',
         ws: true,
-        changeOrigin: true
+        changeOrigin: true,
+        logLevel: 'debug',
+        onProxyReq: function(proxyReq, req, res) {
+          // Log proxy requests for debugging
+          console.log('[Proxy]', req.method, req.url, '->', proxyReq.path);
+        },
+        onError: function(err, req, res) {
+          console.error('[Proxy Error]', err.message);
+          res.writeHead(500, {
+            'Content-Type': 'text/plain'
+          });
+          res.end('Proxy error: ' + err.message);
+        }
       }
     }
   },

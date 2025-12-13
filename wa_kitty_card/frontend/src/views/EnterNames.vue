@@ -91,6 +91,8 @@
 </template>
 
 <script>
+import api from '@/services/api'
+
 export default {
   name: 'EnterNames',
   data() {
@@ -109,12 +111,7 @@ export default {
   },
   methods: {
     createGame() {
-      fetch('/createGame', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ playerName: this.playerName })
-      })
-        .then(response => response.json())
+      api.createGame(this.playerName)
         .then(data => {
           if (data.status !== 'OK') {
             this.errorMessage = 'Failed to create game. Please try again.';
@@ -139,12 +136,7 @@ export default {
     },
     joinGame() {
       const gameId = this.joinGameId.trim().toUpperCase();
-      fetch('/joinGame', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: gameId, playerName: this.playerName })
-      })
-        .then(response => response.json())
+      api.joinGame(gameId, this.playerName)
         .then(data => {
           if (data.status !== 'OK') {
             this.errorMessage = data.message || 'Failed to join game. Please check the Game ID.';
@@ -161,7 +153,14 @@ export default {
 
           this.connectWebSocket();
           setTimeout(() => {
-            window.location.href = `/combinedView?sessionId=${this.sessionId}&playerId=${this.playerId}&playerNumber=${this.playerNumber}`;
+            this.$router.push({
+              path: '/combinedView',
+              query: {
+                sessionId: this.sessionId,
+                playerId: this.playerId,
+                playerNumber: this.playerNumber
+              }
+            });
           }, 500);
         })
         .catch(err => {
@@ -178,13 +177,20 @@ export default {
       });
     },
     connectWebSocket() {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      this.websocket = new WebSocket(`${protocol}//${window.location.host}/ws/${this.sessionId}/${this.playerId}`);
+      const wsUrl = api.getWebSocketUrl(this.sessionId, this.playerId);
+      this.websocket = new WebSocket(wsUrl);
 
       this.websocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type === 'player-joined' && this.waiting) {
-          window.location.href = `/combinedView?sessionId=${this.sessionId}&playerId=${this.playerId}&playerNumber=${this.playerNumber}`;
+          this.$router.push({
+            path: '/combinedView',
+            query: {
+              sessionId: this.sessionId,
+              playerId: this.playerId,
+              playerNumber: this.playerNumber
+            }
+          });
         }
       };
     }
