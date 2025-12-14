@@ -1,8 +1,6 @@
 const API_BASE_URL = process.env.VUE_APP_API_BASE_URL || '';
 const WS_BASE_URL = process.env.VUE_APP_WS_BASE_URL || '';
 
-
-//serivce to interact with backend api
 async function apiFetch(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
   

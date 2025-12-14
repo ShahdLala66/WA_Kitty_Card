@@ -1,4 +1,3 @@
-# API Routes - Backend only handles JSON
 POST    /api/game/create                controllers.UiController.createGame()
 POST    /api/game/join                  controllers.UiController.joinGame()
 GET     /api/game/state                 controllers.UiController.getGameState()
@@ -6,8 +5,6 @@ POST    /api/card/place                 controllers.UiController.placeCard()
 POST    /api/card/draw                  controllers.UiController.drawCard()
 GET     /api/ws/:sessionId/:playerId    controllers.UiController.gameWebSocket(sessionId: String, playerId: String)
 
-# Static assets
 GET     /assets/*file                   controllers.Assets.versioned(path="/public", file: Asset)
 
-# Serve Vue.js frontend - catch all routes and serve index.html
 GET     /*path                          controllers.UiController.index(path: String)

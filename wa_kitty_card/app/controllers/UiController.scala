@@ -14,21 +14,16 @@ import actors.GameWebSocketActorFactory
 @Singleton
 class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSystem, mat: Materializer) extends AbstractController(cc) {
 
-  // Track which player placed cards at which positions: (x, y) -> playerNumber
   private val gridPlacements = scala.collection.mutable.Map[(Int, Int), String]()
 
-  // Serve the Vue.js SPA for all routes (SPA catch-all)
   def index(path: String): Action[AnyContent] = Action {
-    // Serve the compiled Vue.js index.html for all non-API routes
-    // This enables client-side routing in the Vue app
-    Ok(views.html.vueIndex("{}"))
+    Ok(views.html.vueIndex())
   }
   
   def createGame: Action[JsValue] = Action(parse.json) { implicit request: Request[JsValue] =>
     val playerName = (request.body \ "playerName").as[String]
     val playerId = java.util.UUID.randomUUID().toString
     
-    // Start a new game to reset game over state
     Main.controller.handleCommand("start")
     gridPlacements.clear()
     
@@ -109,7 +104,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
         )
       }
       
-      // Get hand for current player
+
       val handSeq = (sessionId, playerId, playerNumber) match {
         case (Some(sid), Some(pid), Some(pNum)) =>
           Main.controller.getSessionPlayer(sid, pNum)
@@ -118,7 +113,6 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
         case _ => Seq.empty
       }
       
-      // Get players with scores
       val playersOpt = safe(Main.controller.getPlayers)
       val playersJson = playersOpt.map { players =>
         players.map { player =>
@@ -146,8 +140,6 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
       GameWebSocketActorFactory.create(out, sessionId, playerId)
     }
   }
-
-  // HELPER METHODS
 
   private def getGridState: Seq[(Int, Int, String, String, String)] = {
     safe(Main.controller.getGridColors)
@@ -190,8 +182,6 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
       .getOrElse(Seq.empty)
   }
 
-  // API ACTIONS
-
   def placeCard: Action[AnyContent] = Action { implicit request =>
     if (Main.controller.isGameOver) {
       Ok(Json.obj("gameOver" -> true))
@@ -222,7 +212,6 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
                 "message" -> "Failed to place card. The position might be occupied or invalid."
               ))
             } else {
-              // Store which player placed this card
               gridPlacements((x, y)) = playerNumber
               val handSeq = for {
                 sid <- sessionId
@@ -345,7 +334,6 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
         )
       }
 
-      // Get players with scores
       val playersOpt = safe(Main.controller.getPlayers)
       val playersJson = playersOpt.map { players =>
         players.map { player =>

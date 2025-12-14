@@ -1,8 +1,6 @@
 const { GenerateSW } = require('workbox-webpack-plugin')
 
 module.exports = {
-  // Proxy is only used in development mode when running 'npm run serve'
-  // Only proxy API calls to the backend; all other routes handled by Vue Router, actually not sure if thats what is needed ...
   devServer: {
     proxy: {
       '^/api': {
@@ -11,7 +9,6 @@ module.exports = {
         changeOrigin: true,
         logLevel: 'debug',
         onProxyReq: function(proxyReq, req, res) {
-          // Log proxy requests for debugging
           console.log('[Proxy]', req.method, req.url, '->', proxyReq.path);
         },
         onError: function(err, req, res) {
@@ -31,7 +28,6 @@ module.exports = {
         clientsClaim: true,
         runtimeCaching: [
           {
-            // API: relativ, funktioniert lokal und auf einer späteren Domain
             urlPattern: ({ url }) => url.pathname.startsWith('/api'),
             handler: 'NetworkFirst',
             options: {
@@ -45,7 +41,6 @@ module.exports = {
             },
           },
           {
-            // JS/CSS/Fonts: schnell laden, aber bei Änderungen frisch
             urlPattern: ({ request }) =>
               request.destination === 'style' ||
               request.destination === 'script' ||
@@ -56,14 +51,13 @@ module.exports = {
             },
           },
           {
-            // Bilder: Cache-first mit Ablauf
             urlPattern: ({ request }) => request.destination === 'image',
             handler: 'CacheFirst',
             options: {
               cacheName: 'image-cache',
               expiration: {
                 maxEntries: 60,
-                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Tage
+                maxAgeSeconds: 30 * 24 * 60 * 60,
               },
               cacheableResponse: { statuses: [0, 200] },
             },

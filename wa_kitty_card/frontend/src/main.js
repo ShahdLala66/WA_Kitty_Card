@@ -15,7 +15,6 @@ const vuetify = createVuetify({
 
 const app = createApp(App)
 
-// Register service worker and make it available globally
 if (process.env.NODE_ENV === 'production') {
   const wb = registerServiceWorker()
   app.config.globalProperties.$workbox = wb

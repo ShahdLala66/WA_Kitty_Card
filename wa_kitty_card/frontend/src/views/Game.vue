@@ -108,7 +108,8 @@ export default {
       this.websocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.gameOver) {
-          this.$router.push('/gameOverPage');
+          const winner = this.getWinner(data.players || this.players);
+          this.$router.push({ path: '/gameOverPage', query: { winner } });
           return;
         }
         if (data.state) this.state = data.state;
@@ -132,7 +133,8 @@ export default {
       api.drawCard(this.sessionId, this.playerId)
         .then(data => {
           if (data.gameOver) {
-            this.$router.push('/gameOverPage');
+            const winner = this.getWinner(data.players || this.players);
+            this.$router.push({ path: '/gameOverPage', query: { winner } });
             return;
           }
           if (data.success === false || data.message) {
@@ -190,7 +192,8 @@ export default {
       })
         .then(data => {
           if (data.gameOver) {
-            this.$router.push('/gameOverPage');
+            const winner = this.getWinner(data.players || this.players);
+            this.$router.push({ path: '/gameOverPage', query: { winner } });
             return;
           }
           if (data.message) {
@@ -240,6 +243,11 @@ export default {
         .catch(err => {
           alert('Failed to place card: ' + err);
         });
+    },
+    getWinner(players) {
+      if (!players || players.length === 0) return 'Unknown';
+      const sorted = [...players].sort((a, b) => b.score - a.score);
+      return sorted[0].name;
     }
   }
 }
