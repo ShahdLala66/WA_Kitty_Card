@@ -78,8 +78,7 @@ export default {
 body {
   text-align: center;
   background: linear-gradient(to bottom, $primary-blue 0%, $pink-light 50%, $pink-dark 100%);
-  min-height: 100vh;
-  overflow-x: hidden;
+  background-attachment: fixed;
   position: relative;
 }
 
