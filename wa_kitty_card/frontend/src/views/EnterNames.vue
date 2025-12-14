@@ -1,86 +1,53 @@
 <template>
   <v-container class="fill-height d-flex align-center justify-center">
-    <v-card class="glass-card pa-6" width="100%" max-width="750" min-height="90%" elevation="4">
-      <v-card-title class="text-h4 font-weight-bold text-center mb-6">
-        Kitty Card - Multiplayer
+    <v-card class="glass-card pa-6" width="100%" max-width="750" min-height="90%">
+      <v-card-title class="text-h5 font-weight-bold text-center">
+        Multiplayer
       </v-card-title>
 
-      <v-tabs v-model="mode" grow class="mb-6 bg-transparent" color="deep-purple-lighten-1">
-        <v-tab value="create">Create New Game</v-tab>
-        <v-tab value="join">Join Existing Game</v-tab>
+      <v-tabs v-model="mode" grow class="mb-6 bg-transparent mobile-tabs" color="deep-purple-lighten-1">
+        <v-tab value="create" class="text-caption text-sm-body-1">Create New Game</v-tab>
+        <v-tab value="join" class="text-caption text-sm-body-1">Join Existing Game</v-tab>
       </v-tabs>
 
       <v-window v-model="mode">
         <v-window-item value="create">
           <v-form @submit.prevent="createGame">
-            <v-text-field
-              v-model="playerName"
-              label="Your Name"
-              required
-              color="deep-purple-lighten-1"
-              class="mb-4"
-            ></v-text-field>
-            
-            <v-btn
-              type="submit"
-              color="deep-purple-lighten-1"
-              block
-              size="large"
-              class="text-h6"
-            >
+            <v-text-field v-model="playerName" label="Your Name" required color="deep-purple-lighten-1"
+              class="mb-4"></v-text-field>
+
+            <v-btn type="submit" color="deep-purple-lighten-1" block size="large" class="text-h6">
               Create Game
             </v-btn>
           </v-form>
 
           <div v-if="waiting" class="text-center mt-6">
-            <h3 class="text-h5 mb-2">Game Created!</h3>
+            <h3 class="text-h5">Game Created!</h3>
             <p class="mb-4">Share this Game ID with another player:</p>
-            
+
             <div class="d-flex align-center gap-2 mb-4">
-              <v-text-field
-                ref="gameIdInput"
-                :model-value="gameId"
-                readonly
-                hide-details
-                class="flex-grow-1"
-                color="deep-purple-lighten-1"
-              ></v-text-field>
+              <v-text-field ref="gameIdInput" :model-value="gameId" readonly hide-details class="flex-grow-1"
+                color="deep-purple-lighten-1"></v-text-field>
               <v-btn color="deep-purple-lighten-1" @click="copyGameId" height="56">
                 Copy ID
               </v-btn>
             </div>
-            
-            <p class="text-medium-emphasis mb-4">Waiting for player 2 to join...</p>
-            <v-progress-circular indeterminate color="deep-purple-lighten-1" size="40"></v-progress-circular>
+
+            <p class="text-medium-emphasis mb-4">Waiting for player 2 to join... <v-progress-circular indeterminate
+                color="deep-purple-lighten-1" size="20"></v-progress-circular>
+            </p>
           </div>
         </v-window-item>
 
         <v-window-item value="join">
-          <v-form @submit.prevent="joinGame">  
-            <v-text-field
-              v-model="playerName"
-              label="Your Name"
-              required
-              color="deep-purple-lighten-1"
-              class="mb-4"
-            ></v-text-field>
+          <v-form @submit.prevent="joinGame">
+            <v-text-field v-model="playerName" label="Your Name" required color="deep-purple-lighten-1"
+              class="mb-4"></v-text-field>
 
-            <v-text-field
-              v-model="joinGameId"
-              label="Game ID"
-              required
-              color="deep-purple-lighten-1"
-              class="mb-4"
-              autocomplete="off"
-            ></v-text-field>
+            <v-text-field v-model="joinGameId" label="Game ID" required color="deep-purple-lighten-1" class="mb-4"
+              autocomplete="off"></v-text-field>
 
-            <v-btn
-              type="submit"
-              color="deep-purple-lighten-1"
-              block
-              size="large"
-              class="text-none text-h6"
-            >
+            <v-btn type="submit" color="deep-purple-lighten-1" block size="large" class="text-none text-h6">
               Join Game
             </v-btn>
           </v-form>
@@ -112,7 +79,7 @@ export default {
   methods: {
     createGame() {
       sessionStorage.setItem('tempPlayerName', this.playerName);
-      
+
       api.createGame(this.playerName)
         .then(data => {
           if (data.status !== 'OK') {
@@ -208,6 +175,19 @@ export default {
   backdrop-filter: blur(10px);
   border-radius: $border-radius;
   border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.mobile-tabs .v-tab {
+  min-width: 0;
+  padding: 0 8px;
+  font-size: 0.75rem;
+}
+
+@media screen and (min-width: 600px) {
+  .mobile-tabs .v-tab {
+    padding: 0 16px;
+    font-size: 0.875rem;
+  }
 }
 
 .gap-2 {
