@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import EnterNames from '../views/EnterNames.vue'
 import Game from '../views/Game.vue'
 import GameOver from '../views/GameOver.vue'
+import OfflineGame from '../views/OfflineGame.vue'
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: '/gameOverPage',
     name: 'GameOver',
     component: GameOver
+  },
+  {
+    path: '/offline-game',
+    name: 'OfflineGame',
+    component: OfflineGame
   }
 ]
 

@@ -111,6 +111,8 @@ export default {
   },
   methods: {
     createGame() {
+      sessionStorage.setItem('tempPlayerName', this.playerName);
+      
       api.createGame(this.playerName)
         .then(data => {
           if (data.status !== 'OK') {
@@ -131,7 +133,7 @@ export default {
           this.connectWebSocket();
         })
         .catch(err => {
-          this.errorMessage = 'Error creating game: ' + err.message;
+          this.$router.push('/offline-game');
         });
     },
     joinGame() {
