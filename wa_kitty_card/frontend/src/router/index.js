@@ -4,6 +4,9 @@ import EnterNames from '../views/EnterNames.vue'
 import Game from '../views/Game.vue'
 import GameOver from '../views/GameOver.vue'
 import OfflineGame from '../views/OfflineGame.vue'
+import Login from '../views/Login.vue'
+import Leaderboard from '../views/Leaderboard.vue'
+import { auth } from '../firebase/config'
 
 const routes = [
   {
@@ -12,30 +15,65 @@ const routes = [
     component: Home
   },
   {
+    path: '/login',
+    name: 'Login',
+    component: Login
+  },
+  {
     path: '/enterNames',
     name: 'EnterNames',
-    component: EnterNames
+    component: EnterNames,
+    meta: { requiresAuth: true }
   },
   {
     path: '/combinedView',
     name: 'Game',
-    component: Game
+    component: Game,
+    meta: { requiresAuth: true }
   },
   {
     path: '/gameOverPage',
     name: 'GameOver',
-    component: GameOver
+    component: GameOver,
+    meta: { requiresAuth: true }
   },
   {
     path: '/offline-game',
     name: 'OfflineGame',
-    component: OfflineGame
+    component: OfflineGame,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/leaderboard',
+    name: 'Leaderboard',
+    component: Leaderboard
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+// Navigation guard to check authentication
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  
+  // Wait for Firebase auth to initialize
+  const unsubscribe = auth.onAuthStateChanged((user) => {
+    unsubscribe() // Unsubscribe immediately after first call
+    
+    if (requiresAuth && !user) {
+      console.log('Route requires auth, redirecting to login')
+      next('/login')
+    } else if (to.path === '/login' && user) {
+      console.log('Already logged in, redirecting to home')
+      next('/')
+    } else {
+      console.log(' Navigation allowed')
+      next()
+    }
+  })
 })
 
 export default router

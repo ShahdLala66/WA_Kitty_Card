@@ -26,6 +26,7 @@ import PlayerState from '@/components/PlayerState.vue'
 import GameGrid from '@/components/GameGrid.vue'
 import PlayerHand from '@/components/PlayerHand.vue'
 import GameActions from '@/components/GameActions.vue'
+import { saveAllPlayersScores } from '@/firebase/firestore'
 //import GameTable from '@/components/GameTable.vue'
 
 export default {
@@ -108,8 +109,26 @@ export default {
       this.websocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.gameOver) {
-          const winner = this.getWinner(data.players || this.players);
-          this.$router.push({ path: '/gameOverPage', query: { winner } });
+          const players = data.players || this.players;
+          const winner = this.getWinner(players);
+          
+          // Save ALL players' scores to Firebase
+          saveAllPlayersScores(players, this.sessionId, winner)
+            .then(() => console.log('All players scores saved!'))
+            .catch(err => console.error(' Failed to save scores:', err));
+          
+          // Redirect to game over page
+          const myScore = this.getPlayerScore(this.state[parseInt(this.playerNumber)], players);
+          const isWinner = winner === this.state[parseInt(this.playerNumber)];
+          this.$router.push({ 
+            path: '/gameOverPage', 
+            query: { 
+              winner, 
+              score: myScore, 
+              isWinner: String(isWinner),
+              gameId: this.sessionId 
+            } 
+          });
           return;
         }
         if (data.state) this.state = data.state;
@@ -134,7 +153,9 @@ export default {
         .then(data => {
           if (data.gameOver) {
             const winner = this.getWinner(data.players || this.players);
-            this.$router.push({ path: '/gameOverPage', query: { winner } });
+            const score = this.getPlayerScore(winner, data.players || this.players);
+            const isWinner = winner === this.state[parseInt(this.playerNumber)];
+            this.$router.push({ path: '/gameOverPage', query: { winner, score, isWinner: String(isWinner) } });
             return;
           }
           if (data.success === false || data.message) {
@@ -177,10 +198,6 @@ export default {
       const currentPlayerName = stateArray[0];
       const myPlayerName = stateArray[parseInt(this.playerNumber)];
 
-      // Only update if we have valid player names (not "Waiting")
-      if (myPlayerName && myPlayerName !== 'Waiting') {
-        this.isMyTurn = currentPlayerName === myPlayerName;
-      }
     },
     placeCard(cardIndex, x, y) {
       api.placeCard({
@@ -193,7 +210,9 @@ export default {
         .then(data => {
           if (data.gameOver) {
             const winner = this.getWinner(data.players || this.players);
-            this.$router.push({ path: '/gameOverPage', query: { winner } });
+            const score = this.getPlayerScore(winner, data.players || this.players);
+            const isWinner = winner === this.state[parseInt(this.playerNumber)];
+            this.$router.push({ path: '/gameOverPage', query: { winner, score, isWinner: String(isWinner) } });
             return;
           }
           if (data.message) {
@@ -248,6 +267,12 @@ export default {
       if (!players || players.length === 0) return 'Unknown';
       const sorted = [...players].sort((a, b) => b.score - a.score);
       return sorted[0].name;
+    },
+    //uberprufen ob es nicht im backendschon gibt so ein funktion
+    getPlayerScore(winnerName, players) {
+      if (!players || players.length === 0) return 0;
+      const winner = players.find(p => p.name === winnerName);
+      return winner ? winner.score : 0;
     }
   }
 }

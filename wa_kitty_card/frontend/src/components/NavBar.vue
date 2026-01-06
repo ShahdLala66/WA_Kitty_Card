@@ -7,6 +7,7 @@
 
       <!-- Desktop Menu -->
       <div class="d-none d-sm-flex align-center nav-items-container">
+        <v-btn variant="text" href="/leaderboard" class="nav-btn">🏆 Leaderboard</v-btn>
         <v-btn variant="text" href="/combinedView" class="nav-btn">Game View</v-btn>
 
         <v-menu open-on-hover>
@@ -22,6 +23,13 @@
             <v-btn variant="text" href="/listEvents" class="justify-start" block>List Events</v-btn>
           </div>
         </v-menu>
+
+        <!-- Auth Buttons -->
+        <div v-if="user" class="d-flex align-center ml-4">
+          <span class="mr-3 text-body-2">{{ user.displayName || user.email }}</span>
+          <v-btn variant="text" @click="handleLogout" class="nav-btn">Logout</v-btn>
+        </div>
+        <v-btn v-else variant="text" href="/login" class="nav-btn ml-4">Login</v-btn>
       </div>
 
       <!-- Mobile Menu Button -->
@@ -40,25 +48,42 @@
       class="glass-drawer"
     >
       <v-list class="bg-transparent">
+        <v-list-item href="/leaderboard" title="Leaderboard" prepend-icon="mdi-trophy"></v-list-item>
         <v-list-item href="/combinedView" title="Game View" prepend-icon="mdi-gamepad-variant"></v-list-item>
         <v-list-item href="/playersState" title="Players State" prepend-icon="mdi-account-group"></v-list-item>
         <v-list-item href="/gridColors" title="Grid" prepend-icon="mdi-grid"></v-list-item>
         <v-list-item href="/playersHand" title="Players Hand" prepend-icon="mdi-cards"></v-list-item>
         <v-list-item href="/listEvents" title="List Events" prepend-icon="mdi-format-list-bulleted"></v-list-item>
+        
+        <v-divider class="my-2"></v-divider>
+        
+        <v-list-item v-if="user" @click="handleLogout" title="Logout" prepend-icon="mdi-logout"></v-list-item>
+        <v-list-item v-else href="/login" title="Login" prepend-icon="mdi-login"></v-list-item>
+        
+        <v-list-item v-if="user" disabled>
+          <template v-slot:prepend>
+            <v-icon>mdi-account</v-icon>
+          </template>
+          <v-list-item-title class="text-caption">{{ user.displayName || user.email }}</v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'NavBar',
-  data() {
-    return {
-      drawer: false
-    }
-  }
-}
+<script setup>
+import { ref } from 'vue';
+import { useAuth } from '@/composables/useAuth';
+import { useRouter } from 'vue-router';
+
+const drawer = ref(false);
+const { user, signOut } = useAuth();
+const router = useRouter();
+
+const handleLogout = async () => {
+  await signOut();
+  router.push('/');
+};
 </script>
 
 <style lang="scss" scoped>

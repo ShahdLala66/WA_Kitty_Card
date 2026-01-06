@@ -8,14 +8,33 @@
       <div class="text-h4 mb-8 text-center">
         Winner: <span class="font-weight-bold">{{ winnerName }}</span>
       </div>
+
+      <v-alert v-if="scoreSaved" type="success" class="mb-4">
+        Score saved to leaderboard!
+      </v-alert>
+
+      <v-alert v-if="saveError" type="error" class="mb-4">
+        {{ saveError }}
+      </v-alert>
       
       <div class="d-flex flex-column gap-4 w-100" style="max-width: 400px;">
+        <v-btn
+          to="/leaderboard"
+          color="gold"
+          size="large"
+          block
+          class="mb-2 text-h6"
+          prepend-icon="mdi-trophy"
+        >
+          View Leaderboard
+        </v-btn>
+
         <v-btn
           to="/enterNames"
           color="deep-purple-lighten-1"
           size="large"
           block
-          class="mb-4 text-h6"
+          class="mb-2 text-h6"
           prepend-icon="mdi-replay"
         >
           New Game
@@ -37,18 +56,33 @@
   </v-container>
 </template>
 
-<script>
-export default {
-  name: 'GameOver',
-  data() {
-    return {
-      winnerName: 'Unknown'
-    }
-  },
-  mounted() {
-    this.winnerName = this.$route.query.winner || 'Unknown'
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { saveGameResult } from '../firebase/firestore'
+import { auth } from '../firebase/config'
+
+const route = useRoute()
+const winnerName = ref('Unknown')
+const scoreSaved = ref(false)
+const saveError = ref(null)
+
+onMounted(async () => {
+  console.log('GameOver mounted - Starting...')
+  
+  winnerName.value = route.query.winner || 'Unknown'
+  const score = parseInt(route.query.score) || 0
+  const isWinner = route.query.isWinner === 'true'
+  const gameId = route.query.gameId
+
+  console.log('Game data:', { winner: winnerName.value, score, isWinner, gameId })
+  
+  // Scores are already saved by Game.vue, so we just show the message
+  if (gameId && score > 0) {
+    scoreSaved.value = true
+    console.log('Scores were saved by the game (gameId:', gameId, ')')
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>
