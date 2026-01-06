@@ -1,6 +1,6 @@
 
 applications:
-- name: kittycards
+- name: kittycard-backend
   memory: 1G
   instances: 1
   docker:

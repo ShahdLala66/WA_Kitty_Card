@@ -45,10 +45,8 @@ export default {
       winnerName: 'Unknown'
     }
   },
-  created() {
-    if (window.initialData && window.initialData.winnerName) {
-      this.winnerName = window.initialData.winnerName;
-    }
+  mounted() {
+    this.winnerName = this.$route.query.winner || 'Unknown'
   }
 }
 </script>

@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import api from '@/services/api'
 import PlayerState from '@/components/PlayerState.vue'
 import GameGrid from '@/components/GameGrid.vue'
 import PlayerHand from '@/components/PlayerHand.vue'
@@ -63,12 +64,6 @@ export default {
     }
   },
   mounted() {
-    if (window.initialData) {
-      if (window.initialData.state) this.state = window.initialData.state;
-      if (window.initialData.gridData) this.gridData = window.initialData.gridData;
-      if (window.initialData.currentPlayerHand) this.currentPlayerHand = window.initialData.currentPlayerHand;
-    }
-
     const urlParams = new URLSearchParams(window.location.search);
     this.sessionId = sessionStorage.getItem('sessionId') || urlParams.get('sessionId');
     this.playerId = sessionStorage.getItem('playerId') || urlParams.get('playerId');
@@ -78,24 +73,43 @@ export default {
       this.playerIdentity = 'Player ' + this.playerNumber;
       this.playerBannerClass = 'player-' + this.playerNumber;
       this.playerBannerDisplay = 'block';
-
-      // Initialize turn state from loaded state
-      this.updateTurnState(this.state);
     }
 
+    // Fetch initial game state from API
     if (this.sessionId && this.playerId) {
+      this.loadGameState();
       this.connectWebSocket();
     }
   },
   methods: {
+    loadGameState() {
+      api.getGameState(this.sessionId, this.playerId)
+        .then(data => {
+          if (data.success) {
+            if (data.state) this.state = data.state;
+            if (data.grid) {
+              this.gridData = data.grid.map(c => [
+                c.x, c.y, c.card, c.color, c.suit, c.placedByPlayer || null
+              ]);
+            }
+            if (data.hand) this.currentPlayerHand = data.hand;
+            if (data.players) this.players = data.players;
+            this.updateTurnState(this.state);
+          }
+        })
+        .catch(err => {
+          console.error('Failed to load game state:', err);
+        });
+    },
     connectWebSocket() {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      this.websocket = new WebSocket(`${protocol}//${window.location.host}/ws/${this.sessionId}/${this.playerId}`);
+      const wsUrl = api.getWebSocketUrl(this.sessionId, this.playerId);
+      this.websocket = new WebSocket(wsUrl);
 
       this.websocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.gameOver) {
-          window.location.href = '/gameOverPage';
+          const winner = this.getWinner(data.players || this.players);
+          this.$router.push({ path: '/gameOverPage', query: { winner } });
           return;
         }
         if (data.state) this.state = data.state;
@@ -116,15 +130,11 @@ export default {
         return;
       }
 
-      fetch('/draw', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: this.sessionId, playerId: this.playerId })
-      })
-        .then(res => res.json())
+      api.drawCard(this.sessionId, this.playerId)
         .then(data => {
           if (data.gameOver) {
-            window.location.href = '/gameOverPage';
+            const winner = this.getWinner(data.players || this.players);
+            this.$router.push({ path: '/gameOverPage', query: { winner } });
             return;
           }
           if (data.success === false || data.message) {
@@ -173,34 +183,17 @@ export default {
       }
     },
     placeCard(cardIndex, x, y) {
-      const requestBody = {
-        cardIndex: cardIndex,
-        x: x,
-        y: y
-      };
-
-      if (this.sessionId && this.playerId) {
-        requestBody.sessionId = this.sessionId;
-        requestBody.playerId = this.playerId;
-      }
-
-      fetch('/placeCard', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
+      api.placeCard({
+        cardIndex,
+        x,
+        y,
+        sessionId: this.sessionId,
+        playerId: this.playerId
       })
-        .then(response => {
-          if (!response.ok) {
-            return Promise.reject(`HTTP ${response.status}`);
-          }
-          return response.json();
-        })
         .then(data => {
           if (data.gameOver) {
-            window.location.href = '/gameOverPage';
+            const winner = this.getWinner(data.players || this.players);
+            this.$router.push({ path: '/gameOverPage', query: { winner } });
             return;
           }
           if (data.message) {
@@ -250,6 +243,11 @@ export default {
         .catch(err => {
           alert('Failed to place card: ' + err);
         });
+    },
+    getWinner(players) {
+      if (!players || players.length === 0) return 'Unknown';
+      const sorted = [...players].sort((a, b) => b.score - a.score);
+      return sorted[0].name;
     }
   }
 }
