@@ -1,0 +1,15 @@
+---
+applications:
+- name: kittycards
+  memory: 128M
+  instances: 1
+  path: ./wa_kitty_card/frontend/dist
+  buildpacks:
+    -  paketo-buildpacks/web-servers
+  env:
+    FORCE_HTTPS: true
+    BP_WEB_SERVER: nginx
+    BP_WEB_SERVER_ROOT: .
+    BP_NGINX_CONF_LOCATION: nginx.conf
+    VUE_APP_API_BASE_URL: http://kittycards-backend.apps.sharina.tech
+  

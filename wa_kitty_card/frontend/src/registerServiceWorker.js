@@ -1,20 +1,19 @@
 import { Workbox } from 'workbox-window'
 
 export default function registerServiceWorker() {
-  if (process.env.NODE_ENV !== 'production') {
-    return null
-  }
-
   if ('serviceWorker' in navigator) {
     const wb = new Workbox('/service-worker.js')
 
     wb.addEventListener('waiting', () => {
-      console.log('Service Worker update available')
+      wb.addEventListener('controlling', () => {
+        window.location.reload()
+      })
+
+      // Send a message to the waiting service worker, instructing it to activate.
+      wb.messageSkipWaiting()
     })
 
-    wb.register().catch(err => {
-      console.error('Service Worker registration failed:', err)
-    })
+    wb.register()
 
     return wb
   }
