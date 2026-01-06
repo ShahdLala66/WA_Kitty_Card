@@ -21,7 +21,7 @@ class ErrorHandler @Inject() (
   ): Future[Result] = {
     statusCode match {
       case 404 =>
-        Future.successful(NotFound(views.html.vueIndex("{\"error\": \"Page Not Found\"}")))
+        Future.successful(NotFound(views.html.vueIndex()))
       case _ =>
         defaultHandler.onClientError(request, statusCode, message)
     }

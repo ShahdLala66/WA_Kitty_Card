@@ -20,3 +20,7 @@ npm run serve
 
 
  npm install vuetify@^3.11.2
+
+for the serviceworker:
+npm run build 
+npx serve -s dist -l 8080 

@@ -172,11 +172,6 @@ export default {
     return {
       message: 'Welcome to Kitty Card!'
     }
-  },
-  created() {
-    if (window.initialData && window.initialData.message) {
-      this.message = window.initialData.message;
-    }
   }
 }
 </script>
