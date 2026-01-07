@@ -10,9 +10,15 @@ import play.api.libs.streams.ActorFlow
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.Materializer
 import actors.GameWebSocketActorFactory
+import security.{FirebaseAdmin, SecuredAction, AuthenticatedRequest}
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSystem, mat: Materializer) extends AbstractController(cc) {
+class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSystem, mat: Materializer, ec: ExecutionContext) extends AbstractController(cc) {
+
+  FirebaseAdmin.init()
+
+  private val securedAction = new SecuredAction(cc.parsers.defaultBodyParser)
 
   private val gridPlacements = scala.collection.mutable.Map[(Int, Int), String]()
 
@@ -20,7 +26,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
     Ok(views.html.vueIndex())
   }
   
-  def createGame: Action[JsValue] = Action(parse.json) { implicit request: Request[JsValue] =>
+  def createGame: Action[JsValue] = securedAction(parse.json) { implicit request: AuthenticatedRequest[JsValue] =>
     val playerName = (request.body \ "playerName").as[String]
     val playerId = java.util.UUID.randomUUID().toString
     
@@ -42,7 +48,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
     )
   }
   
-  def joinGame: Action[JsValue] = Action(parse.json) { implicit request: Request[JsValue] =>
+  def joinGame: Action[JsValue] = securedAction(parse.json) { implicit request: AuthenticatedRequest[JsValue] =>
     val sessionId = (request.body \ "sessionId").as[String]
     val playerName = (request.body \ "playerName").as[String]
     val playerId = java.util.UUID.randomUUID().toString
@@ -72,7 +78,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
     }
   }
   
-  def getGameState: Action[AnyContent] = Action { implicit request =>
+  def getGameState: Action[AnyContent] = securedAction { implicit request: AuthenticatedRequest[AnyContent] =>
     val sessionId = request.getQueryString("sessionId")
     val playerId = request.getQueryString("playerId")
     val playerNumber = (sessionId, playerId) match {
@@ -182,7 +188,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
       .getOrElse(Seq.empty)
   }
 
-  def placeCard: Action[AnyContent] = Action { implicit request =>
+  def placeCard: Action[AnyContent] = securedAction { implicit request: AuthenticatedRequest[AnyContent] =>
     if (Main.controller.isGameOver) {
       Ok(Json.obj("gameOver" -> true))
     } else {
@@ -258,7 +264,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
     }
   }
 
-  def drawCard: Action[AnyContent] = Action { implicit request =>
+  def drawCard: Action[AnyContent] = securedAction { implicit request: AuthenticatedRequest[AnyContent] =>
     if (Main.controller.isGameOver) {
       Ok(Json.obj("gameOver" -> true))
     } else {

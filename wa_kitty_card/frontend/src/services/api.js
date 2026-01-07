@@ -1,13 +1,31 @@
+import { auth } from '../firebase/config';
+
 const API_BASE_URL = process.env.VUE_APP_API_BASE_URL || '';
 const WS_BASE_URL = process.env.VUE_APP_WS_BASE_URL || '';
 
+async function getAuthHeader() {
+  const user = auth.currentUser;
+  console.log('Firebase User:', user ? `Logged in as ${user.email || user.uid}` : 'NOT LOGGED IN');
+  
+  if (!user) {
+    console.warn('No Firebase user - request will be sent WITHOUT auth token');
+    return {};
+  }
+  
+  const token = await user.getIdToken();
+  console.log('Firebase ID Token:', token.substring(0, 20) + '...');
+  return { Authorization: `Bearer ${token}` }; 
+}
+
 async function apiFetch(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
+  const authHeader = await getAuthHeader();
   
   const defaultOptions = {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      ...authHeader,
       ...options.headers
     }
   };
