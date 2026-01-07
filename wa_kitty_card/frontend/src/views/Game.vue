@@ -26,8 +26,7 @@ import PlayerState from '@/components/PlayerState.vue'
 import GameGrid from '@/components/GameGrid.vue'
 import PlayerHand from '@/components/PlayerHand.vue'
 import GameActions from '@/components/GameActions.vue'
-import { saveAllPlayersScores } from '@/firebase/firestore'
-//import GameTable from '@/components/GameTable.vue'
+import { saveGameResult } from '@/firebase/firestore'
 
 export default {
   name: 'Game',
@@ -76,7 +75,6 @@ export default {
       this.playerBannerDisplay = 'block';
     }
 
-    // Fetch initial game state from API
     if (this.sessionId && this.playerId) {
       this.loadGameState();
       this.connectWebSocket();
@@ -112,14 +110,14 @@ export default {
           const players = data.players || this.players;
           const winner = this.getWinner(players);
           
-          // Save ALL players' scores to Firebase
-          saveAllPlayersScores(players, this.sessionId, winner)
-            .then(() => console.log('All players scores saved!'))
-            .catch(err => console.error(' Failed to save scores:', err));
+          const myPlayerName = this.state[parseInt(this.playerNumber)];
+          const myScore = this.getPlayerScore(myPlayerName, players);
+          const isWinner = winner === myPlayerName;
           
-          // Redirect to game over page
-          const myScore = this.getPlayerScore(this.state[parseInt(this.playerNumber)], players);
-          const isWinner = winner === this.state[parseInt(this.playerNumber)];
+          saveGameResult(myPlayerName, myScore, isWinner, this.sessionId)
+            .then(() => console.log('My score saved to leaderboard!'))
+            .catch(err => console.error('Failed to save my score:', err));
+          
           this.$router.push({ 
             path: '/gameOverPage', 
             query: { 
@@ -131,17 +129,18 @@ export default {
           });
           return;
         }
-        if (data.state) this.state = data.state;
+        if (data.state) {
+          this.state = data.state;
+          this.updateTurnState(data.state);
+        }
         if (data.grid) this.gridData = data.grid.map(c => [c.x, c.y, c.card, c.color, c.suit, c.placedByPlayer || null]);
         if (data.hand) this.currentPlayerHand = data.hand;
         if (data.players) this.players = data.players;
       };
     },
     undo() {
-      // Implement undo
     },
     redo() {
-      // Implement redo
     },
     draw() {
       if (!this.isMyTurn) {
@@ -152,10 +151,17 @@ export default {
       api.drawCard(this.sessionId, this.playerId)
         .then(data => {
           if (data.gameOver) {
-            const winner = this.getWinner(data.players || this.players);
-            const score = this.getPlayerScore(winner, data.players || this.players);
-            const isWinner = winner === this.state[parseInt(this.playerNumber)];
-            this.$router.push({ path: '/gameOverPage', query: { winner, score, isWinner: String(isWinner) } });
+            const players = data.players || this.players;
+            const winner = this.getWinner(players);
+            const myPlayerName = this.state[parseInt(this.playerNumber)];
+            const myScore = this.getPlayerScore(myPlayerName, players);
+            const isWinner = winner === myPlayerName;
+            
+            saveGameResult(myPlayerName, myScore, isWinner, this.sessionId)
+              .then(() => console.log('My score saved to leaderboard!'))
+              .catch(err => console.error('Failed to save my score:', err));
+            
+            this.$router.push({ path: '/gameOverPage', query: { winner, score: myScore, isWinner: String(isWinner), gameId: this.sessionId } });
             return;
           }
           if (data.success === false || data.message) {
@@ -163,7 +169,6 @@ export default {
             return;
           }
 
-          // Update state, grid, and hand from response
           if (data.state) this.state = data.state;
           if (data.grid) {
             this.gridData = data.grid.map(c => [
@@ -188,7 +193,6 @@ export default {
       this.placeCard(cardIndex, x, y);
     },
     onDragEnd() {
-      // Clear any drag state if needed
     },
     updateTurnState(stateArray) {
       if (!stateArray || stateArray.length < 3 || !this.playerNumber) {
@@ -197,7 +201,8 @@ export default {
 
       const currentPlayerName = stateArray[0];
       const myPlayerName = stateArray[parseInt(this.playerNumber)];
-
+      
+      this.isMyTurn = currentPlayerName === myPlayerName;
     },
     placeCard(cardIndex, x, y) {
       api.placeCard({
@@ -209,10 +214,17 @@ export default {
       })
         .then(data => {
           if (data.gameOver) {
-            const winner = this.getWinner(data.players || this.players);
-            const score = this.getPlayerScore(winner, data.players || this.players);
-            const isWinner = winner === this.state[parseInt(this.playerNumber)];
-            this.$router.push({ path: '/gameOverPage', query: { winner, score, isWinner: String(isWinner) } });
+            const players = data.players || this.players;
+            const winner = this.getWinner(players);
+            const myPlayerName = this.state[parseInt(this.playerNumber)];
+            const myScore = this.getPlayerScore(myPlayerName, players);
+            const isWinner = winner === myPlayerName;
+            
+            saveGameResult(myPlayerName, myScore, isWinner, this.sessionId)
+              .then(() => console.log('My score saved to leaderboard!'))
+              .catch(err => console.error('Failed to save my score:', err));
+            
+            this.$router.push({ path: '/gameOverPage', query: { winner, score: myScore, isWinner: String(isWinner), gameId: this.sessionId } });
             return;
           }
           if (data.message) {
@@ -220,12 +232,10 @@ export default {
             return;
           }
 
-          // Update state from response
           if (data.state) {
             this.state = data.state;
           }
 
-          // Update grid with full data including placedByPlayer
           if (data.grid) {
             this.gridData = data.grid.map(c => [
               c.x,
@@ -236,7 +246,6 @@ export default {
               c.placedByPlayer || data.placedByPlayer || null
             ]);
           } else if (data.placedByPlayer) {
-            // Fallback: update just the placed cell
             const newGridData = [...this.gridData];
             const cellIndex = newGridData.findIndex(cell => cell[0] === x && cell[1] === y);
             if (cellIndex !== -1) {
@@ -246,17 +255,14 @@ export default {
             }
           }
 
-          // Update hand from response
           if (data.hand) {
             this.currentPlayerHand = data.hand;
           }
 
-          // Update players scores from response
           if (data.players) {
             this.players = data.players;
           }
 
-          // Clear selection on success
           this.selectedCardIndex = null;
         })
         .catch(err => {
@@ -268,7 +274,6 @@ export default {
       const sorted = [...players].sort((a, b) => b.score - a.score);
       return sorted[0].name;
     },
-    //uberprufen ob es nicht im backendschon gibt so ein funktion
     getPlayerScore(winnerName, players) {
       if (!players || players.length === 0) return 0;
       const winner = players.find(p => p.name === winnerName);

@@ -1,4 +1,3 @@
-//datenbank file 
 import { 
   collection, 
   addDoc, 
@@ -18,7 +17,6 @@ export const saveGameResult = async (playerName, score, isWinner = false, gameId
       throw new Error("User must be logged in to save score");
     }
 
-    // Check if this game was already saved for this user
     if (gameId) {
       const duplicateQuery = query(
         collection(db, "leaderboard"),
@@ -52,7 +50,6 @@ export const saveGameResult = async (playerName, score, isWinner = false, gameId
   }
 };
 
-// Save ALL players' scores for a game (called from game end)
 export const saveAllPlayersScores = async (players, gameId, winnerName) => {
   try {
     if (!auth.currentUser) {
@@ -78,7 +75,6 @@ export const saveAllPlayersScores = async (players, gameId, winnerName) => {
   }
 };
 
-// Get top scores (leaderboard)
 export const getTopScores = async (limitCount = 10) => {
   try {
     const q = query(
@@ -104,7 +100,6 @@ export const getTopScores = async (limitCount = 10) => {
   }
 };
 
-// Get user's personal best scores
 export const getUserScores = async (userId = null) => {
   try {
     const targetUserId = userId || auth.currentUser?.uid;
@@ -136,7 +131,6 @@ export const getUserScores = async (userId = null) => {
   }
 };
 
-// Get recent games
 export const getRecentGames = async (limitCount = 20) => {
   try {
     const q = query(

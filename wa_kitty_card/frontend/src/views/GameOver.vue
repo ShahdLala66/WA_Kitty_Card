@@ -77,7 +77,6 @@ onMounted(async () => {
 
   console.log('Game data:', { winner: winnerName.value, score, isWinner, gameId })
   
-  // Scores are already saved by Game.vue, so we just show the message
   if (gameId && score > 0) {
     scoreSaved.value = true
     console.log('Scores were saved by the game (gameId:', gameId, ')')

@@ -7,7 +7,6 @@ import {
 } from "firebase/auth";
 import { auth, googleProvider } from "./config";
 
-// Sign in with Google
 export const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
@@ -17,7 +16,6 @@ export const signInWithGoogle = async () => {
   }
 };
 
-// Sign up with email and password
 export const signUpWithEmail = async (email, password) => {
   try {
     const result = await createUserWithEmailAndPassword(auth, email, password);
@@ -27,7 +25,6 @@ export const signUpWithEmail = async (email, password) => {
   }
 };
 
-// Sign in with email and password
 export const signInWithEmail = async (email, password) => {
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
@@ -37,7 +34,6 @@ export const signInWithEmail = async (email, password) => {
   }
 };
 
-// Sign out
 export const logout = async () => {
   try {
     await signOut(auth);
@@ -47,7 +43,6 @@ export const logout = async () => {
   }
 };
 
-// Listen to auth state changes
 export const onAuthChange = (callback) => {
   return onAuthStateChanged(auth, callback);
 };

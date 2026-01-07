@@ -9,7 +9,6 @@ export function useAuth() {
   let unsubscribe = null;
 
   onMounted(() => {
-    // Listen for auth state changes
     unsubscribe = onAuthChange((firebaseUser) => {
       user.value = firebaseUser;
       loading.value = false;

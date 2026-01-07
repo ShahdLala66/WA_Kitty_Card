@@ -1,7 +1,7 @@
 <template>
-  <div class="login-container">
-    <v-card class="mx-auto pa-6" max-width="400">
-      <v-card-title class="text-h5 text-center mb-4">
+  <v-container class="fill-height d-flex align-center justify-center">
+    <v-card class="glass-card pa-6" width="100%" max-width="750" min-height="90%">
+      <v-card-title class="text-h5 font-weight-bold text-center">
         Kitty Card Login
       </v-card-title>
 
@@ -10,12 +10,11 @@
           {{ error }}
         </v-alert>
 
-        <!-- Google Sign In Button -->
         <v-btn
           block
-          color="primary"
+          color="deep-purple-lighten-1"
           size="large"
-          class="mb-4"
+          class="mb-4 text-h6"
           :loading="loading"
           @click="handleGoogleLogin"
         >
@@ -27,13 +26,13 @@
           <span class="text-medium-emphasis">OR</span>
         </v-divider>
 
-        <!-- Email/Password Form -->
         <v-form @submit.prevent="handleEmailLogin">
           <v-text-field
             v-model="email"
             label="Email"
             type="email"
             required
+            color="deep-purple-lighten-1"
             class="mb-2"
           />
           <v-text-field
@@ -41,31 +40,36 @@
             label="Password"
             type="password"
             required
+            color="deep-purple-lighten-1"
             class="mb-4"
           />
 
           <v-btn
             block
-            color="secondary"
+            color="deep-purple-lighten-1"
             type="submit"
+            size="large"
             :loading="loading"
-            class="mb-2"
+            class="mb-2 text-h6"
           >
             Sign In
           </v-btn>
 
           <v-btn
             block
-            variant="text"
+            variant="outlined"
+            color="deep-purple-lighten-1"
+            size="large"
             @click="handleEmailSignUp"
             :loading="loading"
+            class="text-h6"
           >
             Create Account
           </v-btn>
         </v-form>
       </v-card-text>
     </v-card>
-  </div>
+  </v-container>
 </template>
 
 <script setup>
@@ -101,12 +105,13 @@ const handleEmailSignUp = async () => {
 };
 </script>
 
-<style scoped>
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+<style lang="scss" scoped>
+@import "@/styles/colors";
+
+.glass-card {
+  background: $white-transparent !important;
+  backdrop-filter: blur(10px);
+  border-radius: $border-radius;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 </style>

@@ -55,13 +55,11 @@ const router = createRouter({
   routes
 })
 
-// Navigation guard to check authentication
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
   
-  // Wait for Firebase auth to initialize
   const unsubscribe = auth.onAuthStateChanged((user) => {
-    unsubscribe() // Unsubscribe immediately after first call
+    unsubscribe() 
     
     if (requiresAuth && !user) {
       console.log('Route requires auth, redirecting to login')

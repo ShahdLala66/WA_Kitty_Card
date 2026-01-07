@@ -5,7 +5,6 @@
 
       <v-spacer></v-spacer>
 
-      <!-- Desktop Menu -->
       <div class="d-none d-sm-flex align-center nav-items-container">
         <v-btn variant="text" href="/leaderboard" class="nav-btn">🏆 Leaderboard</v-btn>
         <v-btn variant="text" href="/combinedView" class="nav-btn">Game View</v-btn>
@@ -24,7 +23,6 @@
           </div>
         </v-menu>
 
-        <!-- Auth Buttons -->
         <div v-if="user" class="d-flex align-center ml-4">
           <span class="mr-3 text-body-2">{{ user.displayName || user.email }}</span>
           <v-btn variant="text" @click="handleLogout" class="nav-btn">Logout</v-btn>
@@ -32,7 +30,6 @@
         <v-btn v-else variant="text" href="/login" class="nav-btn ml-4">Login</v-btn>
       </div>
 
-      <!-- Mobile Menu Button -->
       <div class="d-flex d-sm-none">
         <v-btn icon @click="drawer = !drawer">
           <img src="/images/gorot.png" class="navbar-toggler-icon-img" alt="Menu" />
@@ -40,7 +37,6 @@
       </div>
     </v-app-bar>
 
-    <!-- Mobile Navigation Drawer -->
     <v-navigation-drawer
       v-model="drawer"
       location="right"

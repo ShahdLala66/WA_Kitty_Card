@@ -1,127 +1,118 @@
 <template>
-  <v-container class="leaderboard-page">
-    <v-row justify="center">
-      <v-col cols="12" md="8" lg="6">
-        <v-card class="glass-card pa-6">
-          <v-card-title class="text-h3 text-center mb-6">
-             Leaderboard
-          </v-card-title>
+  <v-container class="fill-height d-flex align-center justify-center">
+    <v-card class="glass-card pa-6" width="100%" max-width="750" min-height="90%">
+      <v-card-title class="text-h5 font-weight-bold text-center">
+        Leaderboard
+      </v-card-title>
 
-          <v-tabs v-model="activeTab" class="mb-4">
-            <v-tab value="top">Top Players</v-tab>
-            <v-tab value="recent">Recent Games</v-tab>
-            <v-tab value="personal">My Scores</v-tab>
-          </v-tabs>
+      <v-tabs v-model="activeTab" grow class="mb-6 bg-transparent mobile-tabs" color="deep-purple-lighten-1">
+        <v-tab value="top" class="text-caption text-sm-body-1">Top Players</v-tab>
+        <v-tab value="recent" class="text-caption text-sm-body-1">Recent Games</v-tab>
+        <v-tab value="personal" class="text-caption text-sm-body-1">My Scores</v-tab>
+      </v-tabs>
 
-          <!-- Loading State -->
-          <v-progress-linear v-if="loading" indeterminate color="primary"></v-progress-linear>
+      <v-progress-linear v-if="loading" indeterminate color="deep-purple-lighten-1"></v-progress-linear>
 
-          <!-- Error State -->
-          <v-alert v-if="error" type="error" class="mb-4">
-            {{ error }}
+      <v-alert v-if="error" type="error" class="mb-4">
+        {{ error }}
+      </v-alert>
+
+      <v-window v-model="activeTab">
+        <v-window-item value="top">
+          <v-list class="bg-transparent">
+            <v-list-item
+              v-for="(entry, index) in topScores"
+              :key="entry.id"
+              class="mb-2"
+            >
+              <template v-slot:prepend>
+                <v-avatar :color="getRankColor(index)">
+                  <span class="text-h6">{{ index + 1 }}</span>
+                </v-avatar>
+              </template>
+
+              <v-list-item-title class="text-h6">
+                {{ entry.playerName || entry.displayName }}
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                {{ entry.email }}
+              </v-list-item-subtitle>
+
+              <template v-slot:append>
+                <div class="text-h5 font-weight-bold">
+                  {{ entry.score }}
+                  <v-icon v-if="entry.isWinner" color="gold">mdi-crown</v-icon>
+                </div>
+              </template>
+            </v-list-item>
+          </v-list>
+        </v-window-item>
+
+        <v-window-item value="recent">
+          <v-list class="bg-transparent">
+            <v-list-item
+              v-for="entry in recentGames"
+              :key="entry.id"
+              class="mb-2"
+            >
+              <v-list-item-title>
+                {{ entry.playerName || entry.displayName }}
+                <v-chip v-if="entry.isWinner" size="small" color="success" class="ml-2">
+                  Winner
+                </v-chip>
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                {{ formatDate(entry.timestamp) }}
+              </v-list-item-subtitle>
+
+              <template v-slot:append>
+                <div class="text-h6 font-weight-bold">
+                  {{ entry.score }}
+                </div>
+              </template>
+            </v-list-item>
+          </v-list>
+        </v-window-item>
+
+        <v-window-item value="personal">
+          <v-list v-if="user" class="bg-transparent">
+            <v-list-item
+              v-for="(entry, index) in personalScores"
+              :key="entry.id"
+              class="mb-2"
+            >
+              <template v-slot:prepend>
+                <v-avatar color="deep-purple-lighten-1">
+                  <span>{{ index + 1 }}</span>
+                </v-avatar>
+              </template>
+
+              <v-list-item-title>
+                {{ formatDate(entry.timestamp) }}
+                <v-chip v-if="entry.isWinner" size="small" color="success" class="ml-2">
+                  Won
+                </v-chip>
+              </v-list-item-title>
+
+              <template v-slot:append>
+                <div class="text-h6 font-weight-bold">
+                  {{ entry.score }}
+                </div>
+              </template>
+            </v-list-item>
+          </v-list>
+          <v-alert v-else type="info">
+            Please log in to see your personal scores
           </v-alert>
+        </v-window-item>
+      </v-window>
 
-          <v-window v-model="activeTab">
-            <!-- Top Players Tab -->
-            <v-window-item value="top">
-              <v-list class="bg-transparent">
-                <v-list-item
-                  v-for="(entry, index) in topScores"
-                  :key="entry.id"
-                  class="mb-2"
-                >
-                  <template v-slot:prepend>
-                    <v-avatar :color="getRankColor(index)">
-                      <span class="text-h6">{{ index + 1 }}</span>
-                    </v-avatar>
-                  </template>
+      <v-divider class="my-4"></v-divider>
 
-                  <v-list-item-title class="text-h6">
-                    {{ entry.displayName || entry.playerName }}
-                  </v-list-item-title>
-                  <v-list-item-subtitle>
-                    {{ entry.email }}
-                  </v-list-item-subtitle>
-
-                  <template v-slot:append>
-                    <div class="text-h5 font-weight-bold">
-                      {{ entry.score }}
-                      <v-icon v-if="entry.isWinner" color="gold">mdi-crown</v-icon>
-                    </div>
-                  </template>
-                </v-list-item>
-              </v-list>
-            </v-window-item>
-
-            <!-- Recent Games Tab -->
-            <v-window-item value="recent">
-              <v-list class="bg-transparent">
-                <v-list-item
-                  v-for="entry in recentGames"
-                  :key="entry.id"
-                  class="mb-2"
-                >
-                  <v-list-item-title>
-                    {{ entry.displayName || entry.playerName }}
-                    <v-chip v-if="entry.isWinner" size="small" color="success" class="ml-2">
-                      Winner
-                    </v-chip>
-                  </v-list-item-title>
-                  <v-list-item-subtitle>
-                    {{ formatDate(entry.timestamp) }}
-                  </v-list-item-subtitle>
-
-                  <template v-slot:append>
-                    <div class="text-h6 font-weight-bold">
-                      {{ entry.score }}
-                    </div>
-                  </template>
-                </v-list-item>
-              </v-list>
-            </v-window-item>
-
-            <!-- Personal Scores Tab -->
-            <v-window-item value="personal">
-              <v-list v-if="user" class="bg-transparent">
-                <v-list-item
-                  v-for="(entry, index) in personalScores"
-                  :key="entry.id"
-                  class="mb-2"
-                >
-                  <template v-slot:prepend>
-                    <v-avatar color="primary">
-                      <span>{{ index + 1 }}</span>
-                    </v-avatar>
-                  </template>
-
-                  <v-list-item-title>
-                    {{ formatDate(entry.timestamp) }}
-                    <v-chip v-if="entry.isWinner" size="small" color="success" class="ml-2">
-                      Won
-                    </v-chip>
-                  </v-list-item-title>
-
-                  <template v-slot:append>
-                    <div class="text-h6 font-weight-bold">
-                      {{ entry.score }}
-                    </div>
-                  </template>
-                </v-list-item>
-              </v-list>
-              <v-alert v-else type="info">
-                Please log in to see your personal scores
-              </v-alert>
-            </v-window-item>
-          </v-window>
-
-          <v-divider class="my-4"></v-divider>
-
-          <v-btn block color="primary" @click="$router.push('/')">
-            Back to Home
-          </v-btn>
-        </v-card>
-      </v-col>
-    </v-row>
+      <v-btn block color="deep-purple-lighten-1" size="large" class="text-h6" @click="$router.push('/')">
+        Back to Home
+      </v-btn>
+    </v-card>
   </v-container>
 </template>
 
@@ -141,10 +132,10 @@ const recentGames = ref([]);
 const personalScores = ref([]);
 
 const getRankColor = (index) => {
-  if (index === 0) return 'gold';
-  if (index === 1) return 'silver';
+  if (index === 0) return '#FFD700'; // gold
+  if (index === 1) return '#C0C0C0'; // silver
   if (index === 2) return '#CD7F32'; // bronze
-  return 'grey';
+  return 'deep-purple-lighten-1';
 };
 
 const formatDate = (timestamp) => {
@@ -191,7 +182,6 @@ const loadPersonalScores = async () => {
   loading.value = false;
 };
 
-// Watch tab changes and load data
 watch(activeTab, (newTab) => {
   if (newTab === 'top') loadTopScores();
   if (newTab === 'recent') loadRecentGames();
@@ -203,15 +193,26 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-.leaderboard-page {
-  min-height: 100vh;
-  padding-top: 2rem;
-}
+<style lang="scss" scoped>
+@import "@/styles/colors";
 
 .glass-card {
-  background-color: rgba(255, 255, 255, 0.9) !important;
+  background: $white-transparent !important;
   backdrop-filter: blur(10px);
-  border-radius: 16px;
+  border-radius: $border-radius;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.mobile-tabs .v-tab {
+  min-width: 0;
+  padding: 0 8px;
+  font-size: 0.75rem;
+}
+
+@media screen and (min-width: 600px) {
+  .mobile-tabs .v-tab {
+    padding: 0 16px;
+    font-size: 0.875rem;
+  }
 }
 </style>

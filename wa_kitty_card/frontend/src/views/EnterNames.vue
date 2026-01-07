@@ -59,6 +59,8 @@
 
 <script>
 import api from '@/services/api'
+import { auth } from '@/firebase/config'
+import { onAuthStateChanged } from 'firebase/auth'
 
 export default {
   name: 'EnterNames',
@@ -75,6 +77,13 @@ export default {
       playerId: null,
       playerNumber: null
     }
+  },
+  mounted() {
+    onAuthStateChanged(auth, (user) => {
+      if (user && user.displayName) {
+        this.playerName = user.displayName.split(' ')[0]
+      }
+    })
   },
   methods: {
     createGame() {
