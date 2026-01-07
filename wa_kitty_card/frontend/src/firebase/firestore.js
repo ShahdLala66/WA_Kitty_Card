@@ -155,3 +155,49 @@ export const getRecentGames = async (limitCount = 20) => {
     return { success: false, error: error.message, games: [] };
   }
 };
+
+export const getAverageScores = async () => {
+  try {
+    const q = query(collection(db, "leaderboard"));
+    const querySnapshot = await getDocs(q);
+    
+    const scoresByEmail = {};
+    
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const email = data.email;
+      
+      if (!email) return;
+      
+      if (!scoresByEmail[email]) {
+        scoresByEmail[email] = {
+          email,
+          displayName: data.displayName || data.playerName,
+          scores: [],
+          totalScore: 0,
+          gameCount: 0
+        };
+      }
+      
+      scoresByEmail[email].scores.push(data.score);
+      scoresByEmail[email].totalScore += data.score;
+      scoresByEmail[email].gameCount += 1;
+    });
+    
+    const averageScores = Object.values(scoresByEmail)
+      .map(player => ({
+        email: player.email,
+        displayName: player.displayName,
+        playerName: player.displayName,
+        gameCount: player.gameCount,
+        totalScore: player.totalScore,
+        averageScore: Math.round(player.totalScore / player.gameCount * 10) / 10
+      }))
+      .sort((a, b) => b.averageScore - a.averageScore);
+    
+    return { success: true, scores: averageScores };
+  } catch (error) {
+    console.error("Error fetching average scores:", error);
+    return { success: false, error: error.message, scores: [] };
+  }
+};

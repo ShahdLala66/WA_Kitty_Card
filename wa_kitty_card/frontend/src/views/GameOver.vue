@@ -9,26 +9,11 @@
         Winner: <span class="font-weight-bold">{{ winnerName }}</span>
       </div>
 
-      <v-alert v-if="scoreSaved" type="success" class="mb-4">
-        Score saved to leaderboard!
-      </v-alert>
-
       <v-alert v-if="saveError" type="error" class="mb-4">
         {{ saveError }}
       </v-alert>
       
       <div class="d-flex flex-column gap-4 w-100" style="max-width: 400px;">
-        <v-btn
-          to="/leaderboard"
-          color="gold"
-          size="large"
-          block
-          class="mb-2 text-h6"
-          prepend-icon="mdi-trophy"
-        >
-          View Leaderboard
-        </v-btn>
-
         <v-btn
           to="/enterNames"
           color="deep-purple-lighten-1"
@@ -38,6 +23,18 @@
           prepend-icon="mdi-replay"
         >
           New Game
+        </v-btn>
+
+        <v-btn
+          to="/leaderboard"
+          variant="outlined"
+          size="large"
+          block
+          class="mb-2 text-h6"
+          prepend-icon="mdi-trophy"
+          color="deep-purple-lighten-1"
+        >
+          View Leaderboard
         </v-btn>
         
         <v-btn

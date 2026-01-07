@@ -6,7 +6,7 @@
       <v-spacer></v-spacer>
 
       <div class="d-none d-sm-flex align-center nav-items-container">
-        <v-btn variant="text" href="/leaderboard" class="nav-btn">🏆 Leaderboard</v-btn>
+        <v-btn variant="text" href="/leaderboard" class="nav-btn">Leaderboard</v-btn>
         <v-btn variant="text" href="/combinedView" class="nav-btn">Game View</v-btn>
 
         <v-menu open-on-hover>

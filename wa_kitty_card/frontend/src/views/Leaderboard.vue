@@ -7,8 +7,9 @@
 
       <v-tabs v-model="activeTab" grow class="mb-6 bg-transparent mobile-tabs" color="deep-purple-lighten-1">
         <v-tab value="top" class="text-caption text-sm-body-1">Top Players</v-tab>
+        <v-tab value="average" class="text-caption text-sm-body-1">Average Score</v-tab>
         <v-tab value="recent" class="text-caption text-sm-body-1">Recent Games</v-tab>
-        <v-tab value="personal" class="text-caption text-sm-body-1">My Scores</v-tab>
+        <v-tab value="personal" class="text-caption text-sm-body-1">Personal Best</v-tab>
       </v-tabs>
 
       <v-progress-linear v-if="loading" indeterminate color="deep-purple-lighten-1"></v-progress-linear>
@@ -31,19 +32,58 @@
                 </v-avatar>
               </template>
 
-              <v-list-item-title class="text-h6">
-                {{ entry.playerName || entry.displayName }}
-              </v-list-item-title>
-              <v-list-item-subtitle>
-                {{ entry.email }}
-              </v-list-item-subtitle>
-
-              <template v-slot:append>
-                <div class="text-h5 font-weight-bold">
-                  {{ entry.score }}
-                  <v-icon v-if="entry.isWinner" color="gold">mdi-crown</v-icon>
+              <div class="d-flex align-center justify-space-between flex-grow-1">
+                <div class="player-info text-center">
+                  <div class="text-h6">
+                    {{ entry.playerName || entry.displayName }}
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    {{ entry.email }}
+                  </div>
                 </div>
+                
+                <div class="score-section">
+                  <span class="text-h5 font-weight-bold score-number">{{ entry.score }}</span>
+                  <span class="crown-placeholder">
+                    <v-icon v-if="entry.isWinner" color="gold">mdi-crown</v-icon>
+                  </span>
+                </div>
+              </div>
+            </v-list-item>
+          </v-list>
+        </v-window-item>
+
+        <v-window-item value="average">
+          <v-list class="bg-transparent">
+            <v-list-item
+              v-for="(entry, index) in averageScores"
+              :key="entry.email"
+              class="mb-2"
+            >
+              <template v-slot:prepend>
+                <v-avatar :color="getRankColor(index)">
+                  <span class="text-h6">{{ index + 1 }}</span>
+                </v-avatar>
               </template>
+
+              <div class="d-flex align-center justify-space-between flex-grow-1">
+                <div class="player-info text-center">
+                  <div class="text-h6">
+                    {{ entry.playerName || entry.displayName }}
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    {{ entry.email }}
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    {{ entry.gameCount }} games
+                  </div>
+                </div>
+                
+                <div class="score-section">
+                  <span class="text-h5 font-weight-bold score-number">{{ entry.averageScore }}</span>
+                  <span class="crown-placeholder"></span>
+                </div>
+              </div>
             </v-list-item>
           </v-list>
         </v-window-item>
@@ -118,7 +158,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { getTopScores, getRecentGames, getUserScores } from '../firebase/firestore';
+import { getTopScores, getRecentGames, getUserScores, getAverageScores } from '../firebase/firestore';
 import { useAuth } from '../composables/useAuth';
 
 const { user } = useAuth();
@@ -128,6 +168,7 @@ const loading = ref(false);
 const error = ref(null);
 
 const topScores = ref([]);
+const averageScores = ref([]);
 const recentGames = ref([]);
 const personalScores = ref([]);
 
@@ -150,6 +191,18 @@ const loadTopScores = async () => {
   const result = await getTopScores(10);
   if (result.success) {
     topScores.value = result.scores;
+  } else {
+    error.value = result.error;
+  }
+  loading.value = false;
+};
+
+const loadAverageScores = async () => {
+  loading.value = true;
+  error.value = null;
+  const result = await getAverageScores();
+  if (result.success) {
+    averageScores.value = result.scores;
   } else {
     error.value = result.error;
   }
@@ -184,6 +237,7 @@ const loadPersonalScores = async () => {
 
 watch(activeTab, (newTab) => {
   if (newTab === 'top') loadTopScores();
+  if (newTab === 'average') loadAverageScores();
   if (newTab === 'recent') loadRecentGames();
   if (newTab === 'personal') loadPersonalScores();
 });
@@ -213,6 +267,46 @@ onMounted(() => {
   .mobile-tabs .v-tab {
     padding: 0 16px;
     font-size: 0.875rem;
+  }
+}
+
+.player-info {
+  flex: 0 0 400px;
+  min-width: 0;
+}
+
+.score-section {
+  flex: 0 0 120px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.score-number {
+  min-width: 60px;
+  text-align: right;
+  display: inline-block;
+}
+
+.crown-placeholder {
+  width: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media screen and (max-width: 600px) {
+  .player-info {
+    flex: 0 0 200px;
+  }
+  
+  .score-section {
+    flex: 0 0 100px;
+  }
+  
+  .score-number {
+    min-width: 50px;
   }
 }
 </style>
