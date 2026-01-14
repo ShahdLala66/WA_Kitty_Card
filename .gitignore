@@ -16,3 +16,6 @@ dist/
 .env
 .env.production
 .env.development
+
+manifestl.yml
+manifest-frontend.yml
