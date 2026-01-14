@@ -12,14 +12,23 @@
         <v-menu open-on-hover>
           <template v-slot:activator="{ props }">
             <v-btn variant="text" v-bind="props" class="nav-btn">
-              Debug ▾
+              Table of Content ▾
             </v-btn>
           </template>
           <div class="glass-menu d-flex flex-column pa-2">
-            <v-btn variant="text" href="/playersState" class="justify-start" block>Players State</v-btn>
-            <v-btn variant="text" href="/gridColors" class="justify-start" block>Grid</v-btn>
-            <v-btn variant="text" href="/playersHand" class="justify-start" block>Players Hand</v-btn>
-            <v-btn variant="text" href="/listEvents" class="justify-start" block>List Events</v-btn>
+            <v-btn variant="text" href="/play-server" class="justify-start" block>Play Server</v-btn>
+            <v-btn variant="text" href="/html" class="justify-start" block>HTML</v-btn>
+            <v-btn variant="text" href="/css" class="justify-start" block>CSS</v-btn>
+            <v-btn variant="text" href="/bootstrap" class="justify-start" block>Bootstrap</v-btn>
+            <v-btn variant="text" href="/javascript" class="justify-start" block>JavaScript</v-btn>
+            <v-btn variant="text" href="/jquery-ajax" class="justify-start" block>jQuery & AJAX</v-btn>
+            <v-btn variant="text" href="/websockets" class="justify-start" block>WebSockets</v-btn>
+            <v-btn variant="text" href="/polymer" class="justify-start" block>Polymer</v-btn>
+            <v-btn variant="text" href="/vue" class="justify-start" block>Vue</v-btn>
+            <v-btn variant="text" href="/web-components" class="justify-start" block>Web Components</v-btn>
+            <v-btn variant="text" href="/pwa" class="justify-start" block>PWA</v-btn>
+            <v-btn variant="text" href="/deployment" class="justify-start" block>Deployment</v-btn>
+            <v-btn variant="text" href="/authentication" class="justify-start" block>Authentication</v-btn>
           </div>
         </v-menu>
 
