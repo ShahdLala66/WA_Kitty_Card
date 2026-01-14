@@ -12,6 +12,8 @@ import org.apache.pekko.stream.Materializer
 import actors.GameWebSocketActorFactory
 import security.{FirebaseAdmin, SecuredAction, AuthenticatedRequest}
 import scala.concurrent.ExecutionContext
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserRecord
 
 @Singleton
 class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSystem, mat: Materializer, ec: ExecutionContext) extends AbstractController(cc) {
@@ -364,5 +366,46 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
 
   private def safe[T](code: => T): Option[T] =
     Try(code).toOption
+
+  // WARNING: Extremely insecure - for demo purposes only!
+  // This allows anyone to reset any password without verification
+  def resetPassword: Action[JsValue] = Action(parse.json) { implicit request =>
+    try {
+      val email = (request.body \ "email").as[String]
+      val newPassword = (request.body \ "newPassword").as[String]
+      
+      if (com.google.firebase.FirebaseApp.getApps.isEmpty) {
+        BadRequest(Json.obj(
+          "status" -> "ERROR",
+          "message" -> "Firebase not initialized"
+        ))
+      } else {
+        // Get user by email
+        val userRecord = FirebaseAuth.getInstance().getUserByEmail(email)
+        
+        // Update password directly without any verification (INSECURE!)
+        val updateRequest = new com.google.firebase.auth.UserRecord.UpdateRequest(userRecord.getUid)
+          .setPassword(newPassword)
+        
+        FirebaseAuth.getInstance().updateUser(updateRequest)
+        
+        Ok(Json.obj(
+          "status" -> "OK",
+          "message" -> "Password updated successfully"
+        ))
+      }
+    } catch {
+      case e: com.google.firebase.auth.FirebaseAuthException =>
+        BadRequest(Json.obj(
+          "status" -> "ERROR",
+          "message" -> s"User not found or error: ${e.getMessage}"
+        ))
+      case e: Exception =>
+        InternalServerError(Json.obj(
+          "status" -> "ERROR",
+          "message" -> s"Error resetting password: ${e.getMessage}"
+        ))
+    }
+  }
 
 }

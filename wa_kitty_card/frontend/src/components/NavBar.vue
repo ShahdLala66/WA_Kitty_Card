@@ -33,7 +33,9 @@
         </v-menu>
 
         <div v-if="user" class="d-flex align-center ml-4">
-          <span class="mr-3 text-body-2">{{ user.displayName || user.email }}</span>
+          <v-btn variant="text" @click="goToProfile" class="nav-btn text-body-2">
+            {{ user.email }}
+          </v-btn>
           <v-btn variant="text" @click="handleLogout" class="nav-btn">Logout</v-btn>
         </div>
         <v-btn v-else variant="text" href="/login" class="nav-btn ml-4">Login</v-btn>
@@ -62,15 +64,11 @@
         
         <v-divider class="my-2"></v-divider>
         
+        <v-list-item v-if="user" @click="goToProfile" title="Profil" prepend-icon="mdi-account">
+          <v-list-item-subtitle class="text-caption">{{ user.email }}</v-list-item-subtitle>
+        </v-list-item>
         <v-list-item v-if="user" @click="handleLogout" title="Logout" prepend-icon="mdi-logout"></v-list-item>
         <v-list-item v-else href="/login" title="Login" prepend-icon="mdi-login"></v-list-item>
-        
-        <v-list-item v-if="user" disabled>
-          <template v-slot:prepend>
-            <v-icon>mdi-account</v-icon>
-          </template>
-          <v-list-item-title class="text-caption">{{ user.displayName || user.email }}</v-list-item-title>
-        </v-list-item>
       </v-list>
     </v-navigation-drawer>
   </div>
@@ -88,6 +86,10 @@ const router = useRouter();
 const handleLogout = async () => {
   await signOut();
   router.push('/');
+};
+
+const goToProfile = () => {
+  router.push('/profile');
 };
 </script>
 

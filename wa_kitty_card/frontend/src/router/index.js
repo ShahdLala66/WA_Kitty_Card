@@ -6,6 +6,7 @@ import GameOver from '../views/GameOver.vue'
 import OfflineGame from '../views/OfflineGame.vue'
 import Login from '../views/Login.vue'
 import Leaderboard from '../views/Leaderboard.vue'
+import Profile from '../views/Profile.vue'
 import { auth } from '../firebase/config'
 
 const routes = [
@@ -18,6 +19,12 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile,
+    meta: { requiresAuth: true }
   },
   {
     path: '/enterNames',
