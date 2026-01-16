@@ -3,6 +3,7 @@ POST    /api/game/join                  controllers.UiController.joinGame()
 GET     /api/game/state                 controllers.UiController.getGameState()
 POST    /api/card/place                 controllers.UiController.placeCard()
 POST    /api/card/draw                  controllers.UiController.drawCard()
+POST    /api/auth/reset-password        controllers.UiController.resetPassword()
 GET     /api/ws/:sessionId/:playerId    controllers.UiController.gameWebSocket(sessionId: String, playerId: String)
 
 GET     /assets/*file                   controllers.Assets.versioned(path="/public", file: Asset)

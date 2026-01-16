@@ -11,7 +11,12 @@ dist/
 .DS_Store
 *.log
 *.class
+**/firebase-service-account.json
 
 .env
 .env.production
 .env.development
+
+manifestl.yml
+manifest-frontend.yml
+manifest.yml

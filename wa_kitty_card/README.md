@@ -19,7 +19,8 @@ npm run serve
 -> http://localhost:8080/
 
 
- npm install vuetify@^3.11.2
+npm install vuetify@^3.11.2
+npm install firebase@^10.7.1
 
 for the serviceworker:
 npm run build 

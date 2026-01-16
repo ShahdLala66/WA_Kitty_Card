@@ -17,7 +17,6 @@
 
     <v-container class="py-4">
       <v-row>
-        <!-- General Section -->
         <v-col cols="12" md="12" xxl="4" class="mb-3">
           <v-card class="h-100 glass-card" elevation="4">
             <v-card-item>
@@ -45,7 +44,6 @@
           </v-card>
         </v-col>
 
-        <!-- Rules Section -->
         <v-col cols="12" md="6" xxl="4" class="mb-3">
           <v-card class="h-100 glass-card" elevation="4">
             <v-card-item>
@@ -127,7 +125,6 @@
           </v-card>
         </v-col>
 
-        <!-- Images Section -->
         <v-col cols="12" md="6" xxl="4" class="mb-3">
           <v-card class="h-100 glass-card" elevation="4">
             <v-card-item>
@@ -186,7 +183,6 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Keep existing custom animations/styles */
 .cute-button {
   border: none;
   background: $white-transparent;

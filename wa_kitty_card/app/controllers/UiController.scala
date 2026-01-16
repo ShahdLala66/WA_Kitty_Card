@@ -10,9 +10,17 @@ import play.api.libs.streams.ActorFlow
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.Materializer
 import actors.GameWebSocketActorFactory
+import security.{FirebaseAdmin, SecuredAction, AuthenticatedRequest}
+import scala.concurrent.ExecutionContext
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserRecord
 
 @Singleton
-class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSystem, mat: Materializer) extends AbstractController(cc) {
+class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSystem, mat: Materializer, ec: ExecutionContext) extends AbstractController(cc) {
+
+  FirebaseAdmin.init()
+
+  private val securedAction = new SecuredAction(cc.parsers.defaultBodyParser)
 
   private val gridPlacements = scala.collection.mutable.Map[(Int, Int), String]()
 
@@ -20,7 +28,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
     Ok(views.html.vueIndex())
   }
   
-  def createGame: Action[JsValue] = Action(parse.json) { implicit request: Request[JsValue] =>
+  def createGame: Action[JsValue] = securedAction(parse.json) { implicit request: AuthenticatedRequest[JsValue] =>
     val playerName = (request.body \ "playerName").as[String]
     val playerId = java.util.UUID.randomUUID().toString
     
@@ -42,7 +50,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
     )
   }
   
-  def joinGame: Action[JsValue] = Action(parse.json) { implicit request: Request[JsValue] =>
+  def joinGame: Action[JsValue] = securedAction(parse.json) { implicit request: AuthenticatedRequest[JsValue] =>
     val sessionId = (request.body \ "sessionId").as[String]
     val playerName = (request.body \ "playerName").as[String]
     val playerId = java.util.UUID.randomUUID().toString
@@ -72,7 +80,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
     }
   }
   
-  def getGameState: Action[AnyContent] = Action { implicit request =>
+  def getGameState: Action[AnyContent] = securedAction { implicit request: AuthenticatedRequest[AnyContent] =>
     val sessionId = request.getQueryString("sessionId")
     val playerId = request.getQueryString("playerId")
     val playerNumber = (sessionId, playerId) match {
@@ -182,7 +190,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
       .getOrElse(Seq.empty)
   }
 
-  def placeCard: Action[AnyContent] = Action { implicit request =>
+  def placeCard: Action[AnyContent] = securedAction { implicit request: AuthenticatedRequest[AnyContent] =>
     if (Main.controller.isGameOver) {
       Ok(Json.obj("gameOver" -> true))
     } else {
@@ -258,7 +266,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
     }
   }
 
-  def drawCard: Action[AnyContent] = Action { implicit request =>
+  def drawCard: Action[AnyContent] = securedAction { implicit request: AuthenticatedRequest[AnyContent] =>
     if (Main.controller.isGameOver) {
       Ok(Json.obj("gameOver" -> true))
     } else {
@@ -358,5 +366,46 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
 
   private def safe[T](code: => T): Option[T] =
     Try(code).toOption
+
+  // WARNING: Extremely insecure - for demo purposes only!
+  // This allows anyone to reset any password without verification
+  def resetPassword: Action[JsValue] = Action(parse.json) { implicit request =>
+    try {
+      val email = (request.body \ "email").as[String]
+      val newPassword = (request.body \ "newPassword").as[String]
+      
+      if (com.google.firebase.FirebaseApp.getApps.isEmpty) {
+        BadRequest(Json.obj(
+          "status" -> "ERROR",
+          "message" -> "Firebase not initialized"
+        ))
+      } else {
+        // Get user by email
+        val userRecord = FirebaseAuth.getInstance().getUserByEmail(email)
+        
+        // Update password directly without any verification (INSECURE!)
+        val updateRequest = new com.google.firebase.auth.UserRecord.UpdateRequest(userRecord.getUid)
+          .setPassword(newPassword)
+        
+        FirebaseAuth.getInstance().updateUser(updateRequest)
+        
+        Ok(Json.obj(
+          "status" -> "OK",
+          "message" -> "Password updated successfully"
+        ))
+      }
+    } catch {
+      case e: com.google.firebase.auth.FirebaseAuthException =>
+        BadRequest(Json.obj(
+          "status" -> "ERROR",
+          "message" -> s"User not found or error: ${e.getMessage}"
+        ))
+      case e: Exception =>
+        InternalServerError(Json.obj(
+          "status" -> "ERROR",
+          "message" -> s"Error resetting password: ${e.getMessage}"
+        ))
+    }
+  }
 
 }

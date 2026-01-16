@@ -9,7 +9,6 @@ export default function registerServiceWorker() {
         window.location.reload()
       })
 
-      // Send a message to the waiting service worker, instructing it to activate.
       wb.messageSkipWaiting()
     })
 
