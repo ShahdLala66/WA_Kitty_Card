@@ -47,7 +47,6 @@ export default {
     }
   },
   created() {
-    // Listen for service worker updates
     if (process.env.NODE_ENV === 'production' && this.$workbox) {
       this.$workbox.addEventListener('waiting', () => {
         this.updateAvailable = true
@@ -352,7 +351,6 @@ ul {
   }
 }
 
-/* Player identity banner */
 .player-info-banner {
   position: fixed;
   top: 80px;
@@ -381,7 +379,6 @@ ul {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-/* Turn indicator */
 #turn-indicator {
   position: fixed;
   top: 20px;
@@ -419,7 +416,6 @@ ul {
   }
 }
 
-/* Disable interaction when not player's turn */
 .card-container.disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -430,7 +426,6 @@ ul {
   cursor: not-allowed;
 }
 
-/* Session info display */
 .session-info {
   position: fixed;
   top: 20px;

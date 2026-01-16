@@ -123,9 +123,9 @@ export default {
 
 .disabled-card {
   pointer-events: none;
-  opacity: 0.6;
-  filter: grayscale(40%);
+  opacity: 0.5;
   cursor: not-allowed;
+  transform: scale(0.95);
 }
 
 .dragging {
