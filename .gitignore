@@ -1,22 +1,56 @@
+# IDE & Editor
 .vscode/
 .metals/
-logs/
-target/
 .bsp/
 .idea/
 .project/
 .g8/
+*.iml
+*.swp
+*.swo
+*~
+
+# Build Artifacts & Compiled Files
+logs/
+target/
+*/target/
+project/target/
+project/project/target/
+*.class
+RUNNING_PID
+server.pid
+
+# Dependencies
 node_modules/
 dist/
-.DS_Store
-*.log
-*.class
-**/firebase-service-account.json
+.cache/
 
+# OS Files
+.DS_Store
+
+# Logs
+*.log
+
+# Sensitive Configuration Files - DO NOT COMMIT
+**/firebase-service-account.json
+wa_kitty_card/conf/firebase-service-account.json
+wa_kitty_card/conf/application.conf
+cors.json
+
+# Environment Variables
 .env
+.env.*
 .env.production
 .env.development
 
+# Deployment Manifests (may contain sensitive info)
 manifestl.yml
 manifest-frontend.yml
 manifest.yml
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+wa_kitty_card/frontend/public/config.js
+wa_kitty_card/frontend/src/firebase/config.js

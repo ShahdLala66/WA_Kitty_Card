@@ -15,6 +15,74 @@
         </v-alert>
 
         <div v-if="user" class="profile-content">
+          <div class="profile-image-section mb-6">
+            <div class="d-flex flex-column align-center">
+              <v-avatar 
+                size="150" 
+                class="mb-4 profile-avatar"
+                :class="{ 'avatar-loading': imageLoading }"
+              >
+                <v-img 
+                  v-if="currentPhotoURL" 
+                  :src="currentPhotoURL" 
+                  alt="Profile"
+                  @error="handleImageError"
+                  cover
+                />
+                <v-icon v-else size="100" color="deep-purple-lighten-1">
+                  mdi-account-circle
+                </v-icon>
+              </v-avatar>
+
+              <div class="d-flex gap-2 flex-wrap justify-center">
+                <v-btn
+                  color="deep-purple-lighten-1"
+                  variant="elevated"
+                  prepend-icon="mdi-upload"
+                  @click="triggerFileInput"
+                  :loading="imageLoading"
+                >
+                  Bild hochladen
+                </v-btn>
+
+                <v-btn
+                  v-if="currentPhotoURL && !isGooglePhoto"
+                  color="error"
+                  variant="outlined"
+                  prepend-icon="mdi-delete"
+                  @click="handleRemoveImage"
+                  :loading="imageLoading"
+                >
+                  Bild entfernen
+                </v-btn>
+              </div>
+
+              <input
+                ref="fileInput"
+                type="file"
+                accept="image/*"
+                style="display: none"
+                @change="handleFileSelect"
+              />
+
+              <v-progress-linear
+                v-if="uploadProgress > 0 && uploadProgress < 100"
+                :model-value="uploadProgress"
+                color="deep-purple-lighten-1"
+                class="mt-3"
+                height="8"
+                rounded
+              />
+
+              <p v-if="isGooglePhoto" class="text-caption text-grey mt-2">
+                <v-icon size="small" class="mr-1">mdi-google</v-icon>
+                Von Google synchronisiert
+              </p>
+            </div>
+          </div>
+
+          <v-divider class="my-4"></v-divider>
+
           <!-- User Information -->
           <v-form>
             <v-text-field
@@ -94,9 +162,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuth } from '../composables/useAuth';
+import { getUserProfile, uploadProfileImage, removeProfileImage } from '../services/surrealdb';
 
 const router = useRouter();
 const { user, signOut } = useAuth();
@@ -104,6 +173,24 @@ const { user, signOut } = useAuth();
 const successMessage = ref('');
 const error = ref('');
 const loading = ref(false);
+const imageLoading = ref(false);
+const fileInput = ref(null);
+const profile = ref(null);
+const uploadProgress = ref(0);
+
+// Current photo URL - prioritize Firestore over Firebase Auth
+const currentPhotoURL = computed(() => {
+  if (profile.value?.photoURL) {
+    return profile.value.photoURL;
+  }
+  return user.value?.photoURL || null;
+});
+
+// Check if photo is from Google
+const isGooglePhoto = computed(() => {
+  const url = currentPhotoURL.value;
+  return url && (url.includes('googleusercontent.com') || url.includes('google.com'));
+});
 
 const accountCreated = computed(() => {
   if (!user.value?.metadata?.creationTime) return 'Unbekannt';
@@ -126,6 +213,119 @@ const lastSignIn = computed(() => {
     minute: '2-digit'
   });
 });
+
+// Load profile when user is available
+const loadUserProfile = async () => {
+  if (!user.value) return;
+  
+  const result = await getUserProfile(user.value.uid);
+  if (result.success) {
+    profile.value = result.profile;
+  }
+};
+
+onMounted(() => {
+  if (user.value) {
+    loadUserProfile();
+  }
+});
+
+watch(user, (newUser) => {
+  if (newUser) {
+    loadUserProfile();
+  }
+});
+
+const triggerFileInput = () => {
+  fileInput.value?.click();
+};
+
+const handleFileSelect = async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  // Validate file
+  if (!file.type.startsWith('image/')) {
+    error.value = 'Bitte wählen Sie eine Bilddatei aus';
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    error.value = 'Die Bildgröße darf 5MB nicht überschreiten';
+    return;
+  }
+
+  if (!user.value) {
+    error.value = 'Benutzer nicht angemeldet';
+    return;
+  }
+
+  imageLoading.value = true;
+  error.value = '';
+  successMessage.value = '';
+
+  try {
+    const result = await uploadProfileImage(user.value.uid, file);
+    
+    if (result.success) {
+      // Update local profile
+      if (profile.value) {
+        profile.value.photoURL = result.photoURL;
+      } else {
+        profile.value = { photoURL: result.photoURL };
+      }
+      successMessage.value = 'Profilbild erfolgreich hochgeladen!';
+      setTimeout(() => {
+        successMessage.value = '';
+      }, 3000);
+    } else {
+      error.value = 'Fehler beim Hochladen: ' + result.error;
+    }
+  } catch (err) {
+    error.value = 'Fehler beim Hochladen des Bildes';
+    console.error(err);
+  } finally {
+    imageLoading.value = false;
+    // Reset file input
+    if (fileInput.value) {
+      fileInput.value.value = '';
+    }
+  }
+};
+
+const handleRemoveImage = async () => {
+  if (!user.value) return;
+
+  imageLoading.value = true;
+  error.value = '';
+  successMessage.value = '';
+
+  try {
+    const result = await removeProfileImage(user.value.uid);
+    
+    if (result.success) {
+      // Update local profile
+      if (profile.value) {
+        profile.value.photoURL = null;
+      }
+      successMessage.value = 'Profilbild erfolgreich entfernt!';
+      setTimeout(() => {
+        successMessage.value = '';
+      }, 3000);
+    } else {
+      error.value = 'Fehler beim Entfernen: ' + result.error;
+    }
+  } catch (err) {
+    error.value = 'Fehler beim Entfernen des Bildes';
+    console.error(err);
+  } finally {
+    imageLoading.value = false;
+  }
+};
+
+const handleImageError = () => {
+  console.error('Failed to load profile image');
+};
 
 const handleLogout = async () => {
   loading.value = true;
@@ -158,6 +358,23 @@ const handleLogout = async () => {
 .profile-content {
   max-width: 600px;
   margin: 0 auto;
+}
+
+.profile-image-section {
+  .profile-avatar {
+    border: 4px solid rgba(103, 58, 183, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: scale(1.05);
+      border-color: rgba(103, 58, 183, 0.6);
+    }
+    
+    &.avatar-loading {
+      opacity: 0.6;
+    }
+  }
 }
 
 .gap-2 {

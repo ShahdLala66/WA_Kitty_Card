@@ -1,6 +1,6 @@
 import { auth } from '../firebase/config';
 
-const API_BASE_URL = process.env.VUE_APP_API_BASE_URL || '';
+const API_BASE_URL = window.APP_CONFIG?.API_BASE_URL || process.env.VUE_APP_API_BASE_URL || '';
 const WS_BASE_URL = process.env.VUE_APP_WS_BASE_URL || '';
 
 async function getAuthHeader() {

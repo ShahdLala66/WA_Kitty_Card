@@ -7,10 +7,12 @@ import {
   sendPasswordResetEmail
 } from "firebase/auth";
 import { auth, googleProvider } from "./config";
+import { initializeUserProfile } from "../services/surrealdb";
 
 export const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
+    await initializeUserProfile(result.user);
     return { user: result.user, error: null };
   } catch (error) {
     return { user: null, error: error.message };
@@ -20,6 +22,7 @@ export const signInWithGoogle = async () => {
 export const signUpWithEmail = async (email, password) => {
   try {
     const result = await createUserWithEmailAndPassword(auth, email, password);
+    await initializeUserProfile(result.user);
     return { user: result.user, error: null };
   } catch (error) {
     return { user: null, error: error.message };
