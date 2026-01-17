@@ -9,29 +9,6 @@
         <v-btn variant="text" href="/leaderboard" class="nav-btn">Leaderboard</v-btn>
         <v-btn variant="text" href="/combinedView" class="nav-btn">Game View</v-btn>
 
-        <v-menu open-on-hover>
-          <template v-slot:activator="{ props }">
-            <v-btn variant="text" v-bind="props" class="nav-btn">
-              Table of Content ▾
-            </v-btn>
-          </template>
-          <div class="glass-menu d-flex flex-column pa-2">
-            <v-btn variant="text" href="/play-server" class="justify-start" block>Play Server</v-btn>
-            <v-btn variant="text" href="/html" class="justify-start" block>HTML</v-btn>
-            <v-btn variant="text" href="/css" class="justify-start" block>CSS</v-btn>
-            <v-btn variant="text" href="/bootstrap" class="justify-start" block>Bootstrap</v-btn>
-            <v-btn variant="text" href="/javascript" class="justify-start" block>JavaScript</v-btn>
-            <v-btn variant="text" href="/jquery-ajax" class="justify-start" block>jQuery & AJAX</v-btn>
-            <v-btn variant="text" href="/websockets" class="justify-start" block>WebSockets</v-btn>
-            <v-btn variant="text" href="/polymer" class="justify-start" block>Polymer</v-btn>
-            <v-btn variant="text" href="/vue" class="justify-start" block>Vue</v-btn>
-            <v-btn variant="text" href="/web-components" class="justify-start" block>Web Components</v-btn>
-            <v-btn variant="text" href="/pwa" class="justify-start" block>PWA</v-btn>
-            <v-btn variant="text" href="/deployment" class="justify-start" block>Deployment</v-btn>
-            <v-btn variant="text" href="/authentication" class="justify-start" block>Authentication</v-btn>
-          </div>
-        </v-menu>
-
         <div v-if="user" class="d-flex align-center ml-4">
           <v-btn variant="text" @click="goToProfile" class="nav-btn text-body-2">
             {{ user.email }}
@@ -57,10 +34,6 @@
       <v-list class="bg-transparent">
         <v-list-item href="/leaderboard" title="Leaderboard" prepend-icon="mdi-trophy"></v-list-item>
         <v-list-item href="/combinedView" title="Game View" prepend-icon="mdi-gamepad-variant"></v-list-item>
-        <v-list-item href="/playersState" title="Players State" prepend-icon="mdi-account-group"></v-list-item>
-        <v-list-item href="/gridColors" title="Grid" prepend-icon="mdi-grid"></v-list-item>
-        <v-list-item href="/playersHand" title="Players Hand" prepend-icon="mdi-cards"></v-list-item>
-        <v-list-item href="/listEvents" title="List Events" prepend-icon="mdi-format-list-bulleted"></v-list-item>
         
         <v-divider class="my-2"></v-divider>
         

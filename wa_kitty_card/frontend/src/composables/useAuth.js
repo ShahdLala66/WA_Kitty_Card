@@ -1,5 +1,6 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { signInWithGoogle, signInWithEmail, signUpWithEmail, logout, onAuthChange, resetPassword } from '../firebase/auth';
+import { initializeUserProfile } from '../services/surrealdb';
 
 export function useAuth() {
   const user = ref(null);
@@ -9,8 +10,17 @@ export function useAuth() {
   let unsubscribe = null;
 
   onMounted(() => {
-    unsubscribe = onAuthChange((firebaseUser) => {
+    unsubscribe = onAuthChange(async (firebaseUser) => {
       user.value = firebaseUser;
+      
+      if (firebaseUser) {
+        try {
+          await initializeUserProfile(firebaseUser);
+        } catch (err) {
+          console.error('Failed to sync profile:', err);
+        }
+      }
+      
       loading.value = false;
     });
   });

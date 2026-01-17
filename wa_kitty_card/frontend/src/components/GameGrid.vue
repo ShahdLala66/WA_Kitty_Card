@@ -82,7 +82,8 @@ export default {
 
 @media screen and (max-width: 576px) {
   .grid-border {
-    width: min(85vh, 40vh);
+    width: min(85vw, 40vh);
+    max-width: calc(100vw - 2rem);
     transform: perspective(2000px) rotateX(15deg);
   }
 }

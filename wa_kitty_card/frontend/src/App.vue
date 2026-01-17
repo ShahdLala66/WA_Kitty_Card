@@ -72,6 +72,15 @@ export default {
 
 * {
   font-family: $font-display !important;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
 }
 
 body {
@@ -83,6 +92,9 @@ body {
 
 .v-application {
   background: transparent !important;
+  overflow-x: hidden !important;
+  width: 100%;
+  max-width: 100vw;
 }
 
 h1 {

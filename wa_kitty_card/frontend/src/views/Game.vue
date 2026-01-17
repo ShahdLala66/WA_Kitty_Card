@@ -286,21 +286,16 @@ export default {
 <style lang="scss" scoped>
 .game-layout {
   display: grid;
-  grid-template-rows: 60vh 5vh 50vh 25vh 45vh; 
+  grid-template-rows: 60vh 5vh 50vh 30vh; 
   height: 160vh;
-  width: 100%;
   position: relative;
-  padding: 0 2rem;
+  overflow: hidden;
 }
 
 
 .zayne-wood {
   background-color: #D4A574;
-  
   width: 100vw;
-  margin-left: -2rem; 
-  margin-right: -2rem; 
-  
   height: 10vh; 
   border-bottom: solid 2vh #C89968;
   
@@ -326,10 +321,11 @@ export default {
 
 .table-background {
   position: absolute;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   top: 70vh; 
   width: 100vw;
-  height: 100vh; 
+  height: calc(100vh + 40px); 
   
   background-color: rgb(252, 244, 208);
   
@@ -340,37 +336,33 @@ export default {
   border-bottom: 40px solid rgb(192, 160, 101);
   pointer-events: none;
   z-index: -1;
-  
-  margin-left: 50%;
-  transform: translateX(-50%);
 }
 
 .state-section, 
-.grid-section, 
+.grid-section {
+  display: flex;
+  align-items: center;
+  z-index: 2; 
+}
+
 .hand-section {
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative; 
   z-index: 2; 
-  margin: 0 1rem;
+  margin: 0;
+  width: 100%;
+  padding: 25px 0 15px 0;
+  overflow: visible;
 }
 
 
 @media screen and (max-width: 576px) {
   .hand-section {
-    align-items: flex-start;
-    padding-top: 10px;
+    align-items: center;
+    padding: 15px 0;
   }
-
-  .game-layout {
-    padding: 0 ;
-    }
-  .zayne-wood {
-    margin-left: 0; 
-    margin-right: 0;
-  }
-
 }
 
 </style>

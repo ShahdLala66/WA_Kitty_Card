@@ -7,6 +7,10 @@
       <div class="chalkboard">
         <div class="player-info">
           <div class="player-row">
+            <v-avatar size="40" class="player-avatar">
+              <v-img v-if="playerProfiles[state[1]]?.photoURL" :src="playerProfiles[state[1]].photoURL" />
+              <v-icon v-else color="deep-purple-lighten-1">mdi-account-circle</v-icon>
+            </v-avatar>
             <span class="player-name">{{ state[1] }}</span>
             <span v-if="getPlayerScore(state[1])" class="score">{{ getPlayerScore(state[1]) }}</span>
           </div>
@@ -14,6 +18,10 @@
             <img src="@/assets/images/kitty.png" alt="Kitty" class="kitty-image" />
           </div>
           <div class="player-row">
+            <v-avatar size="40" class="player-avatar">
+              <v-img v-if="playerProfiles[state[2]]?.photoURL" :src="playerProfiles[state[2]].photoURL" />
+              <v-icon v-else color="deep-purple-lighten-1">mdi-account-circle</v-icon>
+            </v-avatar>
             <span class="player-name">{{ state[2] }}</span>
             <span v-if="getPlayerScore(state[2])" class="score">{{ getPlayerScore(state[2]) }}</span>
           </div>
@@ -29,6 +37,8 @@
 </template>
 
 <script>
+import { getUserProfileByEmail } from '../services/surrealdb';
+
 export default {
   name: 'PlayerState',
   props: {
@@ -41,11 +51,36 @@ export default {
       default: () => []
     }
   },
+  data() {
+    return {
+      playerProfiles: {}
+    };
+  },
+  watch: {
+    players: {
+      immediate: true,
+      async handler(newPlayers) {
+        if (newPlayers && newPlayers.length > 0) {
+          await this.loadPlayerProfiles();
+        }
+      }
+    }
+  },
   methods: {
     getPlayerScore(playerName) {
       if (!this.players || !playerName || playerName === 'Waiting') return null;
       const player = this.players.find(p => p.name === playerName);
       return player ? player.score : null;
+    },
+    async loadPlayerProfiles() {
+      for (const player of this.players) {
+        if (player.email && !this.playerProfiles[player.name]) {
+          const result = await getUserProfileByEmail(player.email);
+          if (result.success) {
+            this.playerProfiles[player.name] = result.profile;
+          }
+        }
+      }
     }
   }
 }
@@ -188,6 +223,12 @@ export default {
   align-items: center;
   margin-bottom: 15px;
   padding: 8px 0;
+  gap: 12px;
+}
+
+.player-avatar {
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .kitty-divider {
