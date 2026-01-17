@@ -1,19 +1,19 @@
 <template>
-  <v-sheet class="d-flex align-center justify-center fill-height bg-transparent pa-2">
-    <v-slide-group show-arrows center-active class="pa-4" style="max-width: 100%;">
+  <v-sheet class="player-hand-container d-flex align-center justify-center bg-transparent">
+    <v-slide-group show-arrows center-active class="pa-0" style="width: 100%;">
       <v-slide-group-item v-for="(card, index) in cards" :key="index">
         <v-card :class="[
-          'ma-2',
+          'mx-2',
           'card-transition',
           {
             'selected-card': selectedCardIndex === index,
             'disabled-card': !isMyTurn,
             'dragging': draggingIndex === index
           }
-        ]" height="200" width="140" :draggable="isMyTurn" @dragstart="onDragStart($event, index, card)"
+        ]" :height="cardHeight" :width="cardWidth" :draggable="isMyTurn" @dragstart="onDragStart($event, index, card)"
           @dragend="onDragEnd" @click="onCardClick(index)" elevation="4" rounded="lg" border>
           <div class="d-flex flex-column align-center justify-center fill-height pa-2">
-            <v-img :src="getCardImage(card)" height="120" width="100%" contain class="mb-2"></v-img>
+            <v-img :src="getCardImage(card)" :height="imageHeight" width="100%" contain class="mb-2"></v-img>
             <div class="text-caption font-weight-bold text-center text-wrap">{{ card }}</div>
           </div>
         </v-card>
@@ -42,6 +42,20 @@ export default {
   data() {
     return {
       draggingIndex: null
+    }
+  },
+  computed: {
+    isMobile() {
+      return window.innerWidth <= 576;
+    },
+    cardHeight() {
+      return this.isMobile ? 160 : 200;
+    },
+    cardWidth() {
+      return this.isMobile ? 110 : 140;
+    },
+    imageHeight() {
+      return this.isMobile ? 100 : 120;
     }
   },
   methods: {
@@ -92,9 +106,30 @@ export default {
 <style lang="scss" scoped>
 @import "@/styles/colors";
 
+.player-hand-container {
+  max-width: 100vw;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  height: fit-content;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
 :deep(.v-slide-group__content) {
   padding-top: 15px !important;
   padding-bottom: 15px !important;
+  justify-content: center !important;
+  display: flex !important;
+  overflow: visible !important;
+}
+
+:deep(.v-slide-group__wrapper) {
+  justify-content: center !important;
+  overflow: visible !important;
 }
 
 .card-transition {
@@ -104,7 +139,7 @@ export default {
   z-index: 1;
 
   &:hover {
-    transform: translateY(-10px);
+    transform: translateY(-5px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2) !important;
     border-color: $pink-dark !important;
     z-index: 100 !important;
@@ -118,7 +153,19 @@ export default {
 .selected-card {
   border-color: $font-dark !important;
   border-width: 3px !important;
-  transform: translateY(-10px);
+  transform: translateY(-5px);
+}
+
+@media screen and (max-width: 576px) {
+  .card-transition {
+    &:hover {
+      transform: translateY(-10px);
+    }
+  }
+  
+  .selected-card {
+    transform: translateY(-10px);
+  }
 }
 
 .disabled-card {

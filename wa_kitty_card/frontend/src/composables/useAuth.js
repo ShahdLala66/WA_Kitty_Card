@@ -13,7 +13,6 @@ export function useAuth() {
     unsubscribe = onAuthChange(async (firebaseUser) => {
       user.value = firebaseUser;
       
-      // Sync profile to SurrealDB on every auth state change
       if (firebaseUser) {
         try {
           await initializeUserProfile(firebaseUser);

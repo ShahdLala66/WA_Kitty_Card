@@ -46,7 +46,6 @@ export function useUserProfile(userId) {
     const result = await saveUserProfile(userId, profileData);
     
     if (result.success) {
-      // Update local profile
       profile.value = { ...profile.value, ...profileData };
     } else {
       error.value = result.error;
@@ -69,7 +68,6 @@ export function useUserProfile(userId) {
     const result = await uploadProfileImage(userId, imageFile);
     
     if (result.success) {
-      // Update local profile with new photo URL
       if (profile.value) {
         profile.value.photoURL = result.photoURL;
       } else {

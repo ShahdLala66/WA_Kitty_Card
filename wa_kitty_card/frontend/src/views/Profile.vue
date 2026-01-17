@@ -178,7 +178,6 @@ const fileInput = ref(null);
 const profile = ref(null);
 const uploadProgress = ref(0);
 
-// Current photo URL - prioritize Firestore over Firebase Auth
 const currentPhotoURL = computed(() => {
   if (profile.value?.photoURL) {
     return profile.value.photoURL;
@@ -186,7 +185,6 @@ const currentPhotoURL = computed(() => {
   return user.value?.photoURL || null;
 });
 
-// Check if photo is from Google
 const isGooglePhoto = computed(() => {
   const url = currentPhotoURL.value;
   return url && (url.includes('googleusercontent.com') || url.includes('google.com'));
@@ -214,7 +212,6 @@ const lastSignIn = computed(() => {
   });
 });
 
-// Load profile when user is available
 const loadUserProfile = async () => {
   if (!user.value) return;
   
@@ -244,7 +241,6 @@ const handleFileSelect = async (event) => {
   const file = event.target.files?.[0];
   if (!file) return;
 
-  // Validate file
   if (!file.type.startsWith('image/')) {
     error.value = 'Bitte wählen Sie eine Bilddatei aus';
     return;
@@ -268,7 +264,6 @@ const handleFileSelect = async (event) => {
     const result = await uploadProfileImage(user.value.uid, file);
     
     if (result.success) {
-      // Update local profile
       if (profile.value) {
         profile.value.photoURL = result.photoURL;
       } else {
@@ -286,7 +281,6 @@ const handleFileSelect = async (event) => {
     console.error(err);
   } finally {
     imageLoading.value = false;
-    // Reset file input
     if (fileInput.value) {
       fileInput.value.value = '';
     }
@@ -304,7 +298,6 @@ const handleRemoveImage = async () => {
     const result = await removeProfileImage(user.value.uid);
     
     if (result.success) {
-      // Update local profile
       if (profile.value) {
         profile.value.photoURL = null;
       }

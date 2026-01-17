@@ -6,7 +6,8 @@ git submodule update --remote
 npm:
 cd wa_kitty_card\frontend
 npm install
-npm run serve
+npm install vuetify@^3.11.2
+npm install firebase@^10.7.1
 
 to run the game:
 
@@ -17,10 +18,6 @@ cd wa_kitty_card\frontend
 npm run serve
 
 -> http://localhost:8080/
-
-
-npm install vuetify@^3.11.2
-npm install firebase@^10.7.1
 
 for the serviceworker:
 npm run build 

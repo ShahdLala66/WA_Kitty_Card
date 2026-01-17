@@ -51,7 +51,7 @@ export default {
   display: flex;
   gap: 15px;
   justify-content: center;
-  padding: 20px;
+  padding: 5px;
   position: absolute;
   bottom: 20px;
   left: 50%;

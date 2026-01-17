@@ -1,4 +1,3 @@
-# IDE & Editor
 .vscode/
 .metals/
 .bsp/
@@ -10,7 +9,6 @@
 *.swo
 *~
 
-# Build Artifacts & Compiled Files
 logs/
 target/
 */target/
@@ -20,35 +18,28 @@ project/project/target/
 RUNNING_PID
 server.pid
 
-# Dependencies
 node_modules/
 dist/
 .cache/
 
-# OS Files
 .DS_Store
 
-# Logs
 *.log
 
-# Sensitive Configuration Files - DO NOT COMMIT
 **/firebase-service-account.json
 wa_kitty_card/conf/firebase-service-account.json
 wa_kitty_card/conf/application.conf
 cors.json
 
-# Environment Variables
 .env
 .env.*
 .env.production
 .env.development
 
-# Deployment Manifests (may contain sensitive info)
 manifestl.yml
 manifest-frontend.yml
 manifest.yml
 
-# Temporary Files
 tmp/
 temp/
 *.tmp

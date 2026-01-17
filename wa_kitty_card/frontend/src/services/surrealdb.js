@@ -19,16 +19,12 @@ export const initSurrealDB = async () => {
     
     await db.connect(dbUrl);
     
-    // Authenticate with ROOT credentials
     await db.signin({
       username: username,
       password: password
     });
     
-    // Use namespace and database after authentication
     await db.use({ namespace: namespace, database: database });
-    
-    // Initialize table schema if needed
     await initializeSchema();
     
     isConnected = true;
@@ -40,12 +36,8 @@ export const initSurrealDB = async () => {
   }
 };
 
-/**
- * Initialize database schema
- */
 const initializeSchema = async () => {
   try {
-    // Define user_profiles table with schema
     await db.query(`
       DEFINE TABLE IF NOT EXISTS user_profiles SCHEMAFULL;
       DEFINE FIELD IF NOT EXISTS userId ON user_profiles TYPE string;
@@ -65,9 +57,6 @@ const initializeSchema = async () => {
   }
 };
 
-/**
- * Get user profile from SurrealDB
- */
 export const getUserProfile = async (userId) => {
   try {
     await initSurrealDB();
@@ -85,9 +74,6 @@ export const getUserProfile = async (userId) => {
   }
 };
 
-/**
- * Get user profile by email
- */
 export const getUserProfileByEmail = async (email) => {
   try {
     await initSurrealDB();
@@ -107,9 +93,6 @@ export const getUserProfileByEmail = async (email) => {
   }
 };
 
-/**
- * Save or update user profile in SurrealDB
- */
 export const saveUserProfile = async (userId, profileData) => {
   try {
     await initSurrealDB();
@@ -120,7 +103,6 @@ export const saveUserProfile = async (userId, profileData) => {
       updatedAt: new Date().toISOString()
     };
     
-    // Merge with existing profile or create new one
     const result = await db.merge(`user_profiles:${userId}`, data);
     
     return { success: true, profile: result };
@@ -130,25 +112,18 @@ export const saveUserProfile = async (userId, profileData) => {
   }
 };
 
-/**
- * Upload profile image (convert to base64 and store in SurrealDB)
- */
 export const uploadProfileImage = async (userId, imageFile) => {
   try {
-    // Validate file
     if (!imageFile.type.startsWith('image/')) {
       throw new Error('File must be an image');
     }
     
-    // Validate file size (max 5MB)
     if (imageFile.size > 5 * 1024 * 1024) {
       throw new Error('Image size must be less than 5MB');
     }
     
-    // Convert image to base64
     const base64Image = await fileToBase64(imageFile);
     
-    // Save to SurrealDB
     await initSurrealDB();
     
     const result = await db.merge(`user_profiles:${userId}`, {
@@ -165,9 +140,6 @@ export const uploadProfileImage = async (userId, imageFile) => {
   }
 };
 
-/**
- * Remove profile image
- */
 export const removeProfileImage = async (userId) => {
   try {
     await initSurrealDB();
@@ -186,14 +158,10 @@ export const removeProfileImage = async (userId) => {
   }
 };
 
-/**
- * Initialize or update user profile (called on EVERY login to sync data)
- */
 export const initializeUserProfile = async (user) => {
   try {
     await initSurrealDB();
     
-    // Always update/create profile with latest data from Firebase Auth
     const profileData = {
       userId: user.uid,
       email: user.email,
@@ -201,19 +169,15 @@ export const initializeUserProfile = async (user) => {
       updatedAt: new Date().toISOString()
     };
     
-    // Check if profile exists
     const existing = await db.select(`user_profiles:${user.uid}`);
     
     if (existing && existing.length > 0) {
-      // Update existing profile, preserve photoURL if exists
       const result = await db.merge(`user_profiles:${user.uid}`, {
         ...profileData,
-        // Only set photoURL from Google if user doesn't have custom photo
         photoURL: existing[0].photoURL || user.photoURL || null
       });
       return { success: true, created: false, profile: result };
     } else {
-      // Create new profile
       const result = await db.create(`user_profiles:${user.uid}`, {
         ...profileData,
         photoURL: user.photoURL || null,
@@ -227,9 +191,6 @@ export const initializeUserProfile = async (user) => {
   }
 };
 
-/**
- * Helper function to convert File to base64
- */
 const fileToBase64 = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
