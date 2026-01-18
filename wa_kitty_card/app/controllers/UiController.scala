@@ -225,10 +225,6 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
           if (!canPlay) {
             Ok(Json.obj("success" -> false, "message" -> "It's not your turn!"))
           } else {
-            val currentPlayerName = safe(Main.controller.getCurrentplayer).map(_.getPlayerName).getOrElse("")
-            val player1Name = safe(Main.controller.getPlayer1).getOrElse("")
-            val playerNumber = if (currentPlayerName == player1Name) "player1" else "player2"
-
             val placementSuccess = Main.controller.handleCardPlacement(cardIndex, x, y)
             
             if (!placementSuccess) {
@@ -237,7 +233,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
                 "message" -> "Failed to place card. The position might be occupied or invalid."
               ))
             } else {
-              sessionId.foreach(sid => getSessionGridPlacements(sid)((x, y)) = playerNumber)
+              // gridPlacements are already set in handleCardPlacement, no need to set again
               val handSeq = for {
                 sid <- sessionId
                 pid <- playerId
@@ -245,12 +241,12 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
                 player <- Main.controller.getSessionPlayer(sid, playerNum)
               } yield player.getHand.map(_.toString)
               
-              val result = getGameStateJson()
+              val result = getGameStateJsonForSession(sessionId)
               val resultJson = result.asInstanceOf[play.api.mvc.Result].body.asInstanceOf[play.api.http.HttpEntity.Strict].data.utf8String
               val jsonObj = Json.parse(resultJson).as[JsObject]
+              
+              // Include action and hand info
               val response = jsonObj ++ Json.obj(
-                "placedByPlayer" -> playerNumber, 
-                "placedAt" -> Json.obj("x" -> x, "y" -> y),
                 "action" -> "placeCard",
                 "hand" -> handSeq.getOrElse(Seq.empty),
                 "gameOver" -> Main.controller.isGameOver
@@ -267,8 +263,8 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
                 
                 system.eventStream.publish(
                   actors.GameWebSocketActorFactory.BroadcastToSession(sid, jsonObj ++ Json.obj(
-                    "placedByPlayer" -> playerNumber, "placedAt" -> Json.obj("x" -> x, "y" -> y),
-                    "action" -> "placeCard", "hand" -> otherPlayerHand.getOrElse(Seq.empty),
+                    "action" -> "placeCard",
+                    "hand" -> otherPlayerHand.getOrElse(Seq.empty),
                     "gameOver" -> Main.controller.isGameOver
                   ), Some(pid))
                 )
@@ -316,7 +312,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
           player <- Main.controller.getSessionPlayer(sid, playerNum)
         } yield player.getHand.map(_.toString)).getOrElse(Seq.empty)
         
-        val response = getGameStateJson()
+        val response = getGameStateJsonForSession(sessionId)
         val responseJson = response.asInstanceOf[play.api.mvc.Result].body
           .asInstanceOf[play.api.http.HttpEntity.Strict].data.utf8String
         val baseJson = Json.parse(responseJson).as[JsObject]
@@ -337,6 +333,10 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
   }
 
   private def getGameStateJson(): Result = {
+    getGameStateJsonForSession(Main.controller.getCurrentSessionId)
+  }
+  
+  private def getGameStateJsonForSession(sessionIdOpt: Option[String]): Result = {
     val stateOpt  = safe(Main.controller.getStateElements)
     val gridData  = getGridState
 
@@ -351,8 +351,7 @@ class UiController @Inject() (cc: ControllerComponents)(implicit system: ActorSy
       val state = stateOpt.get
 
       val gridJson = gridData.map { case (x, y, cardInfo, htmlColor, suitName) =>
-        // Try to get sessionId from context - this is a fallback, prefer passing sessionId explicitly
-        val placedBy: Option[String] = None  // Will be set by sessions properly
+        val placedBy = sessionIdOpt.flatMap(sid => getSessionGridPlacements(sid).get((x, y)))
         Json.obj(
           "x"     -> x,
           "y"     -> y,
