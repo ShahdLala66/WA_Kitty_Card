@@ -75,7 +75,14 @@ export default {
       websocket: null,
       sessionId: null,
       playerId: null,
-      playerNumber: null
+      playerNumber: null,
+      reconnectAttempts: 0,
+      maxReconnectAttempts: 5
+    }
+  },
+  beforeUnmount() {
+    if (this.websocket) {
+      this.websocket.close();
     }
   },
   mounted() {
@@ -155,22 +162,55 @@ export default {
       });
     },
     connectWebSocket() {
-      const wsUrl = api.getWebSocketUrl(this.sessionId, this.playerId);
-      this.websocket = new WebSocket(wsUrl);
+      if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+        return;
+      }
 
-      this.websocket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type === 'player-joined' && this.waiting) {
-          this.$router.push({
-            path: '/combinedView',
-            query: {
-              sessionId: this.sessionId,
-              playerId: this.playerId,
-              playerNumber: this.playerNumber
-            }
-          });
-        }
-      };
+      const wsUrl = api.getWebSocketUrl(this.sessionId, this.playerId);
+      console.log('[EnterNames WebSocket] Connecting to:', wsUrl);
+      
+      try {
+        this.websocket = new WebSocket(wsUrl);
+
+        this.websocket.onopen = () => {
+          console.log('[EnterNames WebSocket] Connected');
+          this.reconnectAttempts = 0;
+        };
+
+        this.websocket.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          console.log('[EnterNames WebSocket] Received:', data);
+          
+          if (data.type === 'player-joined' && this.waiting) {
+            this.$router.push({
+              path: '/combinedView',
+              query: {
+                sessionId: this.sessionId,
+                playerId: this.playerId,
+                playerNumber: this.playerNumber
+              }
+            });
+          }
+        };
+
+        this.websocket.onerror = (error) => {
+          console.error('[EnterNames WebSocket] Error:', error);
+        };
+
+        this.websocket.onclose = (event) => {
+          console.log('[EnterNames WebSocket] Closed:', event.code);
+          
+          // Attempt to reconnect if waiting for player
+          if (this.waiting && event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
+            this.reconnectAttempts++;
+            const delay = 1000 * Math.pow(2, this.reconnectAttempts - 1);
+            console.log(`[EnterNames WebSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
+            setTimeout(() => this.connectWebSocket(), delay);
+          }
+        };
+      } catch (error) {
+        console.error('[EnterNames WebSocket] Connection failed:', error);
+      }
     }
   }
 }

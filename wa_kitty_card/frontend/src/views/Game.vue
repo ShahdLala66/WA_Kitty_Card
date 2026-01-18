@@ -50,7 +50,21 @@ export default {
       playerId: null,
       playerNumber: null,
       selectedCardIndex: null,
-      isMyTurn: true
+      isMyTurn: true,
+      reconnectAttempts: 0,
+      maxReconnectAttempts: 10,
+      reconnectDelay: 1000,
+      heartbeatInterval: null,
+      isReconnecting: false
+    }
+  },
+  beforeUnmount() {
+    // Clean up WebSocket and heartbeat when component is destroyed
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+    }
+    if (this.websocket) {
+      this.websocket.close();
     }
   },
   computed: {
@@ -101,42 +115,126 @@ export default {
         });
     },
     connectWebSocket() {
-      const wsUrl = api.getWebSocketUrl(this.sessionId, this.playerId);
-      this.websocket = new WebSocket(wsUrl);
+      if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+        console.log('[WebSocket] Already connected');
+        return;
+      }
 
-      this.websocket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.gameOver) {
-          const players = data.players || this.players;
-          const winner = this.getWinner(players);
+      const wsUrl = api.getWebSocketUrl(this.sessionId, this.playerId);
+      console.log('[WebSocket] Connecting to:', wsUrl);
+      
+      try {
+        this.websocket = new WebSocket(wsUrl);
+
+        this.websocket.onopen = () => {
+          console.log('[WebSocket] Connected successfully');
+          this.reconnectAttempts = 0;
+          this.isReconnecting = false;
           
-          const myPlayerName = this.state[parseInt(this.playerNumber)];
-          const myScore = this.getPlayerScore(myPlayerName, players);
-          const isWinner = winner === myPlayerName;
+          // Start heartbeat to keep connection alive
+          this.startHeartbeat();
+        };
+
+        this.websocket.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          console.log('[WebSocket] Received:', data);
           
-          saveGameResult(myPlayerName, myScore, isWinner, this.sessionId)
-            .then(() => console.log('My score saved to leaderboard!'))
-            .catch(err => console.error('Failed to save my score:', err));
+          // Handle pong response (heartbeat)
+          if (data.type === 'pong') {
+            return;
+          }
           
-          this.$router.push({ 
-            path: '/gameOverPage', 
-            query: { 
-              winner, 
-              score: myScore, 
-              isWinner: String(isWinner),
-              gameId: this.sessionId 
-            } 
-          });
-          return;
+          if (data.gameOver) {
+            const players = data.players || this.players;
+            const winner = this.getWinner(players);
+            
+            const myPlayerName = this.state[parseInt(this.playerNumber)];
+            const myScore = this.getPlayerScore(myPlayerName, players);
+            const isWinner = winner === myPlayerName;
+            
+            saveGameResult(myPlayerName, myScore, isWinner, this.sessionId)
+              .then(() => console.log('My score saved to leaderboard!'))
+              .catch(err => console.error('Failed to save my score:', err));
+            
+            this.$router.push({ 
+              path: '/gameOverPage', 
+              query: { 
+                winner, 
+                score: myScore, 
+                isWinner: String(isWinner),
+                gameId: this.sessionId 
+              } 
+            });
+            return;
+          }
+          
+          // Always update state first
+          if (data.state) {
+            this.state = data.state;
+            this.updateTurnState(data.state);
+          }
+          
+          if (data.grid) this.gridData = data.grid.map(c => [c.x, c.y, c.card, c.color, c.suit, c.placedByPlayer || null]);
+          if (data.hand) this.currentPlayerHand = data.hand;
+          if (data.players) this.players = data.players;
+        };
+
+        this.websocket.onerror = (error) => {
+          console.error('[WebSocket] Error:', error);
+        };
+
+        this.websocket.onclose = (event) => {
+          console.log('[WebSocket] Connection closed:', event.code, event.reason);
+          
+          // Stop heartbeat
+          if (this.heartbeatInterval) {
+            clearInterval(this.heartbeatInterval);
+            this.heartbeatInterval = null;
+          }
+          
+          // Attempt to reconnect if not intentional close
+          if (event.code !== 1000 && !this.isReconnecting) {
+            this.attemptReconnect();
+          }
+        };
+      } catch (error) {
+        console.error('[WebSocket] Failed to create connection:', error);
+        this.attemptReconnect();
+      }
+    },
+
+    startHeartbeat() {
+      // Clear any existing heartbeat
+      if (this.heartbeatInterval) {
+        clearInterval(this.heartbeatInterval);
+      }
+      
+      // Send ping every 30 seconds to keep connection alive
+      this.heartbeatInterval = setInterval(() => {
+        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+          this.websocket.send(JSON.stringify({ type: 'ping' }));
         }
-        if (data.state) {
-          this.state = data.state;
-          this.updateTurnState(data.state);
-        }
-        if (data.grid) this.gridData = data.grid.map(c => [c.x, c.y, c.card, c.color, c.suit, c.placedByPlayer || null]);
-        if (data.hand) this.currentPlayerHand = data.hand;
-        if (data.players) this.players = data.players;
-      };
+      }, 30000);
+    },
+
+    attemptReconnect() {
+      if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+        console.error('[WebSocket] Max reconnect attempts reached');
+        alert('Lost connection to game. Please refresh the page.');
+        return;
+      }
+
+      this.isReconnecting = true;
+      this.reconnectAttempts++;
+      
+      const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1); // Exponential backoff
+      console.log(`[WebSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+      
+      setTimeout(() => {
+        console.log('[WebSocket] Attempting to reconnect...');
+        this.loadGameState(); // Refresh game state
+        this.connectWebSocket();
+      }, delay);
     },
     undo() {
     },

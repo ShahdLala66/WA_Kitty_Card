@@ -52,6 +52,10 @@ class GameWebSocketActor(out: ActorRef, sessionId: String, playerId: String) ext
   private def handleClientMessage(msg: JsValue): Unit = {
     val msgType = (msg \ "type").asOpt[String]
     msgType match {
+      case Some("ping") =>
+        // Respond to ping with pong to keep connection alive
+        out ! Json.obj("type" -> "pong")
+        
       case Some("game-action") =>
         context.system.eventStream.publish(
           BroadcastToSession(sessionId, msg, Some(playerId))
@@ -61,6 +65,7 @@ class GameWebSocketActor(out: ActorRef, sessionId: String, playerId: String) ext
           BroadcastToSession(sessionId, msg, Some(playerId))
         )
       case _ =>
+        // Ignore unknown message types
     }
   }
 }

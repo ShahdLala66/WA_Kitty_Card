@@ -18,6 +18,7 @@ export const saveGameResult = async (playerName, score, isWinner = false, gameId
     }
 
     if (gameId) {
+      // Check if this user already saved their score for this game
       const duplicateQuery = query(
         collection(db, "leaderboard"),
         where("gameId", "==", gameId),
@@ -26,7 +27,7 @@ export const saveGameResult = async (playerName, score, isWinner = false, gameId
       const duplicateSnapshot = await getDocs(duplicateQuery);
       
       if (!duplicateSnapshot.empty) {
-        console.log("Score already saved for this game");
+        console.log("Score already saved for this game and user");
         return { success: true, alreadySaved: true };
       }
     }
@@ -43,6 +44,7 @@ export const saveGameResult = async (playerName, score, isWinner = false, gameId
     };
 
     const docRef = await addDoc(collection(db, "leaderboard"), gameResult);
+    console.log(`[Leaderboard] Saved score for ${playerName}: ${score} points (winner: ${isWinner})`);
     return { success: true, id: docRef.id, alreadySaved: false };
   } catch (error) {
     console.error("Error saving game result:", error);
