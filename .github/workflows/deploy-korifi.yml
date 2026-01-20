@@ -32,16 +32,13 @@ jobs:
       - name: Verify CF CLI
         run: |
           cf --version
-          cat ~/.kube/config
       
       - name: Deploy to Cloud Foundry
         run: |
-          set -x
           cf api api.sharina.tech --skip-ssl-validation
           cf login -u default
           cf target -o shahd -s dev
-          cf buildpacks
           envsubst < manifest.yml > manifest_processed.yaml
-          cf push -f manifest_processed.yaml
-          set +x
+          echo "Starting deployment..."
+          cf push -f manifest_processed.yaml > /tmp/deploy.log 2>&1 && echo "Deployment successful" || (echo "Deployment failed" && tail -20 /tmp/deploy.log && exit 1)
 
