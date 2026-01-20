@@ -6,10 +6,10 @@ on:
 
 jobs:
   deploy_to_korifi:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, kubernetes]
     
     container:
-      image: ghcr.io/cloudfoundry/cli:latest
+      image: localhost:5000/cloudfoundry/cli:latest
     
     steps:
       - name: Checkout code
