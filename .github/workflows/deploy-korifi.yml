@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     
     container:
-      image: 172.17.133.1:5000/cloudfoundry/cli:latest
+      image: ghcr.io/cloudfoundry/cli:latest
     
     steps:
       - name: Checkout code
