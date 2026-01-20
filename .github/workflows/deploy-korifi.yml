@@ -8,16 +8,13 @@ jobs:
   deploy_to_korifi:
     runs-on: self-hosted
     
-    container:
-      image: localhost:5000/cloudfoundry/cli:latest
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
       - name: Install dependencies
         run: |
-          apk add --no-cache gettext
+          apk add --no-cache gettext || apt-get update && apt-get install -y gettext-base
       
       - name: Setup kubectl config
         run: |
