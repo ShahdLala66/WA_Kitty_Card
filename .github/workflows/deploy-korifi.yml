@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy_to_korifi:
-    runs-on: [self-hosted, kubernetes]
+    runs-on: self-hosted
     
     container:
       image: localhost:5000/cloudfoundry/cli:latest
