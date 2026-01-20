@@ -10,7 +10,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 #
       
       - name: Install CF CLI
         run: |
@@ -22,7 +22,7 @@ jobs:
       - name: Setup kubectl config
         run: |
           mkdir -p ~/.kube
-          echo "${{ secrets.KUBECTL_CONFIG }}" > ~/.kube/config
+          echo "${{ secrets.KUBECTL_CONFIG }}" > ~/.kube/config 
           chmod 600 ~/.kube/config
       
       - name: Setup manifest file
