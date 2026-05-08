@@ -1,0 +1,466 @@
+<template>
+  <div class="game-layout">
+    <div class="state-section">
+      <PlayerState :state="state" :players="players" />
+    </div>
+    
+    <div class="zayne-wood"></div>
+    <div class="table-background"></div>
+    
+    <div class="grid-section">
+      <GameGrid :gridData="gridData" @cellClicked="onGridCellClicked" @cardDropped="onCardDropped" />
+    </div>
+
+    <div class="hand-section">
+      <PlayerHand :cards="currentPlayerHand" :selectedCardIndex="selectedCardIndex" :isMyTurn="isMyTurn"
+        @cardSelected="onCardSelected" @dragEnd="onDragEnd" />
+    </div>
+
+    <GameActions @undo="undo" @redo="redo" @draw="draw" />
+  </div>
+</template>
+
+<script>
+import api from '@/services/api'
+import PlayerState from '@/components/PlayerState.vue'
+import GameGrid from '@/components/GameGrid.vue'
+import PlayerHand from '@/components/PlayerHand.vue'
+import GameActions from '@/components/GameActions.vue'
+import { saveGameResult } from '@/firebase/firestore'
+
+export default {
+  name: 'Game',
+  components: {
+    PlayerState,
+    GameGrid,
+    PlayerHand,
+    GameActions
+  },
+  data() {
+    return {
+      state: ['Player 1', 'Waiting', 'Waiting'],
+      gridData: [],
+      currentPlayerHand: [],
+      players: [],
+      playerIdentity: 'Player ?',
+      playerBannerClass: '',
+      playerBannerDisplay: 'none',
+      websocket: null,
+      sessionId: null,
+      playerId: null,
+      playerNumber: null,
+      selectedCardIndex: null,
+      isMyTurn: true,
+      reconnectAttempts: 0,
+      maxReconnectAttempts: 10,
+      reconnectDelay: 1000,
+      heartbeatInterval: null,
+      isReconnecting: false
+    }
+  },
+  beforeUnmount() {
+    // Clean up WebSocket and heartbeat when component is destroyed
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+    }
+    if (this.websocket) {
+      this.websocket.close();
+    }
+  },
+  computed: {
+    currentPlayerName() {
+      return this.state && this.state.length > 0 ? this.state[0] : '';
+    }
+  },
+  watch: {
+    state(newState) {
+      this.updateTurnState(newState);
+    }
+  },
+  mounted() {
+    const urlParams = new URLSearchParams(window.location.search);
+    this.sessionId = sessionStorage.getItem('sessionId') || urlParams.get('sessionId');
+    this.playerId = sessionStorage.getItem('playerId') || urlParams.get('playerId');
+    this.playerNumber = sessionStorage.getItem('playerNumber') || urlParams.get('playerNumber');
+
+    if (this.playerNumber) {
+      this.playerIdentity = 'Player ' + this.playerNumber;
+      this.playerBannerClass = 'player-' + this.playerNumber;
+      this.playerBannerDisplay = 'block';
+    }
+
+    if (this.sessionId && this.playerId) {
+      this.loadGameState();
+      this.connectWebSocket();
+    }
+  },
+  methods: {
+    loadGameState() {
+      api.getGameState(this.sessionId, this.playerId)
+        .then(data => {
+          if (data.success) {
+            if (data.state) this.state = data.state;
+            if (data.grid) {
+              this.gridData = data.grid.map(c => [
+                c.x, c.y, c.card, c.color, c.suit, c.placedByPlayer || null
+              ]);
+            }
+            if (data.hand) this.currentPlayerHand = data.hand;
+            if (data.players) this.players = data.players;
+            this.updateTurnState(this.state);
+          }
+        })
+        .catch(err => {
+          console.error('Failed to load game state:', err);
+        });
+    },
+    connectWebSocket() {
+      if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+        console.log('[WebSocket] Already connected');
+        return;
+      }
+
+      const wsUrl = api.getWebSocketUrl(this.sessionId, this.playerId);
+      console.log('[WebSocket] Connecting to:', wsUrl);
+      
+      try {
+        this.websocket = new WebSocket(wsUrl);
+
+        this.websocket.onopen = () => {
+          console.log('[WebSocket] Connected successfully');
+          this.reconnectAttempts = 0;
+          this.isReconnecting = false;
+          
+          // Start heartbeat to keep connection alive
+          this.startHeartbeat();
+        };
+
+        this.websocket.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          console.log('[WebSocket] Received:', data);
+          
+          // Handle pong response (heartbeat)
+          if (data.type === 'pong') {
+            return;
+          }
+          
+          if (data.gameOver) {
+            const players = data.players || this.players;
+            const winner = this.getWinner(players);
+            
+            const myPlayerName = this.state[parseInt(this.playerNumber)];
+            const myScore = this.getPlayerScore(myPlayerName, players);
+            const isWinner = winner === myPlayerName;
+            
+            saveGameResult(myPlayerName, myScore, isWinner, this.sessionId)
+              .then(() => console.log('My score saved to leaderboard!'))
+              .catch(err => console.error('Failed to save my score:', err));
+            
+            this.$router.push({ 
+              path: '/gameOverPage', 
+              query: { 
+                winner, 
+                score: myScore, 
+                isWinner: String(isWinner),
+                gameId: this.sessionId 
+              } 
+            });
+            return;
+          }
+          
+          // Always update state first
+          if (data.state) {
+            this.state = data.state;
+            this.updateTurnState(data.state);
+          }
+          
+          if (data.grid) this.gridData = data.grid.map(c => [c.x, c.y, c.card, c.color, c.suit, c.placedByPlayer || null]);
+          if (data.hand) this.currentPlayerHand = data.hand;
+          if (data.players) this.players = data.players;
+        };
+
+        this.websocket.onerror = (error) => {
+          console.error('[WebSocket] Error:', error);
+        };
+
+        this.websocket.onclose = (event) => {
+          console.log('[WebSocket] Connection closed:', event.code, event.reason);
+          
+          // Stop heartbeat
+          if (this.heartbeatInterval) {
+            clearInterval(this.heartbeatInterval);
+            this.heartbeatInterval = null;
+          }
+          
+          // Attempt to reconnect if not intentional close
+          if (event.code !== 1000 && !this.isReconnecting) {
+            this.attemptReconnect();
+          }
+        };
+      } catch (error) {
+        console.error('[WebSocket] Failed to create connection:', error);
+        this.attemptReconnect();
+      }
+    },
+
+    startHeartbeat() {
+      // Clear any existing heartbeat
+      if (this.heartbeatInterval) {
+        clearInterval(this.heartbeatInterval);
+      }
+      
+      // Send ping every 30 seconds to keep connection alive
+      this.heartbeatInterval = setInterval(() => {
+        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+          this.websocket.send(JSON.stringify({ type: 'ping' }));
+        }
+      }, 30000);
+    },
+
+    attemptReconnect() {
+      if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+        console.error('[WebSocket] Max reconnect attempts reached');
+        alert('Lost connection to game. Please refresh the page.');
+        return;
+      }
+
+      this.isReconnecting = true;
+      this.reconnectAttempts++;
+      
+      const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1); // Exponential backoff
+      console.log(`[WebSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+      
+      setTimeout(() => {
+        console.log('[WebSocket] Attempting to reconnect...');
+        this.loadGameState(); // Refresh game state
+        this.connectWebSocket();
+      }, delay);
+    },
+    undo() {
+    },
+    redo() {
+    },
+    draw() {
+      if (!this.isMyTurn) {
+        alert("It's not your turn!");
+        return;
+      }
+
+      api.drawCard(this.sessionId, this.playerId)
+        .then(data => {
+          if (data.gameOver) {
+            const players = data.players || this.players;
+            const winner = this.getWinner(players);
+            const myPlayerName = this.state[parseInt(this.playerNumber)];
+            const myScore = this.getPlayerScore(myPlayerName, players);
+            const isWinner = winner === myPlayerName;
+            
+            saveGameResult(myPlayerName, myScore, isWinner, this.sessionId)
+              .then(() => console.log('My score saved to leaderboard!'))
+              .catch(err => console.error('Failed to save my score:', err));
+            
+            this.$router.push({ path: '/gameOverPage', query: { winner, score: myScore, isWinner: String(isWinner), gameId: this.sessionId } });
+            return;
+          }
+          if (data.success === false || data.message) {
+            alert(data.message || 'Failed to draw card');
+            return;
+          }
+
+          if (data.state) this.state = data.state;
+          if (data.grid) {
+            this.gridData = data.grid.map(c => [
+              c.x, c.y, c.card, c.color, c.suit, c.placedByPlayer || null
+            ]);
+          }
+          if (data.hand) this.currentPlayerHand = data.hand;
+        })
+        .catch(err => {
+          alert('Failed to draw card: ' + err);
+        });
+    },
+    onCardSelected(index) {
+      this.selectedCardIndex = index;
+    },
+    onGridCellClicked(x, y) {
+      if (this.selectedCardIndex !== null) {
+        this.placeCard(this.selectedCardIndex, x, y);
+      }
+    },
+    onCardDropped(x, y, cardIndex) {
+      this.placeCard(cardIndex, x, y);
+    },
+    onDragEnd() {
+    },
+    updateTurnState(stateArray) {
+      if (!stateArray || stateArray.length < 3 || !this.playerNumber) {
+        return;
+      }
+
+      const currentPlayerName = stateArray[0];
+      const myPlayerName = stateArray[parseInt(this.playerNumber)];
+      
+      this.isMyTurn = currentPlayerName === myPlayerName;
+    },
+    placeCard(cardIndex, x, y) {
+      api.placeCard({
+        cardIndex,
+        x,
+        y,
+        sessionId: this.sessionId,
+        playerId: this.playerId
+      })
+        .then(data => {
+          if (data.gameOver) {
+            const players = data.players || this.players;
+            const winner = this.getWinner(players);
+            const myPlayerName = this.state[parseInt(this.playerNumber)];
+            const myScore = this.getPlayerScore(myPlayerName, players);
+            const isWinner = winner === myPlayerName;
+            
+            saveGameResult(myPlayerName, myScore, isWinner, this.sessionId)
+              .then(() => console.log('My score saved to leaderboard!'))
+              .catch(err => console.error('Failed to save my score:', err));
+            
+            this.$router.push({ path: '/gameOverPage', query: { winner, score: myScore, isWinner: String(isWinner), gameId: this.sessionId } });
+            return;
+          }
+          if (data.message) {
+            alert(data.message);
+            return;
+          }
+
+          if (data.state) {
+            this.state = data.state;
+          }
+
+          if (data.grid) {
+            this.gridData = data.grid.map(c => [
+              c.x,
+              c.y,
+              c.card,
+              c.color,
+              c.suit,
+              c.placedByPlayer || data.placedByPlayer || null
+            ]);
+          } else if (data.placedByPlayer) {
+            const newGridData = [...this.gridData];
+            const cellIndex = newGridData.findIndex(cell => cell[0] === x && cell[1] === y);
+            if (cellIndex !== -1) {
+              newGridData[cellIndex] = [...newGridData[cellIndex]];
+              newGridData[cellIndex][5] = data.placedByPlayer;
+              this.gridData = newGridData;
+            }
+          }
+
+          if (data.hand) {
+            this.currentPlayerHand = data.hand;
+          }
+
+          if (data.players) {
+            this.players = data.players;
+          }
+
+          this.selectedCardIndex = null;
+        })
+        .catch(err => {
+          alert('Failed to place card: ' + err);
+        });
+    },
+    getWinner(players) {
+      if (!players || players.length === 0) return 'Unknown';
+      const sorted = [...players].sort((a, b) => b.score - a.score);
+      return sorted[0].name;
+    },
+    getPlayerScore(winnerName, players) {
+      if (!players || players.length === 0) return 0;
+      const winner = players.find(p => p.name === winnerName);
+      return winner ? winner.score : 0;
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.game-layout {
+  display: grid;
+  grid-template-rows: 60vh 5vh 50vh 30vh; 
+  height: 160vh;
+  position: relative;
+  overflow: hidden;
+}
+
+
+.zayne-wood {
+  background-color: #D4A574;
+  width: 100vw;
+  height: 10vh; 
+  border-bottom: solid 2vh #C89968;
+  
+  background-image: 
+    repeating-conic-gradient(
+      rgba(253, 197, 152, 0.5) 0deg,
+      transparent 69deg,
+      transparent 20deg,
+      rgba(245, 195, 155, 0.5) 15deg
+    ),
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.08) 0%,
+      transparent 30%,
+      transparent 70%,
+      rgba(0, 0, 0, 0.08) 100%
+    );
+  
+  box-shadow: 
+    0 2px 5px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.table-background {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 70vh; 
+  width: 100vw;
+  height: calc(100vh + 40px); 
+  
+  background-color: rgb(252, 244, 208);
+  
+  background-image: 
+    linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+  border-bottom: 40px solid rgb(192, 160, 101);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.state-section, 
+.grid-section {
+  display: flex;
+  align-items: center;
+  z-index: 2; 
+}
+
+.hand-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; 
+  z-index: 2; 
+  margin: 0;
+  width: 100%;
+  padding: 25px 0 15px 0;
+  overflow: visible;
+}
+
+
+@media screen and (max-width: 576px) {
+  .hand-section {
+    align-items: center;
+    padding: 15px 0;
+  }
+}
+
+</style>

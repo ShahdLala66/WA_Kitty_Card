@@ -1,32 +1,23 @@
-# Use an official OpenJDK runtime as a parent image
 FROM eclipse-temurin:21-jdk AS builder
 
-# Install curl and Node.js (needed for Play asset pipeline)
 RUN apt-get update && apt-get install -y curl gnupg && \
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
     rm -rf /var/lib/apt/lists/*
 
-# Install SBT
 RUN curl -L -o sbt-1.9.7.deb https://repo.scala-sbt.org/scalasbt/debian/sbt-1.9.7.deb && \
     dpkg -i sbt-1.9.7.deb && \
     rm sbt-1.9.7.deb
 
-# Set the working directory
 WORKDIR /app
 
-# Copy the project files
 COPY build.sbt ./ 
 COPY project/ ./project/
 COPY se_kitty_card/ ./se_kitty_card/
 COPY wa_kitty_card/ ./wa_kitty_card/
 
-# Compile and stage the application
 RUN sbt -Dsbt.rootdir=true -Dfile.encoding=UTF8 wa_kitty_card/stage
 
-# ------------------------
-# Runtime stage
-# ------------------------
 FROM eclipse-temurin:21-jre
 
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*

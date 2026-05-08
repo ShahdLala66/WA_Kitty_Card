@@ -1,0 +1,44 @@
+name: Deploy to Korifi
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  deploy_to_korifi:
+    runs-on: self-hosted
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 #
+      
+      - name: Install CF CLI
+        run: |
+          curl -fsSL https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo gpg --dearmor -o /usr/share/keyrings/cloudfoundry-cli.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloudfoundry-cli.gpg] https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+          sudo apt-get update
+          sudo apt-get install -y cf8-cli gettext-base
+      
+      - name: Setup kubectl config
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECTL_CONFIG }}" > ~/.kube/config 
+          chmod 600 ~/.kube/config
+      
+      - name: Setup manifest file
+        run: |
+          echo "${{ secrets.MANIFEST_YML }}" > manifest.yml
+      
+      - name: Verify CF CLI
+        run: |
+          cf --version
+      
+      - name: Deploy to Cloud Foundry
+        run: |
+          cf api api.sharina.tech --skip-ssl-validation
+          cf login -u default
+          cf target -o shahd -s dev
+          envsubst < manifest.yml > manifest_processed.yaml
+          echo "Starting deployment..."
+          cf push -f manifest_processed.yaml > /tmp/deploy.log 2>&1 && echo "Deployment successful" || (echo "Deployment failed" && tail -20 /tmp/deploy.log && exit 1)
+

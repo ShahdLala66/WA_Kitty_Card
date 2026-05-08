@@ -1,33 +1,25 @@
-# Git
 .git/
 .gitignore
 
-# SBT
 target/
 .bsp/
 .metals/
 
-# IDE
 .vscode/
 .idea/
 
-# Logs
 logs/
 *.log
 
-# OS
 .DS_Store
 Thumbs.db
 
-# Temporary files
 *.tmp
 *.temp
 *~
 
-# Docker
 Dockerfile
 .dockerignore
 
-# Cloud Foundry
 manifest.yml
 .cfignore

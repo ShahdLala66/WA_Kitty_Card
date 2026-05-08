@@ -30,7 +30,8 @@ lazy val wa_kitty_card = project.in(file("wa_kitty_card"))
   .dependsOn(se_kitty_card % "compile->compile;test->test")
   .settings(
     commonSettings,
-    libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.2" % Test
+    libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.2" % Test,
+    libraryDependencies += "com.google.firebase" % "firebase-admin" % "9.2.0"
   )
 
 lazy val root = (project in file("."))
